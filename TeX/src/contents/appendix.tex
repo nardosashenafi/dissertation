@@ -1,0 +1,49 @@
+\chapter*{Appendix}
+\appendix
+\label{ch:appendix}
+
+\section*{Expectation of the performance index}
+\label{sec:app_expectation}
+
+\begin{proof}[Proof of Lemma~\ref{lem:1}]
+%
+Substituting the solution~\eqref{eq:sol-sde} of the
+SDE~\eqref{eq:first-order-SDE} expression into the performance
+measure~\eqref{eq:perfind} yields
+%
+\begin{align*} \mc{J} =
+        & -\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 +
+        e^{2T(p+\theta)}\right) + 
+        (q+r\theta^2)\theta\sigma \int_0^T
+        e^{(p+\theta)t} \int_0^t e^{(p+\theta)(t-s)}dW_s
+        dt \; + \\ & \hspace{0.5cm}\frac{1}{2}(q+r\theta^2)\theta^2
+        \sigma^2 \int_0^T \left( \int_0^t
+        e^{(p+\theta)(t-s)} dW_s  \right)^2 dt 
+\end{align*}
+%
+The conditional expectation of this quantity given the system parameter $p$
+under the distribution induced by the Wiener process may be computed in
+closed-form using It\^{o} calculus:
+%
+\begin{align*} 
+\mathbb{E}_W\left[\mc{J} \mid p \right]
+        &= -\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 -
+        e^{2T(p+\theta)}\right) +
+        (q+r\theta^2)\theta\sigma\int_0^Te^{(p+\theta)t}\cancelto{0}{\mathbb{E}_W\left[\int_0^t
+        e^{(p+\theta)(t-s)} dW_s~\Big\rvert p\right]} dt + \\
+        & \hspace{0.5cm} \frac{1}{2}(q+r\theta)^2\theta^2\sigma^2\int_0^T\mathbb{E}_W\left[\left(\int_0^t
+        e^{(p+\theta)(t-s)} dW_s \right)^2~\bigg\rvert p\right] dt \\
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 -
+        e^{2T(p+\theta)}\right) + 
+        \frac{1}{2}(q+r\theta^2)\theta^2\sigma^2\int_0^T\left(\int_0^t
+        e^{2(p+\theta)(t-s)} ds \right) dt \\ 
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 - e^{2T(p+\theta)}\right) + 
+        \frac{1}{2}(q+r\theta^2)\theta^2\sigma^2\int_0^T
+        -\frac{1}{2(p+\theta)}\left(1 - e^{2T(p+\theta)}\right) dt \\ 
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta} \left[ \theta^2 \sigma^2 T +
+        \left(1 - e^{2T(p+\theta)}\right) \left(1 +
+        \frac{1}{2}\frac{\theta^2\sigma^2}{p+\theta}\right)\right].  
+\end{align*}
+%
+\end{proof}
+

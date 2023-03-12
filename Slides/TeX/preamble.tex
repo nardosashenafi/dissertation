@@ -1,0 +1,97 @@
+\usepackage[export]{adjustbox}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{booktabs}               % Allows the use of \toprule, \midrule and \bottomrule in tables for horizontal lines
+\usepackage{breqn}
+\usepackage{caption}
+\usepackage{comment}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{graphics}               % for pdf, bitmapped graphics files
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{mathtools} 
+\usepackage{media9}                 % YouTube video playback
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{nicefrac}
+\usepackage[square,numbers,comma,sort&compress]{natbib}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{todonotes}
+\usepackage{url}
+\usepackage{wrapfig}
+\usetikzlibrary{positioning}
+\tikzset{>=stealth}
+% https://tex.stackexchange.com/a/402466/121799
+\newcommand{\tikzmark}[3][]{
+\ifmmode
+\tikz[remember picture,baseline=(#2.base)] \node [inner sep=0pt,#1](#2) {$#3$};
+\else
+\tikz[remember picture,baseline=(#2.base)] \node [inner sep=0pt,#1](#2) {#3};
+\fi
+}
+
+\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\ubar}[1]{\text{\b{$#1$}}}
+\newcommand{\norm}[2]{\|{#1}\|_{{}_{#2}}}
+\newcommand{\abs}[1]{\left|{#1}\right|}
+\newcommand{\mbf}[1]{\mathbf{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+\newcommand{\dd}{\operatorname{d}\!}
+\newcommand{\muc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand*\Eval[3]{\left.#1\right\rvert_{#2}^{#3}}
+\newcommand{\inner}[1]{\left\langle#1\right\rangle}
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pdd}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\vectornorm}[1]{\left|\left|#1\right|\right|}
+\newcommand{\dom}[1]{\textrm{dom}\;#1}
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+\newcommand{\idapbc}{\textsc{IdaPbc}}
+
+% Corrects over dot position for compiling metropolis theme w/ lualatex
+\let\mydot\dot
+\renewcommand\dot[1]{\mydot{#1}}
+\renewcommand{\footnotesize}{\tiny}
+\addtolength{\footnotesep}{1mm} 
+\renewcommand{\footnoterule}{%
+  \kern 1.0pt
+  \hrule width 0.2\textwidth height 0.2pt
+  \kern 0.1pt
+}
+
+\newtheorem{defn}{Definition}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{rem}{Remark}
+
+\usepackage{hyperref}
+\hypersetup{
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={Robust Control of Dynamical Systems via Neural Bayesian Learning},    % title
+    pdfauthor={Nardos Ayele Ashenafi},     % author
+    % pdfsubject={Subject},   % subject of the document
+    % pdfcreator={Creator},   % creator of the document
+    % pdfproducer={Producer}, % producer of the document
+    % pdfkeywords={keyword1, key2, key3}, % list of keywords
+    pdfnewwindow=true,      % links in new PDF window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=magenta,          % color of internal links (change box color with linkbordercolor)
+    linkbordercolor=orange,
+    citecolor=blue,        % color of links to bibliography
+    citebordercolor=green,
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan,           % color of external links
+    urlbordercolor=blue,
+}

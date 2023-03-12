@@ -1,0 +1,121 @@
+% Graduate thesis BSU Format
+% Kasper van Wijk (original author)
+% Dylan Mikesell (current maintainer)
+% \immediate\write18{makeindex -s nomencl.ist -o "\jobname.nls" "\jobname.nlo"}
+
+% if you don't want two-sided printing, erase the twoside option
+% from the following line:
+\documentclass[12pt]{report}
+
+% custom file for BSU style by KvW, 2006:
+\usepackage{BSUthesis}
+% \usepackage{acro}
+% probably a good idea for the nomenclature entries:
+% \acsetup{first-style=short}
+\input{preamble.tex}
+
+\newcommand\inputfile[1]{%
+    \InputIfFileExists{#1}{}{\typeout{No file #1.}}%
+} % this command keep latexmk from erroring when \input is missing
+
+% For abbreviations
+\makeglossaries
+\loadglsentries{contents/abbreviations}
+% For symbols and nomenclature 
+\makenomenclature
+\input{contents/nomenclature}
+
+\begin{document}
+
+%------------------------------------------------------------------------------
+% bunch of fields to enter:
+%------------------------------------------------------------------------------
+\author{Nardos Ayele Ashenafi}
+%------------------------------------------------------------------------------
+\degree{Doctor of Philosophy}
+% \degreetype{Doctor of Philosophy}
+%------------------------------------------------------------------------------
+\discipline{Electrical and Computer Engineering}
+%------------------------------------------------------------------------------
+\title{Robust Control of Contact-Rich Robots via Neural Bayesian Inference} % use correct capitalization
+%------------------------------------------------------------------------------
+\advisor{Aykut C Satici}{Ph.D.}
+\committeeMemberA{John Chiasson}{Ph.D.}
+\committeeMemberB{Kurtis Cantley}{Ph.D.}
+\committeeMemberC{Hao Chen}{Ph.D.}
+%------------------------------------------------------------------------------
+\dean{Scott Lowe}{Dean of the Graduate College}
+%------------------------------------------------------------------------------
+% insert month and year of your thesis, only:
+\date{May 2023}
+\oralexamdate{2 May 2023}
+%------------------------------------------------------------------------------
+% optional external member: 
+% \extmember{Dr. Jane Doe}{Doctor of Experimental Philosophy}{University of Chicago}
+%------------------------------------------------------------------------------
+\maketitle
+%------------------------------------------------------------------------------
+\makecopyright
+%------------------------------------------------------------------------------
+% \submittalsheet
+%------------------------------------------------------------------------------
+\setcounter{page}{4}
+%------------------------------------------------------------------------------
+\input contents/abstract
+%------------------------------------------------------------------------------
+% \cleardoublepage
+\tableofcontents
+%------------------------------------------------------------------------------
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of figures} 
+\listoffigures
+%------------------------------------------------------------------------------
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of tables} 
+\listoftables
+%------------------------------------------------------------------------------
+% print abbreviations
+% \printglossary[title={List of abbreviations},type=\acronymtype]
+%------------------------------------------------------------------------------
+% print symbols
+% \cleardoublepage% or \clearpage
+% \addcontentsline{toc}{chapter}{List of symbols} 
+% \renewcommand{\nomname}{List of symbols}
+% \markboth{\nomname}{\nomname}% maybe with \MakeUppercase
+% \printnomenclature
+
+
+ % \printnomenclature
+
+%------------------------------------------------------------------------------
+% start of main text (reset pagenumbers, etc.):
+%------------------------------------------------------------------------------
+\begintext
+
+\input contents/background
+\chapter{Switching Control with Deep-Net Mixture of Experts}
+\input contents/moe/introduction
+\input contents/moe/methods
+\input contents/moe/results
+\input contents/moe/conclusion
+\chapter{Uncertainty Handling via Neural Bayesian Inference}
+\input contents/bl/introduction
+\input contents/bl/justification
+\input contents/bl/methods
+\input contents/bl/results
+\input contents/bl/conclusion
+\input contents/futurework
+%------------------------------------------------------------------------------
+% bibliography:
+% \cleardoublepage
+\addcontentsline{toc}{chapter}{References} 
+\bibliographystyle{IEEEtran}
+\bibliography{references/proposal}
+
+%------------------------------------------------------------------------------
+% \cleardoublepage
+\addcontentsline{toc}{chapter}{Appendices}
+\appendix
+\input contents/appendix
+%------------------------------------------------------------------------------
+\end{document}

@@ -1,0 +1,98 @@
+%------------------------------------------------
+%	PACKAGES AND THEMES
+%------------------------------------------------
+\documentclass{beamer}
+\geometry{paperwidth=170.66mm, paperheight=96mm}
+\setbeamercolor{footline}{fg=black}
+\mode<presentation>{
+    % \usetheme[
+    %     block=fill,
+    %     % sectionpage=progressbar,
+    %     % titleformat=allcaps,
+    %     numbering=none,
+    %     progressbar=foot,
+    % ]{metropolis}
+    \useoutertheme[numbering=none, progressbar=foot]{metropolis}
+    \useinnertheme[sectionpage=none]{metropolis}
+    \usefonttheme[titleformat title=allsmallcaps]{metropolis}
+    \usecolortheme[block=fill]{metropolis}
+    \insertsectionhead
+    % \usecolortheme{seahorse}
+    % \usecolortheme{crane}
+    \usecolortheme[snowy]{owl}
+    % \usefonttheme[onlymath]{serif}
+    % \setbeamercolor{normal text}{bg=white}
+    \setbeamertemplate{navigation symbols}{
+        \usebeamerfont{footline}
+        \usebeamercolor[fg]{footline}
+        \vspace{-0.5cm}
+        \insertframenumber/\inserttotalframenumber
+    }
+}
+% \setbeameroption{show notes on second screen=right}
+% \setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
+\setbeamercolor*{block title}{bg=normal text.bg!90!normal text.fg}
+\setbeamercolor{block body}{bg=normal text.bg!95!normal text.fg}
+\setbeamersize{text margin left=1em,text margin right=1em} 
+% \setbeamercovered{invisible}
+% \setbeamercovered{%
+%   again covered={\opaqueness<1->{15}}}
+% \input{embed_video.tex}
+\input{preamble.tex}
+\input{utils/neuralnet-tikz.tex}
+
+%------------------------------------------------
+%   TITLE PAGE
+%------------------------------------------------
+\title{%
+Robust Control of Dynamical Systems via Neural Bayesian Learning
+}
+\subtitle{\footnotesize Dissertation Proposal}
+\author{
+    Presenter : Nardos Ayele Ashenafi \\
+    Advisor : Dr. Aykut Satici
+}
+\institute{
+    Electrical and Computer Engineering Department\\%
+    Boise State University, Boise, ID 83725 USA 
+}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain,noframenumbering]
+\titlepage
+\end{frame}
+
+%------------------------------------------------
+%	PRESENTATION SLIDES
+%------------------------------------------------
+% \begin{frame}[plain, noframenumbering]
+%     \frametitle{Outline}
+%     \tableofcontents
+%     % \tableofcontents[hideallsubsections]
+% \end{frame}
+
+
+\input{contents/introduction.tex}
+\input{contents/background.tex}
+\input{contents/methods.tex}
+\input{contents/results.tex}
+\input{contents/future_work.tex}
+\input{contents/appendix.tex}
+
+%------------------------------------------------
+%   The Bibliography
+%------------------------------------------------
+% \begin{frame}
+%     \frametitle{References}
+%     \bibliographystyle{abbrvnat}
+%     \bibliography{wankun_thesis}
+% \end{frame}
+
+%------------------------------------------------
+%   The End
+%------------------------------------------------
+\begin{frame}[plain,standout,noframenumbering]\end{frame}
+
+\end{document}

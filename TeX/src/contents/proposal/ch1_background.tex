@@ -1,0 +1,165 @@
+\chapter{Background}
+\label{ch:background}
+
+Deterministic data-drive techniques, such as \textsc{NeuralPbc}~\cite{neuralpbc}
+and \textsc{Neural-IdaPbc} \cite{neuralidapbc}, require an accurate model to
+learn a viable control law. Uncertainties in system parameters and measurement
+error may lead to instabilities in the real system. One way of addressing this
+issue is to leverage the uncertainty-handling capabilities of Bayesian learning
+techniques. In the following section, we provide a brief background on Bayesian
+learning.
+%
+
+\section{Bayesian Learning}
+
+
+The objective of Bayesian learning is to determine a stochastic model (target
+function) that best fits observed data $\mathcal{D}$ with inherent noise. Let
+this stochastic target function be represented by $F(x; \theta) : \mathcal{X}
+\rightarrow \mathbb{R}^t$, where $\theta \in \Theta \subset \mathcal{R}^v$ is a
+multivariate random variable that parameterizes the model. Given prior belief on
+the distribution of the parameters $p(\theta)$, Bayesian learning finds a
+posterior distribution $p(\theta \mid \mathcal{D})$ over $\theta$ that maximizes
+the likelihood of the target function generating the dataset
+$\mathcal{D}$~\cite{bishop2006pattern}. This can be expressed in terms of Bayes'
+theorem as 
+\begin{align}
+  p(\theta | \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}
+  = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{\int_\theta p(\mathcal{D} \mid \theta') p(\theta') d\theta'},
+\end{align}
+where $p(\mathcal{D} \mid \theta)$ is the likelihood function and
+$p(\mathcal{D})$ is the evidence. While the likelihood and prior distribution
+can be expressed explicitly, the evidence is intractable. This calls for
+techniques that approximate or find the exact posterior distribution, some of
+which are discussed in the following section.
+
+\subsubsection{Posterior Distribution}
+
+Bayesian learning provides various techniques to infer the posterior distribution
+over the parameters $\theta$. Two of the most famous techniques are discussed as follows.
+\begin{enumerate}
+  \item Markov Chain Monte Carlo (MCMC) methods: learn the exact posterior
+  distribution by collecting samples of $\theta$ either through random walk
+  (e.g. Metropolis-Hastings) or following the gradient of the likelihood (e.g.
+  Hamiltonian Monte Carlo). Metropolis-Hastings methods collect samples of
+  $\theta$ from a conditional probability distribution until the samples
+  converge to an equilibrium distribution per the properties of irreducible and
+  aperiodic Markov chains~\cite{gilks1995markov}. Hamiltonian Monte Carlo (HMC)
+  method, shown in detail in Algorithm~\ref{algo:hmc}, also finds the
+  equilibrium distribution of the Markov chain, but unlike Metropolis-Hastings,
+  it efficiently searches the parameter space through the gradient of the
+  likelihood. In the case of HMC, the Markov chain is generated from two
+  first-order differential equations shown in lines 5-7 of
+  Algorithm~\ref{algo:hmc}. While HMC method learns the exact posterior
+  distribution, it has slow convergence properties for high-dimensional
+  parameters. In such cases, techniques such as variational inference compromise
+  accuracy of the posterior distribution for speed of convergence.
+  
+%   \begin{algorithm}[H]
+%       \centering
+%       \caption{Gibb's Sampling}\label{algo:gibbs}
+%       \begin{algorithmic}[1]
+%           \State Select initial state $\theta = \{\theta_i: i = 1, \dots ,\theta_v\}$
+%           \State $\tilde{p}(\theta | \mathcal{D}) = p(\mathcal{D} | \theta) p(\theta)$ \Comment{Compute posterior upto a normalization constant}
+%           \State Select a transition probability of the Markov Chain $p(\theta_i | \theta_{\backslash i})$
+%           \For{$t = 1, \dots, T$}
+%           \State Sample $\theta_1^{t+1} \sim p(\theta_1 | \theta_2^{t}, \theta_3^{t}, \dots, \theta_v^{t})$
+%           \State Sample $\theta_2^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \theta_3^{t}, \dots, \theta_v^{t})$
+%           \State Sample $\theta_3^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \theta_2^{t+1}, \dots, \theta_v^{t})$ 
+%           \State Sample $\theta_v^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \dots, \theta_{v-1}^{t})$ 
+%           \EndFor
+%           \State \textbf{Return}  $\theta^{T}$
+%       \end{algorithmic}
+% \end{algorithm}
+\begin{algorithm}[tb]
+    \centering
+    \setstretch{1.5}
+    \caption{Hamiltonian Monte Carlo}\label{algo:hmc}
+    \begin{algorithmic}[1]
+      \State Select initial state $\theta$ and momentum $r$ from prior knowledge
+      \State Select regularization coefficient $\lambda$
+      \State Create a set $\Theta$ to collect samples of $\theta$
+      % \State Define the prior distribution with distribution parameters $\theta_0$ 
+      \State Define $p(\theta, \mathcal{D}) \propto \exp(-E(\theta, \mathcal{D}))$, \; $E(\theta, \mathcal{D}) = \sum_{d \in \mathcal{D}}\vectornorm{F(x;\theta) - d}^2 + \lambda \vectornorm{\theta}^2$
+      \For{$t = 0:\Delta t: T$}
+      \State $r(t + \Delta t/2) = r(t) - \dfrac{\Delta t}{2} \dfrac{\partial E}{\partial \theta_i}(\theta(t), \mathcal{D})$
+      \State $\theta(t + \Delta t) = \theta(t) + \Delta t \; r(t + \Delta t/2) $ 
+      \State $r(t + \Delta t) = r(t + \Delta t/2) - \dfrac{\Delta t}{2}\dfrac{\partial E}{\partial \theta_i}(\theta(t + \Delta t), \mathcal{D})$
+      \State $\nu \sim \text{Uniform}[0, 1]$
+      \If {$E(\theta(t + \Delta t), \mathcal{D}) < E(\theta(t), \mathcal{D})$}
+      \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
+      \ElsIf{$\nu < \exp( E(\theta(t), \mathcal{D}) - E(\theta(t+\Delta t), \mathcal{D})) $}
+      \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
+      \ElsIf{$\nu > \exp( E(\theta(t), \mathcal{D}) - E(\theta(t+\Delta t), \mathcal{D})) $}
+      \State Reject $\theta(t + \Delta t)$ 
+      \EndIf
+      \EndFor
+      \State \textbf{Return} $\Theta$
+    \end{algorithmic}
+\end{algorithm}
+
+%
+\item Variational Inference (VI): this technique selects a posterior
+distribution $q(\theta;z)$ from the conjugate families of the likelihood and
+prior distributions. The goal is to learn the distribution parameters $z$ that
+minimize the Kullback-Leibler divergence or equivalently maximize the evidence
+lower bound (\textsc{Elbo}). The \textsc{Elbo}, $\mathcal{L}$, is given
+by~\cite{cohen2016bayesian}
+\begin{align}
+  \begin{split}
+  \mathcal{L}(\mathcal{D},z) &= \mathbb{E}_{\theta \sim q} \left[\log(p(\theta, \mathcal{D};z)) - \log(q(\theta;z)) \right], \\
+  p(\theta, \mathcal{D};z) &= p(\mathcal{D} \mid \theta;z)p(\theta),
+  \end{split}
+  \label{eq:elbo}
+\end{align}
+where $p(\mathcal{D} \mid \theta;z)$ is the likelihood function. 
+\end{enumerate}
+\begin{rem}
+  For continuous posterior distribution, the \textsc{Elbo} given in
+  equation~\eqref{eq:elbo} is redefined using differential entropy, which
+  expresses the prior and posterior in terms of their probability density
+  functions. In this case, the likelihood $p(\theta \mid \mathcal{D};z)$ is also
+  a probability density function and the \textsc{Elbo} is not bounded by zero.
+\end{rem}
+
+The power of Bayesian learning lies in its ability to build a target function
+and make predictions that integrate over
+uncertainties~\cite{tipping2003bayesian}. These predictions can be found by
+marginalizing the model over the posterior as follows~\cite{jospin2020hands}.
+\begin{equation}
+  \hat{F}(x) = \frac{1}{N} \sum_{\theta \sim q} F(x, \theta),
+  \label{eqn:marginalization}
+\end{equation} 
+where $N$ is the number of samples drawn from the posterior. Moreover, Bayesian
+frameworks can quantify the confidence in the predictions through the variance
+of the predictive distribution, $p(F \mid x, \mathcal{D})$. The variance of
+$p(F|x, \mathcal{D})$ is given by~\cite{jospin2020hands}
+\begin{equation}
+  \Sigma_{F \mid x,\mathcal{D}} = \frac{1}{N-1} \sum_{\theta \sim q} \vectornorm{F(x,\theta) - \frac{1}{N} \sum_{\theta \sim q} F(x, \theta)}^2.
+  \label{eqn:predictive_variance}
+\end{equation}
+%
+
+\subsubsection{Bayesian Deep Learning}
+
+The Bayesian paradigm discussed so far can be adapted to incorporate the
+strengths of deep learning techniques by introducing the universal approximation
+capabilities of Bayesian neural networks (BNN) to parameterize the target
+function. In the BNN architecture, the weights and biases of the neural network
+are samples drawn from a posterior probability distribution, which is determined
+through Bayesian learning techniques~\cite{jospin2020hands}. 
+%
+There are many advantages to learning the distribution of the neural net
+parameters over point estimates; for instance, Bayesian learning can infer a
+model and characterize uncertainty of predictions with small amount of
+data~\cite{jospin2020hands}. 
+%
+Prior knowledge can be explicitly injected into the Bayesian training in the form of 
+prior distribution.
+%
+Moreover, the use of prior distribution behaves like a regularization term
+that prevents the model from overfitting to the training
+data~\cite{bishop2006pattern}. 
+%
+On the flip side, it is more complicated and computationally expensive to learn
+probability distributions than point estimates.

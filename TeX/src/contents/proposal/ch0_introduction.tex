@@ -1,0 +1,86 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+In recent years, machine learning and data-driven techniques have dominated the
+field of control design for robotic systems. 
+%
+Such techniques learn viable controllers from interactions with the real system
+or simulation.
+%
+Model-free reinforcement learning is an example of a technique that relies on
+repeated interactions with the unknown
+environment~\cite{heess2017emergence,andrychowicz2020learning,lillicrap2015continuous}.
+%
+While this technique offers more flexibility on how the control policies are
+inferred from unknown dynamics, they do not provide the physical structure
+required to infer stability properties.
+%
+Thus, data-driven techniques trained in simulation, such as neural
+passivity-based control (\textsc{NeuralPbc}~\cite{neuralpbc} and
+\textsc{Neural-Idapbc}~\cite{neuralidapbc}) offer more insight on the stability
+of the system and just as capable control strategies.
+%
+Nevertheless, training in simulation relies strongly on the
+dynamical model, and the use of inaccurate models may lead to poor performance
+or even instability.
+%
+This raises concerns regarding model uncertainties, especially in dynamical
+systems with large number of parameters~\cite{nagy,wu2020active}.
+%
+
+Bayesian learning (BL)~\cite{gal2016improving,thakur} offers an alternative method to
+simultaneously combat model uncertainties while preserving the useful physical
+structure in a data-driven framework.
+%
+A common approach is shown in~\cite{sadigh2015safe, shen2022online,
+pmlr-v54-linderman17a}, where a stochastic dynamical model is constructed via BL
+techniques, and utilized in data-driven control synthesis executed in
+simulation. 
+%
+For instance, BL is used to model uncertainties caused by disturbances, such as
+the effect of wind gusts on quadcopters and the motion of other vehicles in
+autonomous driving~\cite{sadigh2015safe}. 
+%
+% Nonlinear dynamics can be decomposed into segments of linear dynamics, and learn
+% the linear dynamical units and their transition probabilities through
+% BL~\cite{pmlr-v54-linderman17a}. 
+The authors of~\cite{shen2022online} perform Bayesian learning online to
+characterize time-varying kinematic and dynamical models of industrial robots.
+%
+Another approach to combating model uncertainties is to surpass the process of
+learning the stochastic model and instead directly learn the controller through
+BL. 
+%
+Adaptive control framework is provided in~\cite{fan2020bayesian}, where the
+search for the control is given by a quadratic program that imposes
+Lyapunov stability constraint for safety critical systems.
+%
+This technique uses BL to infer a controller through interactions with an
+unknown dynamics, while maintaining the algebraic structure of a stable system.
+%
+Inspired by this technique, we merge the structure and stability properties of
+passivity-based control (PBC) with the robustness properties of BL.  
+
+
+In this work, we present a unified framework that simultaneously combine
+deterministic data-driven techniques and rigorously address model uncertainties
+using Bayesian learning.
+%
+We aim to apply BL and develop an algorithm that finds a suitable probability
+distribution of the target function/policy automatically.
+%
+In contrast to deterministic optimization, this approach provides a probability
+distribution over the parameters of the target function instead of point
+estimates, providing a way to reason about model uncertainties and measurement
+noise during the learning process.
+%
+
+In Chapter 2, we provide a brief background on Bayesian learning; Chapter 3
+presents a theoretical justification of the robustness properties of BL in
+control design. Following the example, we present a data-driven Bayesian policy
+learning framework. The success of this technique is demonstrated in Chapter 4,
+where we compare the performance of our stochastic policy with controllers
+parameterized by point estimates. Lastly, in Chapter 5, we propose a way to
+extend our Bayesian framework to learning controllers for contact-rich systems,
+such as walking robots and grippers.
+
