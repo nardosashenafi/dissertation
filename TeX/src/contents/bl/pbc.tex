@@ -1,6 +1,169 @@
 
 \section{Bayesian Neural PBC}
 
+\subsection{Control Design for Smooth Dynamical Systems}
+In this subsection, we formulate the Bayesian learning framework that minimizes
+the effects of system parameter uncertainties and measurement errors. 
+%
+In this framework, the neural net parameterization of $H^\theta_d$ given in
+Section~\ref{sssec:ml-pbc-deterministic} is replaced by a Bayesian neural
+network whose parameters are uncorrelated random variables sampled from a
+multivariate probability distribution (MPD).
+%
+The goal is to learn the distribution parameters $z$ of the posterior MPD
+$q(\theta;z)$ that maximize the \textsc{Elbo} given in~\eqref{eq:elbo}. 
+%
+% For continuous probability distributions, ELBO is redefined in terms of
+% continuous entropy as
+% %
+% \begin{equation}
+%     \mathcal{L}(x,z) = \mathbb{E}_{\theta \sim q} \left[\log(f(x|\theta;z)q(\theta)) - \log(q(\theta)) \right],
+%     \label{eqn:cont_entropy_elbo}
+% \end{equation}
+%
+The computation of the \textsc{Elbo} requires the likelihood function and the
+prior distribution.
+%
+The likelihood function is chosen to be a Gaussian probability
+distribution of the form
+\begin{equation}
+    p(J \mid \theta) = \mathcal{N}\left(0, s \right),
+    % \text{likelihood} = \frac{1}{\sqrt{2\pi}s}\exp{\left(-\frac{1}{2} \left ( \frac{-\ell(\gamma, u)}{s}\right)^2 \right)}
+    \label{eqn:likelihood_neuralpbc}
+\end{equation}
+where $s$ is the standard deviation of the likelihood and a hyperparameter. 
+%
+With the choice of the likelihood given in \eqref{eqn:likelihood_neuralpbc},
+maximizing the \textsc{Elbo} pulls the loss $J(\theta)$ to zero.
+%
+On top of the neural net parameters $\theta$, we wish to learn the posterior
+over the standard deviation $s$ of the likelihood. 
+%
+Hence, the posterior distribution $q(\xi)$ is an MPD over the multivariate
+random variable $\xi$, where $\xi = [\theta, s]$ and $z$ is the distribution
+parameters over $\xi$.
+%
+\begin{rem}
+    For continuous posterior distribution, the \textsc{Elbo} given in
+    equation~\eqref{eq:elbo} is redefined using differential entropy, which
+    expresses the prior and posterior in terms of their probability density
+    functions (PDF). In this case, the likelihood
+    in~\eqref{eqn:likelihood_neuralpbc} is also a PDF and the \textsc{Elbo} is
+    not bounded by zero.
+\end{rem}
+
+We take two approaches to selecting the distribution parameters $z_0$ of the
+prior. The simplest approach is to use an uninformed prior with randomly
+initialized $z_0$ to start the optimization problem; this choice encourages
+exploration but has slow convergence properties. The second approach uses an
+informed prior that warm-starts the Bayesian training around the solution of the
+deterministic training. To do so, $z_0$ is selected such that the prior
+distribution is centered around the parameters learned from the deterministic
+technique discussed in Section~\ref{sssec:ml-pbc-deterministic}.
+
+
+System parameter uncertainties and measurement noise can deteriorate the
+performance of controllers when employed on real systems. 
+%
+Hence, in the Bayesian framework, we inject these uncertainties directly into
+the training loop in order to learn a controller that works for a wide range of
+system parameters and measurement noise.
+%
+We model system parameter uncertainties by sampling a set of system parameters
+$\zeta$ from a normal distribution $\mathcal{N}(\zeta_0, \sigma_{\zeta})$
+centered around a nominal parameter $\zeta_0$.
+%
+Each time we generate a new trajectory starting from the initial states drawn
+from the replay buffer $\mathcal{D}$, we draw a new sample of $\zeta$.
+%
+
+
+Additionally, we model measurement error by injecting noise into the prediction
+$\gamma$.
+%
+This is achieved by replacing the dynamical constraint given
+in~\eqref{eq:neural_pbc_finite_optim} with the following stochastic differential
+equation (SDE).
+\begin{align}
+    \dd x &= \left(\bmat{\phantom{-}\nabla_p H \\-\nabla_q H} + \bmat{0 \\ G(q)}u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, 
+    \label{eq:sde_initial}
+\end{align}
+where $\dd W_t$ is a correlated noise process, such as Wiener process, on the
+states due to measurement uncertainties, and $\nabla_x u(x)$ is the coefficient
+of the first-order Taylor approximation of $u^{\theta}(x)$ around zero noise. 
+  
+\begin{rem}
+    Introducing uncertainties to the deterministic training finds a point
+    estimate of the optimal controller parameter, which may be interpreted
+    as the mean of the optimal posterior distribution that Bayesian learning
+    provides. A point estimate of the learned parameters is prone to be
+    biased (for example, if the uncertainty in system parameters is large,
+    the optimal parameter $\theta$ for the true system parameter may be
+    quite far from the deterministic solution). This bias-variance trade-off
+    problem is alleviated by Bayesian inference which allows one to
+    marginalize over the posterior parameter
+    distribution~\cite{bishop2006pattern}.
+\end{rem}  
+
+
+%
+This Bayesian framework extends the deterministic training process discussed in
+Section~\ref{sssec:ml-pbc-deterministic}, by replacing lines 7 to 10 of
+Algorithm~\ref{algo:neuralpbc} with Algorithm~\ref{algo:neural_bayes_pbc}.
+%
+% Similar to the deterministic training, the SGD update shown in line 8 of
+% Algorithm~\ref{algo:neural_bayes_pbc} can be replaced by more refined variants
+% such as \textsc{ADAM}, \textsc{ADAGrad}~\cite{lydia2019adagrad}, etc. 
+%
+% The computation of the gradient ${\partial \mathcal{L}}/{\partial z}$ comes with
+% two complications. First, the gradient requires differentiating the
+% \textsc{Elbo} through the solution $\phi(t;x_0;u^\theta)$ of an ODE. We address
+% this issue by using the adjoint method briefly discussed in
+% Section~\ref{sssec:ml-pbc-deterministic}. 
+%
+Similar to the deterministic training, we use the adjoint method to compute the
+gradient ${\partial \mathcal{L}}/{\partial z}$ through the solution of the SDE
+given in~\eqref{eq:sde_initial}.
+%
+Moreover, we invoke the reparameterization trick of the Automatic
+Differentiation Variational
+Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic} to compute the gradient
+of samples $\theta$ with respect to the distribution parameters $z$.
+%
+% Second, computing ${\partial \mathcal{L}}/{\partial z}$ requires the derivative
+% of the sample $\xi$ with respect to the distribution parameters $z$, which is
+% intractable. We handle this complication by invoking the reparameterization
+% trick of the Automatic Differentiation Variational
+% Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic}.
+
+
+
+\begin{algorithm}
+    \caption{Bayesian Learning}\label{algo:neural_bayes_pbc}
+    \small
+    \begin{algorithmic}[1]
+        % \algrenewcommand\algorithmicindent{0em} % No indent
+        % \State Select inform or uninformed prior $z$
+        \State $f \,\gets f(H,G)$ dynamics given by SDE~\eqref{eq:sde_initial} with $u = u^\theta$
+        \For{each $x_0 \in$ \texttt{batch}}
+        \State Initialize $\mathcal{L} = 0$
+        % \algrenewcommand\algorithmicindent{1.5em} % Change indent back to default
+        \For{i=1:N}
+            \State $\theta, s \sim q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
+            \State $\zeta \sim \mathcal{N}(\zeta_0,\sigma_{\zeta})$ \Comment{Sample system parameters}
+            \State $\gamma \gets$ integrate $f$ from $x_0$ 
+            \State $p(J, \theta) = \frac{1}{s\sqrt{2\pi}}\exp{\left(-\frac{1}{2} \left ( \frac{J(\theta)}{s}\right)^2 \right)} p(\theta)$
+            \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N}\left (\log[p(\ell, \theta)] - \log[q(\theta;z)]\right)$
+        \EndFor
+        \EndFor
+        \State $z \gets z + \alpha_i \left({\partial \mathcal{L}}/{\partial z}\right)$
+    \end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \subsection{Simple Pendulum}
 
 The equation of motion of a simple pendulum with measurement noise is given by
@@ -392,5 +555,426 @@ nonlinear control problems while simultaneously incorporating prior knowledge
 and model uncertainties.
 %
   
-\subsection{Rimless Wheel}
 
+\subsection{Control Design for Hybrid Dynamical Systems}
+
+\subsubsection{Deterministic \textsc{NeuralPbc}}
+\label{sssec:data_driven_neuralpbc}
+
+In this framework, we aim to find a passive closed loop system for the hybrid
+dynamics~\eqref{eq:hybrid_dynamics} whose desired stable equilibrium is at
+$(q^*, \dot{q}^*)$.
+%
+We formulate this problem as a search over the point-estimate parameters of
+$H_d$ given by a neural network.
+%
+This training framework can be posed as the following optimization problem. 
+\begin{equation}
+    \begin{aligned}
+        \underset{\theta}{\textrm{minimize}} 
+        & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\%
+        \textrm{subject to}
+        & & M(q) &\dd \dot{q} + h(q, \dot{q}, \theta)\dd t - \dd R  = 0,\\%
+        & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H),%
+    \end{aligned}
+    \label{eq:hybrid_neuralpbc}
+\end{equation}
+%
+The performance objective $\ell$ is evaluated from closed loop trajectories
+generated from various initial states.
+%
+We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outline
+in Algorithm~\eqref{algo:moreau} to resolve the complementarity constraint
+in~\eqref{eq:complementarity} and numerically integrate the measure differential
+equations~\eqref{eq:dynamics}.
+%
+
+We intend to find a solution to the optimization problem
+in~\eqref{eq:hybrid_dynamics} for all initial states $(q_0, \dot{q}_0)$ in the
+state space.
+%
+To efficiently sample the initial states, we use a combination of greedy and
+explorative state sampling techniques.
+%
+The greedy state sampling, commonly known as \textsc{DAgger}~\cite{ross2011no},
+generates trajectories using the current $H_d$ parameters and collects $N_d$
+samples from the visited states. 
+%
+This allows the training to refine the controller on the states it visits the
+most.
+%
+We recover from locally optimal solutions through explorative state sampling,
+which takes $N_r$ number of random samples from the state space.
+%
+In a single batch training, we compute the performance objective as an expectation
+over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
+\begin{align*}
+    J(\theta) = \mathbb{E}_{q_0, \dot{q}_0 \sim \mathcal{D}_N}[ \ell(\phi(t; q_0, \dot{q}_0), u^\theta)]
+\end{align*}
+\noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
+
+
+As outlined in Algorithm~\ref{algo:deter_neuralpbc}, we compose the cost
+$\ell$ from the $N_{\mathcal{D}}$ closed loop trajectories and update the
+parameters $\theta$ through stochastic gradient descent (SGD). 
+%
+We compute the gradient $\nicefrac{\partial \ell}{\partial \theta}$ through
+auto-differentiation techniques.
+%
+
+\begin{algorithm}
+  \setstretch{1.2}
+    \caption{Solution to the Optimization Problem~\eqref{eq:hybrid_neuralpbc}}
+    \label{algo:deter_neuralpbc}
+    \small
+    \begin{algorithmic}[1]
+        \algrenewcommand\algorithmicindent{0em} % No indent
+        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
+        \While{$i < $ \texttt{maximum iteration}}
+        \State $J \gets 0$\Comment{Batch loss}
+        \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
+            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+            \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ \Comment{Batch loss}
+        \EndFor
+        \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
+        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $i \;\:\gets i + 1$
+        \EndWhile
+        \State \textbf{return} $\theta$
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Bayesian \textsc{NeuralPbc}}
+\label{sssec:bayesian_inference}
+
+Walking machines such as the rimless wheel are bound to experience undetermined
+external forces from uneven terrain.
+%
+If the robot does not respond to these external disturbances in real-time, they
+can cause underperformance or even instability.
+%
+In order to learn a controller robust against these uncertainties, we inject
+domain randomization on the state of the environment during the training
+process.
+%
+Unfortunately, simply introducing random environmental conditions to the
+training outlined in Algorithm~\ref{algo:deter_neuralpbc} is not sufficient. 
+%
+In the presence of high variance disturbances, the point-estimate parameters
+$\theta$ under domain randomization are prone to be
+biased~\cite{ashenafi2022robustness};
+%
+for instance, if the uncertainty in the terrain elevation is large, the learned
+parameters $\theta$ may be far from the optimal controller corresponding to
+the true elevation.
+%
+To combat this issue, we propose a probabilistic framework, where we learn a
+posterior probability distribution over the parameters $\theta$ via Bayesian
+inference. 
+%
+Then we address the bias-variance trade-off problem by marginalizing the
+controller over the distribution of the parameters~\cite{bishop2006pattern}.
+
+In the probabilistic framework, we parameterize the desired Hamiltonian $H_d$
+with a Bayesian neural network, whose weights and biases are samples drawn from
+a posterior probability distribution~\cite{jospin2020hands}.
+%
+The objective is to find the posterior distribution $P(\theta |J)$ that achieves
+the performance objective for various environmental conditions.
+%
+This framework can be summarized by the following optimization problem.
+
+\begin{equation}
+    \begin{aligned}
+        \underset{P(\theta)}{\textrm{minimize}} 
+        & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\
+        \textrm{subject to}
+        & & M(q) &\dd \dot{q} + h(q, \dot{q}, \theta)\dd t - \dd R  = 0,\\
+        & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
+        & & p_s &\sim \mathcal{U}(p_{min}, p_{max}), \\
+        & & \theta &\sim P(\theta).
+    \end{aligned}
+    \label{eq:bayesian_hybrid_neuralpbc}
+\end{equation}
+\noindent The random variable $p_s \in \mathbb{R}^{N}$ is sampled from $N$
+uncorrelated uniform probability distributions $\mathcal{U} \sim [p_{min}, p_{max}]$
+with lower bound $p_{min}$ and upper bound $p_{max}$.
+%
+The magnitude of the samples $p_s$ determine the elevation of the terrain under
+each spoke, which consequently randomize the gap $g_N$, pre-impact velocities
+$\dot{q}^{-}$ and contact forces between each spoke and the ground.
+
+From Bayes' theorem, the posterior distribution $P(\theta |J)$ is a function of
+the prior distribution $P(\theta)$ and the likelihood function $P(J |
+\theta)$~\cite{bishop2006pattern}.
+\begin{align}
+  P(\theta | J) = \frac{P(J | \theta) P(\theta)}{\int P(J | \theta) P(\theta) \; d \theta}
+  \label{eq:bayes}
+\end{align} 
+The prior can be used to inject any former knowledge about the controller. 
+%
+For instance, an informed prior can be a normal distribution whose mean is the
+solution to the optimization problem in~\eqref{eq:hybrid_neuralpbc}. If there is
+no prior information, $P(\theta)$ can be set as a uniform distribution.
+%
+The likelihood function consists of the expected performance $J$ in the following form:
+\begin{align}
+  P(J|\theta) = \mathcal{N}(0, s),
+  \label{eq:likelihood}
+\end{align}
+\noindent where $s$ is the standard deviation of the likelihood.
+%
+
+
+There are various techniques to find the exact posterior
+distribution~\cite{bishop2006pattern}, but they have weak scalability
+for high-dimensional systems. Thus, we use variational inference, a technique
+that approximates the posterior with the distribution $Q(\theta;z)$ selected
+from the conjugate family of the prior~\cite{cohen2016bayesian}. 
+%
+The goal is to learn the distribution parameters $z$ of the chosen posterior.
+%
+The performance objective that minimizes the loss $J$ while also matching the 
+approximate posterior $Q$ to the exact one is
+\begin{align}
+  \mathcal{L}(J, z) = \mathbb{E}_{\theta \sim Q}[ \log{(P(J | \theta) P(\theta))} - \log{(Q(\theta;z))}]
+  \label{eq:elbo}
+\end{align}
+\noindent where $\mathcal{L}(J, z)$ is the evidence lower bound (\textsc{Elbo})~\cite{tipping2003bayesian}.
+%
+
+As outline in Algorithm~\eqref{algo:bayes_neuralpbc}, we update the distribution
+parameters of the posterior $Q(\theta;z)$ through stochastic gradient descent. 
+%
+We use auto-differentiation techniques to take the gradient of the \textsc{Elbo}
+with respect to $z$.
+%
+We invoke the reparameterization trick of the Automatic Differentiation
+Variational Inference (ADVI)~\cite{kucukelbir2015automatic} to compute the
+gradient of~\eqref{eq:elbo} through the samples drawn from the posterior.
+
+\begin{algorithm}
+  \setstretch{1.2}
+    \caption{Solution to the Optimization Problem~\eqref{eq:bayesian_hybrid_neuralpbc}}
+    \label{algo:bayes_neuralpbc}
+    \small
+    \begin{algorithmic}[1]
+        \algrenewcommand\algorithmicindent{0em} % No indent
+        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
+        \While{$i < $ \texttt{maximum iteration}}
+        \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
+        \For{$i=1:Q_N$} \Comment{Samples to compute~\eqref{eq:elbo}}
+        \State $J \gets 0$ \Comment{Batch loss}
+        \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
+          \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
+            \State $p_s \sim \mathcal{U}(p_{min}, p_{max})$
+            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+            \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
+          \EndFor
+        \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{Q_N} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
+        \EndFor
+        \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
+        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $i \;\:\gets i + 1$
+        \EndWhile
+        \State \textbf{return} $z$
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Rimless Wheel}
+\label{sssec:model}
+
+This mechanism consists of a rimless wheel in the plane with a set of $N$ spokes
+and a torso freely rotating about a pin joint located at the center of the
+wheel.
+% 
+The mass of the wheel $m_1$ is concentrated at the hip and spans a radius of
+$l_1$.
+%
+The torso has its mass $m_2$ concentrated at a distance of $l_2$ from the hip. 
+%
+We actuate the torso angle with the motor mounted at the hip, which in turn
+propels the entire wheel. 
+%
+The angle of the torso is characterized by $\varphi$ measured from the outward
+normal of the runway shown as $\hat{n}$ in Figure~\ref{fig:rimless_wheel_w_torso}.  
+%
+The orientation of the wheel $\beta$ is measured from $\hat{n}$ to a datum spoke.
+%
+
+\begin{figure}[b]
+ \centering
+ \includegraphics[width=0.75\columnwidth]{./figures/rimless_wheel_with_torso_v3.eps}
+ \caption{Rimless wheel with torso depicted with $N=10$ spokes.}
+ \label{fig:rimless_wheel_w_torso}
+\end{figure}
+
+% \subsubsection{Equations of motion}
+Rimless wheel is a system that undergoes phases of continuous flows and discrete
+transitions, resulting in a hybrid dynamical system with two modes. We construct
+a dynamical model for such system with the Lagrangian approach. The kinetic and
+potential energies of the system are given by
+
+\begin{equation*}
+  \begin{gathered}
+    \mathcal{K} = \frac{1}{2} m_t(\dot{x} + \dot{y})^2  +  \frac{1}{2} I_1 \dot{\beta}^2  + 
+                    \frac{1}{2} (m_2 l_2^2 + I_2) \dot{\varphi}^2 + m_2 l_2(c_{\varphi} \dot{x} + s_{\varphi} \dot{y}) \dot{\varphi} \\
+    \mathcal{P} = m_tg(-x s_{\gamma} + y c_\gamma) - m_2 g l_2 c_{\varphi \gamma}
+  \end{gathered}
+\end{equation*}
+
+\noindent where $c_a := \cos{(a)}, s_a := \sin{(a)}, c_{ab} := \cos{(a - b)},
+s_{ab} := \sin{(a - b)}$. The total mass of the mechanism is given by $m_t$;
+$I_1$ and $I_2$ are moments of inertia of the wheel and torso respectively. The
+position vector $(x, y)$ represents the location of the hip with respect to the
+frame $\Sigma_1$ shown in Figure~\ref{fig:rimless_wheel_w_torso}. The slope of
+the runway is given by $\gamma$, $g$ is the magnitude of acceleration due to
+gravity.
+%
+The Euler-Lagrange equations corresponding to the Lagrangian $\mathcal{L} =
+\mathcal{K} - \mathcal{P}$ are
+
+\begin{equation}
+  M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0,
+  \label{eq:dynamics}
+\end{equation}
+
+\begin{equation*}
+  \begin{gathered}
+    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}),\\
+    M(q) = \bmat{m_t & 0 & m_2 l_2 c_{\varphi} & 0 \\ 0 & m_t & m_2 l_2 s_{\varphi} & 0 \\
+            m_2 l_2 c_{\varphi} & m_2 l_2 s_{\varphi} & I_2+m_2 l_2^2 & 0 \\
+            0 & 0 & 0 & I_1}, \\
+    C(q,\dot{q}) = m_2l_2 \bmat{0 & 0 & -s_{\varphi} \dot{\varphi} & 0\\ 
+                    0 & 0 & c_{\varphi} \dot{\varphi} & 0 \\ 
+                    -s_{\varphi} \dot{\varphi} & c_{\varphi} \dot{\varphi} & 0 & 0 \\
+                    0 & 0 & 0 & 0}, \\
+    G(q) = g\bmat{-m_t s_{\gamma} & 
+                  m_t c_{\gamma} &
+                  m_2 l_2 s_{\phi,\gamma} &
+                  0}^\top \\
+  \end{gathered}
+\end{equation*}
+
+\noindent where $q = (x, y, \varphi, \beta)$, $B = \bmat{0 & 0 & 1 & -1}^\top$,
+$u(q, \dot{q})$ is the torque applied to the torso and $\dd R$ represents the
+force measure of contact forces and Coulomb friction exerted on the spokes by
+the ground. We use the linear complementarity
+formulation~\cite{glocker2005formulation} to resolve the contact forces and
+Coulomb friction contributing to the discrete transitions.
+
+
+\subsubsection{Training}
+\label{sssec:training}
+
+Both the deterministic and Bayesian frameworks learn $H_d$ given by a
+fully-connected neural network with a total of 113 weights and biases.   
+%
+A single parameter update consists of a batch of 4 initial states sampled
+through greedy or explorative techniques.
+%
+Each initial state is integrated forward for time horizon of 5 seconds.
+%
+The objective of the trainings is to use the control authority on the torso to
+move the robot at a constant hip speed.
+%
+The performance objective is given by the accumulated loss
+\begin{align}
+    J_T = \int_0^{T} \ell(\phi(t); \theta) \dd t = \sum_{t=0}^{T} (\dot{x}^* - \dot{x}(t; \theta))
+    \label{eq:loss}
+\end{align}
+\noindent where $\dot{x}^*$ is a constant 1 \nicefrac{m}{s}.
+%
+For the Bayesian training, we generate random terrain elevation parameters $p_s$
+from a uniform probability distribution $\mathcal{U} \sim[0, 3]$ centimeters.
+
+
+\subsubsection{Simulated Experiments}
+
+We first show the performance of the deterministic \textsc{NeuralPbc} training
+on a level ground.
+%
+As shown on the bottom plot of Figure~\ref{fig:deter_rw_trajectory}, the robot
+starts from rest and slowly reaches the desired hip speed.
+%
+The top plot shows that the controller learned to apply large torque
+when the wheel is at rest and then the torso maintains a constant angle, which
+is sufficient to create constant hip speed on level ground.  
+%
+During discrete transitions (shown with dashed-red lines), the angular velocity
+of the torso counteracts the forward motion of the wheel, but a large torque is
+applied quickly to maintain the torso angle.
+%
+The torque plot on Figure~\ref{fig:deter_control} shows that a large
+positive torque is applied if the wheel stumbles backwards.
+%
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory.eps}
+    \caption{Top: Torso orientation and velocity for 10-second trajectory. The
+            solid black lines show the continuous phases and the dashed red
+            lines show discrete transitions. Bottom: Horizontal hip speed}
+    \label{fig:deter_rw_trajectory}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{RW_deterministic_control.eps}
+    \caption{Torque command to torso as a function of torso angle and horizontal hip speed}
+    \label{fig:deter_control}
+\end{figure}
+We compare the performance of the two controllers as follows.
+%
+Similar to the Bayesian training, we sample the terrain elevation from
+$\mathcal{U} \sim[0, p_{max}]$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
+%
+For each value of $p_{max}$, we generate 10 random initial states $(q_0,
+\dot{q}_0)$ and integrate 10-second trajectories.
+%
+The cost of each trajectory is calculated as per~\eqref{eq:loss}.
+%
+The solid line in Figure~\ref{fig:comparison} shows the average $J_T$ over the
+10 trajectories for each $p_{max}$ and the error band represents the standard
+deviation over the accumulated losses.
+
+\begin{figure}
+    % \includegraphics[options]{name}
+    \label{fig:comparison}
+\end{figure}
+
+\subsubsection{Real-World Experiments}
+
+We test the performance of both controllers on the hardware shown in
+Figure~\ref{fig:hardware}.
+%
+The robot consists of two set of $10$ spokes for stability.
+%
+The torso holds two ODrive v3.6 brushless DC motors, which actuate the drive
+shaft through a belt-drive system.
+%
+The end of the Aluminum spokes land on preloaded springs to reduce vibration,
+while the rubber feet ensure no-slip condition.
+%
+The incremental capacitive encoders attached to the motors report the
+orientation of the spokes.
+%
+We use IMU readings fused with Mahony filter~\cite{mahony2008nonlinear} to estimate
+the pitch of the torso.
+%
+A 24V battery pack is placed at the bottom edge of the torso to power
+the motors, a Raspberry Pi 3B and a Teensy microcontroller.
+%
+We evaluate the neural networks on a laptop and exchange sensor readings and
+torque commands with the Raspberry Pi via ROS wireless communication protocols.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\columnwidth]{rendering.JPG}
+    \caption{Rimless Wheel Assembly}
+    \label{fig:hardware}
+\end{figure}

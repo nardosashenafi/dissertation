@@ -1,118 +1,128 @@
-\chapter{Background}
-\label{ch:background}
 
-\section{Contact Modeling with Linear Complementarity Problem}
+\section{Background}
 
-\section{Passivity-Based Control (PBC)}
+\subsection{Passivity-Based Control (PBC)}
 
-Let $x \in \mathcal{X} \subset \mathbb{R}^{2n}$ denote the state of the robot.
-%
-The state $x$ is represented in terms of the generalized positions and momenta
-$x = (q, p)$. 
-%
-With $M$ denoting the symmetric, positive-definite mass matrix, the Hamiltonian
-$H$ of the robot is expressed as 
+Suppose we have a robotic system whose Hamiltonian $H$ can be expressed as
 %
 \begin{equation}
     H(q,p) = \frac{1}{2} p^\top M^{-1}(q) p + V(q),
     \label{eq:system_hamiltonian}
 \end{equation}
 %
-where $V(q)$ represents the potential energy. The system's equations of motion
-can then be expressed as 
+where $p \in \mathbb{R}^m$ is the generalized momenta, and $V(q)$ represents the
+potential energy. Hamilton's equations of motion are given by
 
-%
 \begin{align}
     \begin{split}  
-      \bmat{\dot{q} \\ \dot{p}} &= \bmat{0 & I_n \\ -I_n & 0}\bmat{\nabla_qH \\
-      \nabla_pH} + \bmat{0 \\ G(q)}u, \\
-      y &= G^\top \dot{q},
+      f(x, u) &= \bmat{\nabla_pH \\ -\nabla_qH}\ + \bmat{0 \\ \Omega(q)}u, \\
+      &\hspace{-0.15cm} y = \Omega(q)^\top \dot{q},
     \end{split}
     \label{eq:hamiltonian_dynamics}
 \end{align}
+\noindent where $\Omega(q) \in \mathbb{R}^{m \times n}$ is the input matrix, and $u
+\in \mathbb{R}^{n}$ is the control input.
 %
-where $G(q) \in \mathbb{R}^{n \times m}$ is the input matrix, $I_n$ denotes the
-$n \times n$ identity matrix, and $u \in \mathbb{R}^m$ is
-the control input.
+% The system~\eqref{eq:hamiltonian_dynamics} is \textit{underactuated} if rank $\Omega
+% = n < m$.
 %
-The system~\eqref{eq:hamiltonian_dynamics} is \textit{underactuated} if rank $G
-= m < n$.
+Passivity-based control leverages the stability properties of passive systems to
+design a stable closed-loop system.
+%
+A mechanical system is considered passive if it is dissipative, i.e.
+\begin{align}
+  H(x(t_1)) \leq H(x(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) dt,
+\end{align}
+\noindent for all initial state $x(t_0$) and all input $u$ under the supply rate
+$s = u^\top y$.
+%
+From Lyapunov stability theory, the system~\eqref{eq:hamiltonian_dynamics} is
+passive and therefore the origin $x = (0, 0)$ is stable because 
+\begin{equation*}
+  \begin{gathered}
+    \dot{H} = \frac{\partial H}{\partial x} f(x, u) \leq u^\top y, \\
+    H \geq 0.
+  \end{gathered}
+\end{equation*}
 
-The main idea of passivity-based control (PBC)~\cite{van2000l2} is to design the
-input $u$ with the objective of imposing a desired storage function $H_d:
-\mathcal{X} \rightarrow \mathbb{R}$ on the closed-loop system, rendering it
-passive and consequently stable.
+The objective of passivity-based control (PBC) is to design a control
+law $u$ that imposes the desired storage function $H_d: \mathcal{X} \rightarrow
+\mathbb{R}$ on the closed-loop system, rendering it passive and therefore
+stable~\cite{van2000l2}.
 %
-In the standard formulation of PBC, the control comprises an
-energy shaping term and a damping injection term:
+The dynamics of the resulting closed-loop system is 
+\begin{align}
+  \begin{split}  
+    f(x, u) &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
+  \end{split}
+  \label{eq:desired_hamiltonian_dynamics}
+\end{align}
+\noindent and it has a new desired stable equilibrium at $x^*$.
+
+From~\eqref{eq:hamiltonian_dynamics}
+and~\eqref{eq:desired_hamiltonian_dynamics}, we can find the energy shaping term
+that creates a passive closed-loop system as
 %
 \begin{equation}
-  u = u_{es}(x) + u_{di}(x).
-  \label{eq:ida-pbc_control}
+  u_{es}(x) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right).
+  \label{eq:esc}
 \end{equation}
-%
-% such that the closed loop dynamics satisfies
-% %
-% \[
-%   H_d(x(t)) - H_d(x(0)) = \int_0^t u_{di}^\top(t) y(t) \, \dd t - d^\star(x(t)),
-% \]
-% %
-% where $d^\star \geq 0$ is the desired damping dissipation. 
-%
-For mechanical systems, one solution to the PBC problem is of the form
-%
-\begin{align*}
-  u_{es}(x) &= 
-  % -\left( G^\top G  \right)^{-1} G^\top
-  -G^{\dagger}
-  \left( \nabla_q H_d - \nabla_q H \right), \\
-  u_{di}(x) &= - K_{v} \, y,%\quad \mathbb{R}^{m \times m} \ni K_v \succ 0,
-\end{align*}
-%
-where $G^\dagger = \left( G^\top G  \right)^{-1} G^\top$, and $K_v \succ 0$ is the
-damping gain matrix. The choice for $H_d$ must satisfy
-%
+\noindent where $\Omega^\dagger = \left( \Omega^\top \Omega  \right)^{-1}
+\Omega^\top$. We also introduce a damping term $u_{di}$ that results in an
+asymptotically stable system. The resulting controller is
 \begin{align}
-  G^\bot \left( \nabla_q H_d - \nabla_q H \right) = 0,
-  \label{eq:pdes}
-\end{align} 
+  \begin{split} 
+    u &= u_{es}(x) + u_{di}(x), \\
+    &u_{di}(x) = - K_{v} \, y
+  \end{split}
+  \label{eq:damping_and_es_control}
+\end{align}
+\noindent where $K_v \succ 0$ is the damping gain matrix.
+From~\eqref{eq:damping_and_es_control}, we can construct a constraint on the
+form of $H_d$ as 
+\begin{align}
+  \Omega^\bot \left( \nabla_q H_d - \nabla_q H \right) = 0,
+    \label{eq:pdes}
+\end{align}
+where $\Omega^\perp \Omega = 0$ and $H_d$ has a minimum at the desired
+equilibrium $(q^\star, p^*)$. 
 %
-where $G^\perp G = 0$, and $H_d$ has a minimum at the desired equilibrium
-$x^\star$. 
-
-\subsection{Neural PBC}
-
-{\color{red} CONTINUITY}
-
 However, the closed-form solution to the partial differential
-equations (PDEs) in~\eqref{eq:pdes} is intractable. The deterministic
-\textsc{NeuralPbc} framework presented in~\cite{neuralpbc} solves the PDEs given
-in~\eqref{eq:pdes} by rewriting the PBC problem as an optimization problem of
-the form 
+equations (PDEs) in~\eqref{eq:pdes} is intractable. 
+
+\subsubsection{Neural PBC}
+
+The deterministic \textsc{NeuralPbc} framework presented in~\cite{neuralpbc}
+solves the PDEs~\eqref{eq:pdes} by rewriting the PBC problem as the following 
+optimization problem
 \begin{equation}
   \begin{aligned}
       \underset{\theta}{\textrm{minimize}} 
       & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\%
       \textrm{subject to}
-      & & \dot{x} &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ G(q)}u^{\theta}, \\%
-      & & u^{\theta} &= -G^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} G^\top \nabla_p H_d^{\theta},%
+      & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
+      & & u^{\theta} &= -\Omega^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} \Omega^\top \nabla_p H_d^{\theta},%
       % & \quad x(0) &= x_0 \in \mathcal{X}, \\%
   \end{aligned}
   \label{eq:neural_pbc_finite_optim}
 \end{equation}
 where $T>0$ is the time horizon, $\ell: \mathcal{X} \times \mathcal{U}
-\rightarrow \mathbb{R}$ is a running cost function to be defined, and $\phi(t;
-x_0, u^\theta)$ is the flow of the dynamical system.
+\rightarrow \mathbb{R}$ is a running cost function to be defined, and $\phi(
+x_0, u^\theta, T)$ is a closed-loop trajectory generated from the initial state
+$x_0$ under the current control law $u^\theta$.
 %
 The \textsc{NeuralPbc} technique adds three important features to the classical 
 PBC framework.
 \begin{enumerate}
-  \item The optimization problem finds an approximate solution to the PDEs in~\eqref{eq:pdes}.
-  \item Desired system behavior is explicitly introduced into the optimization via the performance objective $\ell$.
-  \item The universal approximation capabilities of neural networks are leveraged to parameterize the desired Hamiltonian $H^\theta_d$.
+  \item The optimization problem finds an approximate solution to the PDEs
+  in~\eqref{eq:pdes} using stochastic gradient descent.
+  \item Desired system behavior is explicitly introduced into the optimization
+  via the performance objective $\ell$.
+  \item The framework leverages the universal approximation capabilities of
+  neural networks to parameterize the desired Hamiltonian $H^\theta_d$.
 \end{enumerate}
 
-\subsection{Neural Interconnection and Damping Assignment PBC}
+\subsubsection{Neural Interconnection and Damping Assignment PBC}
 
 \textsc{IdaPbc}, a variant of \textsc{Pbc}, selects a particular structure for
 $H_d$ 
@@ -160,7 +170,7 @@ where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
 
 
-\section{Bayesian Learning}
+\subsection{Bayesian Learning}
 
 The objective of Bayesian learning is to determine a stochastic model (target
 function) that best fits observed data $\mathcal{D}$ with inherent noise. Let

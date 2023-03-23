@@ -1,0 +1,249 @@
+
+\section{Background}
+
+\subsection{Contact Modeling with Linear Complementarity Problem}
+
+Suppose a hybrid dynamical system consists of $k$ contact events, each
+introducing normal contact forces $\lambda_N \in \mathbb{R}^{k}$ and Coulomb
+friction forces $\lambda_T \in \mathbb{R}^{k}$ to the overall system.
+%
+We can model this hybrid system with the measure equality~\cite{glocker2005formulation}
+
+\begin{equation}
+  \begin{gathered}
+    M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0, \\
+    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), 
+  \end{gathered}
+  \label{eq:hybrid_dynamics}
+\end{equation}
+
+\noindent where $x \in \mathcal{X} \subset \mathbb{R}^{2m}$ consists of robot
+position $q \in \mathbb{R}^m$ and velocities $\dot{q}$, $M \in \mathbb{R}^{m
+\times m}$ denotes the positive-definite mass matrix, $C \in \mathbb{R}^{m
+\times m}$ holds the Coriolis and centripetal terms, and $G \in \mathbb{R}^{m}$
+is the gravitational term. The matrix $B \in \mathbb{R}^{m \times n}$ maps the
+input $u \in \mathbb{R}^{n}$ to the generalized coordinates and $\dd R \in
+\mathbb{R}^m$ represents the force measure of contact forces and Coulomb
+friction exerted on the system. 
+%
+% The vector $\lambda \in \mathbb{R}^{2k}$ consists of the normal and
+% tangential contact forces and the matrix $W \in \mathbb{R}^{m \times 2k}$ maps
+% these contact forces to the generalized coordinates.
+%
+In contrast to smooth dynamical systems, the hybrid
+system~\eqref{eq:hybrid_dynamics} exhibits contact and impact forces that enforce
+the geometric and kinematic constraints of contact surfaces.
+%
+For instance, the contact force between two objects in collision characterizes
+the no-penetration conditions and the post-impact velocities of the objects.
+%
+Resolving these contact forces accurately can be difficult and computationally
+expensive.
+%
+Most collision simulators work on the kinematic level as opposed to the dynamic
+level.
+%
+For instance, there are event detection methods that simply change the velocity
+of the moving objects at the time of impact.
+%
+One of the drawbacks of these techniques is finding the exact time the contact
+occurs in high speed collision.
+%
+There is the additional difficulty of identifying the Coulomb friction, which is
+especially prone to Painleve' Paradox~\cite{genot1999new} in high friction
+scenarios.
+%
+The linear complementarity formulation in~\cite{glocker2005formulation} provides
+a rigorous technique to resolve contact forces, Coulomb friction and impact
+forces in a hybrid system.
+%
+The work presents an optimization problem that searches for \it{contact force
+and post-impact velocity} \normalfont pairs that obey the geometric and
+kinematic constraints during contacts or impacts.
+%
+
+%
+The linear complementarity formulation is constructed as follows. We define a
+vector of gap functions $g_N(q) \in \mathbb{R}^{k}$ that measure the
+Euclidean distance between the contact surfaces. 
+%
+Let $\gamma_N = \dot{g}_N(q)$ be the normal relative velocity and
+$\gamma_T$ the tangential relative velocity between contact surfaces.
+%
+The linear complementarity formulation imposes a unilateral constraint between
+contact forces and relative velocities given by:
+
+\begin{equation}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_T(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_N  \\
+        \lambda_T
+      \end{pmatrix} \geq 0, \\
+  % \end{eqnarray}
+  % \begin{eqnarray}
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_T(q, \dot{q})
+    \end{pmatrix} =
+      \begin{pmatrix}
+        (1+\epsilon_N) \gamma_N(q, \dot{q})  \\
+        (1+\epsilon_T) \gamma_T(q, \dot{q})
+      \end{pmatrix},
+  \end{gathered}
+  \label{eq:complementarity} 
+\end{equation}
+
+\noindent where $\epsilon_N$ and $\epsilon_T$ are the normal and tangential
+coefficients of restitution respectively. 
+% 
+From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N$ and $\xi_T$ can be
+expressed as an affine function over the contact forces $\lambda_N$ and
+$\lambda_T$ as follows~\cite{glocker2005formulation}:
+
+\begin{gather*}
+  \begin{pmatrix}
+    \xi_N \\
+    \xi_R \\
+    \lambda_L
+  \end{pmatrix} =
+      A
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b, \\
+    A = \begin{bmatrix}
+      W_N M^{-1} (W_N - W_T \mu) & W_N M^{-1} W_N & 0  \\
+      W_T M^{-1} (W_N - W_T \mu) & W_T M^{-1} W_T & I_k  \\
+      2\mu & -I_k & 0
+    \end{bmatrix}, \;  b = \begin{bmatrix}
+      W_N M^{-1} h \Delta t + (I_k+\epsilon_N) \gamma_N\\
+      W_T M^{-1} h \Delta t + (I_k+\epsilon_T) \gamma_T\\
+      0
+    \end{bmatrix} \\
+    \begin{pmatrix}
+      \xi_T   \\
+      \lambda_R \\
+      \lambda_L 
+    \end{pmatrix} = 
+    \begin{pmatrix}
+      \xi_R - \xi_L \\
+      \mu \lambda_N + \lambda_T  \\
+      \mu \lambda_N - \lambda_T  
+    \end{pmatrix} \\
+\end{gather*}
+ 
+\noindent where $\mu$ is the coefficient of friction, $I_k$ is the $k \times k$ identity
+matrix, $W_N$ and $W_T$ map the velocity vector $\dot{q}$ to $\gamma_N$ and
+$\gamma_T$, respectively, and $\Delta t$ is the integration time step.
+%
+The linear complementarity problem (LCP)~\eqref{eq:complementarity} can be posed as
+the following feasibility problem:
+
+\begin{equation}
+    0 \leq 
+    \left[ A \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b \right]
+    \perp
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} \geq 0, \\
+  \label{eq:feasibility} 
+\end{equation}
+\noindent which can be solved with various optimization techniques. 
+
+We follow Moreau's time stepping algorithm~\cite{glocker2005formulation}
+outlined in Algorithm~\eqref{algo:moreau} to resolve the complementarity
+constraint in~\eqref{eq:feasibility} and numerically integrate the
+dynamics~\eqref{eq:hybrid_dynamics}. While the complementarity constraint can be
+posed as a feasibility problem, the presence of Coulomb friction makes it a
+non-convex optimization problem. We use a pivoting (basis-exchange) technique
+called Lemke's algorithm~\cite{acary2008numerical} to find the solution to the
+linear complementarity problem~\eqref{eq:feasibility}. This allows us to
+differentiate the solution to the LCP in our efforts to use machine learning
+techniques.
+
+\begin{algorithm}[H]
+  \setstretch{1.2}
+    \caption{Moreau's Time Stepping Algorithm}
+    \label{algo:moreau}
+    \small
+    \hspace*{\algorithmicindent} \textbf{Input}: $z(0) = (q(0), \dot{q}(0))$
+    \begin{algorithmic}[1]
+      \State $\phi \leftarrow  [z(0)]$ \Comment{Initial States}
+        % \algrenewcommand\algorithmicindent{0em} % No indent
+          \For{$t \in 0:\Delta t:T$} 
+            \State $t_M = t + \nicefrac{\Delta t}{2}$
+            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $
+            % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
+            \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
+            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
+            \State $\phi \leftarrow \phi \cup [z(t+\Delta t)]$\Comment{Save trajectory}
+          \EndFor
+        \State \textbf{return} $\phi$
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Mixture of Expert Models}
+\label{ssec:mixture_of_experts}
+
+The mixture of experts (MOE) architecture is primarily used to fit high variance
+or multi-modal datasets onto numerous models.
+%
+Given $N$ number of experts, a gating network divides the input space $z
+\in \mathcal{Z}$ into regions (bins) within which a single expert is active.
+%
+The objective is to learn the expert models and the gating network that best fit
+the dataset.
+%
+
+Since the prominence of machine learning techniques, the expert models and the
+gating network are commonly parameterized by neural networks.
+%
+Let $f(z)$ denote a collection of expert models, i.e. $f(z) = \{f_k(z) :
+\mathcal{Z} \rightarrow \mathcal{U} | \; 1 \leq k \leq N\}$.
+%
+The parameters of the experts are also given by a set $\theta=\{\theta_k | \;
+1 \leq k \leq N\}$.
+%
+The output of the gating network $P(z) : \mathcal{Z} \rightarrow \mathbb{R}^N$
+is the probability of the input $z$ belonging to each bin.
+%
+We use a categorical probability distribution to sample a bin based on the
+outputs of the gating network as follows~\cite{harkonen2022mixtures} 
+\begin{align}
+  c_i | z, \psi \sim \text{Categorical}(P(z; \psi)) 
+  \label{eq:gating_categorical}
+\end{align}
+\noindent where $c_i$ is the bin corresponding to the $k^{th}$ expert and $\psi$
+is the parameters of the gating network.
+%
+
+There are several Bayesian inference techniques to train the expert models and
+the gating network, one of which is \it{expectation maximization} \normalfont
+(EM).
+%
+In this technique, we compose a likelihood function   
+\begin{equation}
+  \mathcal{L}(\norm{f(z)-y}{}) = \sum_{k=1}^{N} \norm{f_k(z; \theta_k)-y}{} P(c_i = k | z, \psi)
+  \label{eq:likelihood}
+\end{equation}
+\noindent where $\norm{f_k(z) - y}{}$ is the error in the current
+prediction.
+%
+The standard EM approach evaluates the expectation of~\eqref{eq:likelihood}
+over many samples of $z$ and finds the parameters $(\psi, \theta)$ that
+maximize the likelihood and consequently minimize prediction error.
+%
