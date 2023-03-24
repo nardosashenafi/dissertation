@@ -4,17 +4,16 @@
 In this section, we present a framework that infers a mixture of expert
 controllers for a hybrid dynamical system. 
 %
-This technique allows us to observe the discontinuities in closed loop
-trajectories and learn a switching mechanism to best control the hybrid system
+This technique allows us to observe the effects of contacts in the closed loop
+trajectories  and learn a switching mechanism to best control the hybrid system
 in all modes.
 %
 We also learn optimal expert controllers that achieve a certain performance
 objective through data-driven techniques.
 
-The goal of this framework is to learn $N$ expert controllers and their corresponding
-gating network given by neural nets.
+
 %
-Let $\gamma(z_0, u, T)$ denote a closed loop trajectory with initial state $z_0$
+Let $\gamma(x_0, u, T)$ denote a closed loop trajectory with initial state $x_0$
 integrated for the time horizon $T$.
 %
 We pose the search over the parameters of the experts and the gating network as
@@ -23,58 +22,65 @@ We pose the search over the parameters of the experts and the gating network as
         \underset{\psi, \theta}{\textrm{minimize}} 
         & & & \ell \Bigl(\gamma,u(\gamma; \psi, \theta) \Bigr)  , \\%
         \textrm{subject to}
-        & & M(q) &\dd \dot{q} + h(z; \psi, \theta)\dd t - \dd R  = 0,\\%
-        & & u = \{f_k&(z; \theta_k) | \; k  \sim \text{Categorical} (P(z; \psi)) \}
+        & & M(q) &\dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
+        & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x; \psi)) \}
     \end{aligned}
     \label{eq:moe_opt}
 \end{equation}
-\noindent where $z = (q, \dot{q})$, and $\ell : \mathcal{Z} \times \mathcal{U}
+\noindent where $x = (q, \dot{q})$, and $\ell : \mathcal{X} \times \mathcal{U}
 \rightarrow \mathbb{R}$ represents the running cost of closed loop trajectories
 generated from~\eqref{eq:hybrid_dynamics}.
 %
-We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} to
-generate trajectories as shown in Algorithm~\eqref{algo:moreau_moe}
+We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outlined
+in Algorithm~\eqref{algo:moreau} to resolve the complementarity constraint
+in~\eqref{eq:complementarity} and numerically integrate the measure differential
+equations~\eqref{eq:hybrid_dynamics}.
 %
 At each integration step, the control law $u$ first samples a bin number from
-$P(z;\psi)$; then it evaluates the expert controller $f_k$ that corresponds to
+$P(x;\psi)$; then it evaluates the expert controller $F_i$ that corresponds to
 the sampled bin.
 %
+The running cost $\ell(\gamma, u)$ quantifies the performance of the trajectory
+$\gamma$ under the current parameters $(\psi, \theta)$.
+%
+We use gradient-based techniques to adjust the decision parameters $(\psi, \theta)$
+based on the running cost.
 
 \begin{algorithm}
   \setstretch{1.2}
-    \caption{Moreau's Time Stepping Algorithm with MOE controllers}
-    \label{algo:moreau_moe}
+    \caption{Moreau's Time Stepping Algorithm}
+    \label{algo:moreau}
     \small
-    \hspace*{\algorithmicindent} \textbf{Input}: $\psi, \theta, z(0) = (q(0), \dot{q}(0))$
+    \hspace*{\algorithmicindent} \textbf{Input}: $\psi, \theta, x(0) = (q(0), \dot{q}(0))$
     \begin{algorithmic}[1]
-      \State $\gamma \leftarrow  [z(0)]$ \Comment{Initial States}
+      \State $\gamma \leftarrow  [x(0)]$ \Comment{Initial States}
         % \algrenewcommand\algorithmicindent{0em} % No indent
           \For{$t \in 0:\Delta t:T$} 
-            \State $k \sim \text{Categorical}(P(z(t); \psi))$ \Comment{Sample a bin number}
-            \State $u = f_k(z(t), \theta_k)$      \Comment{Expert in bin $k$}
+            \State $k \sim \text{Categorical}(P(x(t); \psi))$ \Comment{Sample a bin number}
+            \State $u = F_i(x(t), \theta_k)$      \Comment{Expert in bin $k$}
             \State $t_M = t + \nicefrac{\Delta t}{2}$
             \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $
             % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
             \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
             \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
-            \State $\gamma \leftarrow \gamma \cup [z(t+\Delta t)]$
+            \State $\gamma \leftarrow \gamma \cup [x(t+\Delta t)]$
           \EndFor
         \State \textbf{return} $\gamma$
     \end{algorithmic}
 \end{algorithm}
 
-The running cost $\ell(\gamma, u)$ quantifies the performance of the trajectory
-$\gamma$ under the current parameters $(\psi, \theta)$.
+
+\subsubsection{Performance Objective}
 %
-We present two viable choices for the cost function. 
+We present two viable choices for the running cost function. 
 \begin{enumerate}
     \item Accumulated loss: is the total quadratic loss between the desired
-    state $z^*$ and the state generated under the current control law. We also
+    state $x^*$ and the state generated under the current control law. We also
     incur a cost on the control authority as follows.
     \begin{equation}
         \begin{gathered}
-            \ell(z, u) = \frac{1}{2}(z - z^*)^\top Q (z - z^*) + \frac{1}{2} u^\top R u , \\
-            \ell(\gamma, u) = \int_0^{T}  \ell(z(t), u)\dd t,
+            \ell(x, u) = \frac{1}{2}(x - x^*)^\top Q (x - x^*) + \frac{1}{2} u^\top R u , \\
+            \ell(\gamma, u) = \int_0^{T}  \ell(x(t), u)\dd t,
         \end{gathered}
     \label{eq:accumulatedLoss}
     \end{equation}
@@ -82,11 +88,11 @@ We present two viable choices for the cost function.
     %
     The corresponding likelihood is given by 
     \begin{align}
-        \mathcal{L}(\gamma) = \int_{0}^{T} \Biggl( \sum_{k=1}^{N} \Bigl[ \ell \Bigl(z(t), f_k \Bigr) P\Bigl(c_i = k | z(t), \psi \Bigr) \Bigr] \Biggr) \dd t.
+        \mathcal{L}(\gamma) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Bigl[ \ell \Bigl(x(t), F_i \Bigr) P\Bigl(c_i = i | x(t), \psi \Bigr) \Bigr] \Biggr) \dd t.
         \label{eq:accumulated_likelihood}
     \end{align}
-    \item Minimum trajectory loss (MTL): allows us to train on a section of the
-    trajectory that leads to the lowest cost.
+    \item Minimum trajectory loss (MTL): some dynamical need to deviate further
+    away from the desired equilibrium momentarily before converging to it.  
     %
     For instance, suppose we want to swing-up the simple pendulum to the upright
     equilibrium. 
@@ -97,23 +103,27 @@ We present two viable choices for the cost function.
     Accumulated loss incurs a lot of cost in such scenarios and the control
     search would get stuck in local minima.
     %
-    A successful loss function encourages all trajectories that \it{eventually}
-    \normalfont lead to a minimum cost.
+    In such cases, a successful loss function encourages trajectories that
+    \it{eventually} \normalfont lead to a minimum cost.
     %
     Hence, we compose MTL as
     \begin{equation}
         \begin{gathered}
-            t_{min} = \text{argmin}_{t} \; \ell(z(t), u)  \\
-            \mathcal{L}(\gamma) = - \frac{\ell(z(t_{min}), u)}{C} \sum_{t=0}^{t_{min}} \log(P(c_i=k| z(t), \psi)) 
+            t_{min} = \text{argmin}_{t} \; \ell(x(t), u)  \\
+            \mathcal{L}(\gamma) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}} \log(P(c_i=i| x(t), \psi)) 
         \end{gathered} 
     \end{equation}
     \noindent where $C > 0$ is a normalization factor.
     %
-
+    MTL allows us to train on a section of the trajectory that leads to the
+    lowest cost. 
+    %
 \end{enumerate}
 
+\subsubsection{State Sampling}
+
 We intend to find a solution to the optimization problem
-in~\eqref{eq:moe_opt} for all initial states $z_0$ in the
+in~\eqref{eq:moe_opt} for all initial states $x_0$ in the
 state space.
 %
 To efficiently sample the initial states, we use a combination of greedy and
@@ -132,7 +142,7 @@ which takes $N_r$ number of random samples from the state space.
 In a single batch training, we compute the running cost as an expectation
 over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
 \begin{align*}
-    J(\theta) = \mathbb{E}_{z_0 \sim \mathcal{D}_N}[ \ell(\gamma(z_0, u, T), u)]
+    J(\theta) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\gamma(x_0, u, T), u)]
 \end{align*}
 \noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
 
@@ -150,18 +160,19 @@ likelihood with respect to the learned parameters.
       \small
       \begin{algorithmic}[1]
           \algrenewcommand\algorithmicindent{0em} % No indent
-          \State $\mathcal{D}_N \gets \{z_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+          \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
           \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
           \While{$i < $ \texttt{maximum iteration}}
           \State $J \gets 0$\Comment{Batch loss}
           \For{$z_0 \in \mathcal {D}_N$}
-              \State $\gamma$ = Moreau($\phi, \theta, z_0$) \Comment Algorithm~\eqref{algo:moreau}
+              \State $\gamma$ = Moreau($\phi, \theta, x_0$) \Comment Algorithm~\eqref{algo:moreau}
               \State $J \gets J + \mathcal{L}(\gamma)/N_{\mathcal{D}}$ \Comment{Batch loss}
           \EndFor
           \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
-          \State $\mathcal{D}_N \gets \{z_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+          \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
           \State $i \;\:\gets i + 1$
           \EndWhile
           \State \textbf{return} $\theta$
       \end{algorithmic}
   \end{algorithm}
+

@@ -1,6 +1,12 @@
 
 \section{Background}
 
+In this section, we provide a brief introduction to contact modeling with the
+linear complementarity formulation.
+%
+We also present a basic introduction to the mixture of experts architecture and
+its uses in machine learning.
+
 \subsection{Contact Modeling with Linear Complementarity Problem}
 
 Suppose a hybrid dynamical system consists of $k$ contact events, each
@@ -179,9 +185,9 @@ techniques.
     \caption{Moreau's Time Stepping Algorithm}
     \label{algo:moreau}
     \small
-    \hspace*{\algorithmicindent} \textbf{Input}: $z(0) = (q(0), \dot{q}(0))$
+    \hspace*{\algorithmicindent} \textbf{Input}: $x(0) = (q(0), \dot{q}(0))$
     \begin{algorithmic}[1]
-      \State $\phi \leftarrow  [z(0)]$ \Comment{Initial States}
+      \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
         % \algrenewcommand\algorithmicindent{0em} % No indent
           \For{$t \in 0:\Delta t:T$} 
             \State $t_M = t + \nicefrac{\Delta t}{2}$
@@ -189,7 +195,7 @@ techniques.
             % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
             \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
             \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
-            \State $\phi \leftarrow \phi \cup [z(t+\Delta t)]$\Comment{Save trajectory}
+            \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
           \EndFor
         \State \textbf{return} $\phi$
     \end{algorithmic}
@@ -199,51 +205,80 @@ techniques.
 \subsection{Mixture of Expert Models}
 \label{ssec:mixture_of_experts}
 
-The mixture of experts (MOE) architecture is primarily used to fit high variance
-or multi-modal datasets onto numerous models.
+The mixture of experts (MOE) architecture is primarily used to learn an ensemble
+of expert models that best fit high variance or multi-modal datasets.
 %
-Given $N$ number of experts, a gating network divides the input space $z
-\in \mathcal{Z}$ into regions (bins) within which a single expert is active.
+Suppose we are trying to model the source of the dataset shown on the left of
+Figure~\ref{fig:gaussian_moe}.
 %
-The objective is to learn the expert models and the gating network that best fit
-the dataset.
+A single Gaussian distribution provides a poor fit to the multi-modal data.
+%
+MOE framework allows us to fit multiple uni-modal distributions as shown on
+the right of Figure~\ref{fig:gaussian_moe}.
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{gaussian_moe.png}
+  \caption{Left: Fit with one Gaussian distribution. Right: Fit with Gaussian
+  mixture of 2 experts~\cite{mcgonagle_dobre_pilling}}
+  \label{fig:gaussian_moe}
+\end{figure}
+%
+This technique uses a gating network to divide the input space $x \in
+\mathcal{X} \subset \mathbb{R}^{2m}$ into state partitions within which a single
+expert is active.
+%
+The objective is to learn the $N_F$ expert models and the gating network that
+best fit the dataset.
 %
 
 Since the prominence of machine learning techniques, the expert models and the
 gating network are commonly parameterized by neural networks.
 %
-Let $f(z)$ denote a collection of expert models, i.e. $f(z) = \{f_k(z) :
-\mathcal{Z} \rightarrow \mathcal{U} | \; 1 \leq k \leq N\}$.
+Let $F(x)$ denote a collection of expert models, i.e. $F(x) = \{F_1(x), \dots,
+F_{N_{F}(x)}\}$.
 %
-The parameters of the experts are also given by a set $\theta=\{\theta_k | \;
-1 \leq k \leq N\}$.
+The parameters of the experts are also given by the set $\theta=\{\theta_1, \dots,
+\theta_{N_{F}} \}$.
 %
-The output of the gating network $P(z) : \mathcal{Z} \rightarrow \mathbb{R}^N$
-is the probability of the input $z$ belonging to each bin.
+% Henceforth, we assume that the number of state partitions is the same as the
+% number of available expert controller.
 %
-We use a categorical probability distribution to sample a bin based on the
-outputs of the gating network as follows~\cite{harkonen2022mixtures} 
+The gating network $P(x) : \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ determines 
+the probability of state $x$ belonging to each state partitions. 
+%
+We apply the \textsc{softmax} function on the last layer of the gating network
+to convert the outputs into vector of probabilities that sum to one.
+%
+We use a categorical probability distribution to sample a state partition based
+on the outputs of the gating network as follows~\cite{harkonen2022mixtures} 
 \begin{align}
-  c_i | z, \psi \sim \text{Categorical}(P(z; \psi)) 
+  c_i | x, \psi \sim \text{Categorical}(P(x; \psi)) 
   \label{eq:gating_categorical}
 \end{align}
-\noindent where $c_i$ is the bin corresponding to the $k^{th}$ expert and $\psi$
+\noindent where $c_i$ is the bin corresponding to the $i^{th}$ expert and $\psi$
 is the parameters of the gating network.
 %
 
-There are several Bayesian inference techniques to train the expert models and
-the gating network, one of which is \it{expectation maximization} \normalfont
-(EM).
+There are several Bayesian inference techniques to learn the parameters of the
+expert models and the gating network, one of which is \it{expectation
+maximization} \normalfont (EM).
 %
 In this technique, we compose a likelihood function   
 \begin{equation}
-  \mathcal{L}(\norm{f(z)-y}{}) = \sum_{k=1}^{N} \norm{f_k(z; \theta_k)-y}{} P(c_i = k | z, \psi)
+  \mathcal{L}(\norm{f(x)-y}{} | \theta, \psi) = -\sum_{i=1}^{N_F} \norm{f_i(x; \theta_i)-y}{} P(c_i = i | x, \psi)
   \label{eq:likelihood}
 \end{equation}
-\noindent where $\norm{f_k(z) - y}{}$ is the error in the current
-prediction.
+\noindent where $\norm{f_i(x) - y}{}$ is the error in the current prediction.
 %
-The standard EM approach evaluates the expectation of~\eqref{eq:likelihood}
-over many samples of $z$ and finds the parameters $(\psi, \theta)$ that
+The likelihood measures how likely the current parameters $(\psi, \theta)$ are
+to generate the sampled data $y$. 
+%
+% For instance, if two sets of decision parameters are sampled such that  $
+% \mathcal{L}(\norm{f(x)-y}{} | \theta_1, \psi_1) > \mathcal{L}(\norm{f(x)-y}{} |
+% \theta_2, \psi_2)$, it implies that the parameters $(\psi_1, \theta_1)$ are more
+% likely to generate the sample $y$ than $(\psi_1, \theta_1)$.
+%
+The standard EM approach evaluates the expectation of~\eqref{eq:likelihood} over
+many samples of $x$ and iteratively updates the parameters $(\psi, \theta)$ to
 maximize the likelihood and consequently minimize prediction error.
 %
