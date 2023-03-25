@@ -1,104 +1,96 @@
 \section{Mixture of Expert Controllers}
 \label{sec:moe_methods}
 
-In this section, we present a framework that infers a mixture of expert
-controllers for a hybrid dynamical system. 
+In this section, we present a data-driven control design framework for hybrid
+dynamical systems. 
 %
-This technique allows us to observe the effects of contacts in the closed loop
+The objective of this framework is to learn a mixture of expert controllers and
+their responsibilities as determined by the gating network.
+%
+This technique allows us to observe the effects of contacts from the closed loop
 trajectories  and learn a switching mechanism to best control the hybrid system
 in all modes.
 %
 We also learn optimal expert controllers that achieve a certain performance
 objective through data-driven techniques.
 
-
 %
-Let $\gamma(x_0, u, T)$ denote a closed loop trajectory with initial state $x_0$
+Let $\phi(x_0, u, T)$ denote a closed loop trajectory with initial state $x_0$
 integrated for the time horizon $T$.
+%
+For every state $x$ in the trajectory, the control law first samples state
+partition (bin) number from the categorical distribution
+in~\eqref{eq:gating_categorical}.
+%
+The control input at state $x$ is
+\begin{align*}
+    u(x; \psi, \theta) = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x; \psi)) \}
+\end{align*} 
+%
+Without prior knowledge injected to the gating network, the samples from the
+categorical distribution initially explore the performance of most, if not all,
+of the expert controllers.
+%
+We use the running cost $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
+\mathbb{R}$ to measure the performance of the sampled experts, which we discuss
+in depth in Section~\ref{sssec:performance_objective}.
+%
+The running cost plays the role of \it{prediction error} \normalfont in the
+construction of the likelihood as shown in~\eqref{eq:likelihood_def}.
+%
+The goal is to learn the decision parameters $(\psi, \theta)$ that minimize the
+running cost for all initial states in the state space.
 %
 We pose the search over the parameters of the experts and the gating network as
 \begin{equation}
     \begin{aligned}
         \underset{\psi, \theta}{\textrm{minimize}} 
-        & & & \ell \Bigl(\gamma,u(\gamma; \psi, \theta) \Bigr)  , \\%
+        & & & \ell \Bigl(\phi,u(\phi; \psi, \theta) \Bigr)  , \\%
         \textrm{subject to}
         & & M(q) &\dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
         & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x; \psi)) \}
     \end{aligned}
     \label{eq:moe_opt}
 \end{equation}
-\noindent where $x = (q, \dot{q})$, and $\ell : \mathcal{X} \times \mathcal{U}
-\rightarrow \mathbb{R}$ represents the running cost of closed loop trajectories
-generated from~\eqref{eq:hybrid_dynamics}.
 %
-We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outlined
-in Algorithm~\eqref{algo:moreau} to resolve the complementarity constraint
-in~\eqref{eq:complementarity} and numerically integrate the measure differential
-equations~\eqref{eq:hybrid_dynamics}.
-%
-At each integration step, the control law $u$ first samples a bin number from
-$P(x;\psi)$; then it evaluates the expert controller $F_i$ that corresponds to
-the sampled bin.
-%
-The running cost $\ell(\gamma, u)$ quantifies the performance of the trajectory
-$\gamma$ under the current parameters $(\psi, \theta)$.
-%
-We use gradient-based techniques to adjust the decision parameters $(\psi, \theta)$
-based on the running cost.
-
-\begin{algorithm}
-  \setstretch{1.2}
-    \caption{Moreau's Time Stepping Algorithm}
-    \label{algo:moreau}
-    \small
-    \hspace*{\algorithmicindent} \textbf{Input}: $\psi, \theta, x(0) = (q(0), \dot{q}(0))$
-    \begin{algorithmic}[1]
-      \State $\gamma \leftarrow  [x(0)]$ \Comment{Initial States}
-        % \algrenewcommand\algorithmicindent{0em} % No indent
-          \For{$t \in 0:\Delta t:T$} 
-            \State $k \sim \text{Categorical}(P(x(t); \psi))$ \Comment{Sample a bin number}
-            \State $u = F_i(x(t), \theta_k)$      \Comment{Expert in bin $k$}
-            \State $t_M = t + \nicefrac{\Delta t}{2}$
-            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $
-            % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
-            \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
-            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
-            \State $\gamma \leftarrow \gamma \cup [x(t+\Delta t)]$
-          \EndFor
-        \State \textbf{return} $\gamma$
-    \end{algorithmic}
-\end{algorithm}
-
+In Section~\ref{sssec:training_moe}, we provide a procedure to solve the
+optimization problem~\ref{eq:moe_opt}. 
 
 \subsubsection{Performance Objective}
+\label{sssec:performance_objective}
 %
 We present two viable choices for the running cost function. 
 \begin{enumerate}
     \item Accumulated loss: is the total quadratic loss between the desired
-    state $x^*$ and the state generated under the current control law. We also
+    state $x^*$ and the states generated under the current control law. We also
     incur a cost on the control authority as follows.
     \begin{equation}
         \begin{gathered}
             \ell(x, u) = \frac{1}{2}(x - x^*)^\top Q (x - x^*) + \frac{1}{2} u^\top R u , \\
-            \ell(\gamma, u) = \int_0^{T}  \ell(x(t), u)\dd t,
+            \ell(\phi, u) = \int_0^{T}  \ell(x(t), u)\dd t,
         \end{gathered}
     \label{eq:accumulatedLoss}
     \end{equation}
-    \noindent where $Q$ is positive definite matrix and $R$ is a positive semi-definite matrix.
+    \noindent where $Q \succ 0$ is positive definite matrix and $R \succeq 0$ is
+    a positive semi-definite matrix.
+    %
+    This construction encourages trajectories to reach the desired equilibrium
+    with minimum effort and shortest time.
     %
     The corresponding likelihood is given by 
     \begin{align}
-        \mathcal{L}(\gamma) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Bigl[ \ell \Bigl(x(t), F_i \Bigr) P\Bigl(c_i = i | x(t), \psi \Bigr) \Bigr] \Biggr) \dd t.
+        \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Biggl[ - \ell \Bigl(x(t), F_i \Bigr) + \ln \Bigl\{ P\Bigl(c_i = i | x(t), \psi \Bigr)  \Bigr\} \Biggr] \Biggr) \dd t.
         \label{eq:accumulated_likelihood}
     \end{align}
-    \item Minimum trajectory loss (MTL): some dynamical need to deviate further
-    away from the desired equilibrium momentarily before converging to it.  
+    \item Minimum trajectory loss (MTL): While a trivial choice, accumulated
+    loss may not reflect the desired behavior of some dynamical systems.
     %
     For instance, suppose we want to swing-up the simple pendulum to the upright
     equilibrium. 
     %
-    For an underactuated pendulum, the controller needs to pump energy slowly,
-    by moving closer and further away from the upright.
+    For an underactuated pendulum, the controller needs to swing about the
+    downward equilibrium, moving the states closer and further away from the
+    upright.
     %
     Accumulated loss incurs a lot of cost in such scenarios and the control
     search would get stuck in local minima.
@@ -109,14 +101,15 @@ We present two viable choices for the running cost function.
     Hence, we compose MTL as
     \begin{equation}
         \begin{gathered}
-            t_{min} = \text{argmin}_{t} \; \ell(x(t), u)  \\
-            \mathcal{L}(\gamma) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}} \log(P(c_i=i| x(t), \psi)) 
+            t_{min} = \underset{t}{\textrm{argmin}} \; \ell(x(t), u)  \\
+            \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} + \sum_{t=0}^{t_{min}} \ln \{P(c_i=i| x(t), \psi) \} 
         \end{gathered} 
     \end{equation}
     \noindent where $C > 0$ is a normalization factor.
     %
-    MTL allows us to train on a section of the trajectory that leads to the
-    lowest cost. 
+    Unlike accumulated loss, MTL does not particularly reward low effort or
+    short time trajectories, but it equally rewards two trajectories
+    as long as they both reached the desired state within the time horizon $T$. 
     %
 \end{enumerate}
 
@@ -129,30 +122,44 @@ state space.
 To efficiently sample the initial states, we use a combination of greedy and
 explorative state sampling techniques.
 %
-The greedy state sampling, commonly known as \textsc{DAgger}~\cite{ross2011no},
-generates trajectories using the current parameters and collects $N_d$ samples
-from the visited states. 
+Greedy state sampling, commonly known as \textsc{DAgger}, is a technique
+adapted from imitation learning~\cite{ross2011no}.
 %
-This allows the training to refine the controller on the states it visits the
-most.
+This technique refines the controller on the states most visited under the
+current parameters $(\psi, \theta)$.
 %
-We recover from locally optimal solutions through explorative state sampling,
-which takes $N_r$ number of random samples from the state space.
+We first sample several initial states randomly and generate trajectories using
+the current parameters.
+%
+Then, we randomly select $N_d$ samples from the visited states. 
+%
+The explorative state sampling technique helps recover from locally optimal
+solutions. 
+%
+This is achieved by sampling $N_r$ initial states around the neighborhood of the
+desired state $x^*$.
 %
 In a single batch training, we compute the running cost as an expectation
 over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
 \begin{align*}
-    J(\theta) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\gamma(x_0, u, T), u)]
+    J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]
 \end{align*}
 \noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
 
-We solve the optimization problem given in~\eqref{eq:moe_opt} through stochastic
-gradient descent.
+\subsubsection{Training MOE}
+\label{sssec:training_moe}
+
+We solve the optimization problem given in~\eqref{eq:moe_opt} with stochastic
+gradient descent (SGD).
+%
+We invoke a variant of SGD known as \textsc{Adam}~\cite{kingma2014adam} to
+efficiently train the parameters with adaptive learning rates $\alpha_i$.
 %
 The full training procedure is outlined in Algorithm~\eqref{algo:moe_training}.
 %
-We leverage auto-differentiation techniques to compute the gradient of the
-likelihood with respect to the learned parameters.
+We leverage forward-mode auto-differentiation technique~\cite{revels2016forward}
+to back-propagate on the gradient of the likelihood with respect to the learned
+parameters.
 \begin{algorithm}
     \setstretch{1.2}
       \caption{Solution to the Optimization Problem~\eqref{eq:moe_opt}}
@@ -165,10 +172,11 @@ likelihood with respect to the learned parameters.
           \While{$i < $ \texttt{maximum iteration}}
           \State $J \gets 0$\Comment{Batch loss}
           \For{$z_0 \in \mathcal {D}_N$}
-              \State $\gamma$ = Moreau($\phi, \theta, x_0$) \Comment Algorithm~\eqref{algo:moreau}
-              \State $J \gets J + \mathcal{L}(\gamma)/N_{\mathcal{D}}$ \Comment{Batch loss}
+              \State $\phi$ = Moreau($x_0, \psi, \theta$) \Comment Algorithm~\eqref{algo:moreau}
+              \State $J \gets J + \mathbb{L}(\phi)/N_{\mathcal{D}}$ \Comment{Batch loss}
           \EndFor
           \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
+          \State $\psi \gets \psi + \alpha_i \nicefrac{\partial J}{\partial \psi}$
           \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
           \State $i \;\:\gets i + 1$
           \EndWhile
@@ -176,3 +184,82 @@ likelihood with respect to the learned parameters.
       \end{algorithmic}
   \end{algorithm}
 
+\subsubsection{Back-propagation through Hybrid Systems}
+
+The training framework outlined~\eqref{eq:moe_opt} allows us to observe the
+effects of contacts in the closed loop trajectories and infer a controller that
+either uses the contact to its advantage or minimizes its adverse effects.
+%
+In this section, we look at the relevant parts of the back-propagation to give
+insight on how this is achieved.
+%
+We also show that despite the state jumps in the hybrid dynamics, the
+derivatives involved in the back-propagation are well-defined.
+
+Suppose we generate a short trajectory $\phi$ with the sampled expert control
+parameter $\theta_i$.
+%
+Forward-mode auto-differentiation evaluates the gradient of the accumulated cost
+with respect to $\theta_i$ as 
+\begin{align*}
+    \frac{\partial \ell}{\partial \theta_i} = \sum_{t=0}^{T} \frac{\partial \ell}{\partial x_t} \frac{\partial x_t}{\partial \theta_i} ,
+\end{align*}
+\noindent where $R=0$ for simplicity.
+%
+Without loss of generality, we take one integration step for the reminder of
+this discussion. 
+%
+In that step, a contact event is triggered causing the velocities to jump
+between the initial state $x_0$ and the following state $x_1$. 
+%
+Hence, we focus on 
+\begin{align*}
+    \frac{\partial \ell}{\partial \theta_i} = \frac{\partial \ell}{\partial x_1} \frac{\partial x_1}{\partial \theta_i},
+\end{align*}
+%
+We can expand the gradient further as 
+\begin{align*}
+    \frac{\partial \ell}{\partial \theta_i} = \frac{\partial \ell}{\partial x_1} \Bigl( \frac{\partial x_1}{\partial u} \frac{\partial u}{\partial \theta_i} + \frac{\partial x_1}{\partial \lambda}\frac{\partial \lambda}{\partial \theta_i}\Bigr),
+\end{align*}
+\noindent where $\lambda$ holds the contact forces.
+%
+We can compute first term from Moreau's integration step as
+\begin{align*}
+    \frac{\partial x_1}{\partial u} \frac{\partial u}{\partial \theta_i} = 
+    \bmat{M^{-1}B \Delta t^2/2 \\ M^{-1}B \Delta t} \frac{\partial u}{\partial \theta_i},
+\end{align*} 
+%
+At first glance, the derivative $\frac{\partial x_1}{\partial
+\lambda}\frac{\partial \lambda}{\partial \theta_i}$ may seem ill-defined due to
+the discontinuity in the states. 
+%
+A closer observation reveals that  $\frac{\partial x_1}{\partial \lambda}$
+determines how the \it{post-impact velocity is affected by the
+contact forces} \normalfont.
+%
+In fact, the derivative can be found from Moreau's integration as 
+\begin{align*}
+    \frac{\partial x_1}{\partial \lambda} = \bmat{W_N & W_T }, 
+\end{align*}
+%
+demonstrating that the gradient is well-defined even if a state jump has
+occurred. 
+%
+This term is crucial in adjusting the decision parameters in response to how the
+contact force assists or inhibits the system.
+%
+If the contact forces affect the \it{post-impact} \normalfont velocity such that
+the resulting generalized coordinates are closer to the desired state $x^*$,
+then the gradient $\frac{\partial \ell}{\partial x_1} \frac{\partial
+x_1}{\partial \lambda}\frac{\partial \lambda}{\partial \theta_i}$ adjusts the
+parameter $\theta_i$ to favor states undergoing contact events. 
+%
+We in fact demonstrate this behavior in simulation and real-world experiments in
+Section~\ref{ssec:cartpole_with_walls}.
+%
+Conversely, if the contact forces move the states further away from $x^*$, the
+gradient leads to control parameters that attempt to recover from the outcomes
+of the contact events.
+%
+We also demonstrate this behavior on a walking robot example in
+Section~\ref{sssec:rimless_wheel_model}.

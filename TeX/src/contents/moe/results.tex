@@ -35,25 +35,29 @@ function~\cite{clevert2015fast}.
 %
 We constrain the maximum number of state partitions to $4$.
 %
-Each state partition has a corresponding controller parameter $\theta_k \in
+Each state partition has a corresponding controller parameter $\theta_i \in
 \mathbb{R}$. 
 %
 The control law is a sample from the Bernoulli probability distribution
 \begin{align}
-    u = \begin{cases}
-       0, & \theta_k > \frac{1}{2}, \\
-       1, & \theta_k \leq \frac{1}{2},
+    u(\theta_i) = \begin{cases}
+       0, & \theta_i > \frac{1}{2}, \\
+       1, & \theta_i \leq \frac{1}{2},
     \end{cases}
 \end{align}
 \noindent where $u = 0$ corresponds to the first dynamics $\dot{x} = A_1
 x$ and $u=1$ corresponds to $\dot{x} = A_2x$.
+%
+We use the \textsc{Sigmoid} activation function to limit $\theta_i$ between 0
+and 1.
 %
 We generate a trajectory following the procedure in
 Algorithm~\eqref{algo:switching_A1A2}.
 %
 The likelihood is modified to account for the probabilistic control as
 \begin{align*}
-    \mathcal{L}(\gamma) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N} \sum_{u=0}^{1}\Bigl[ \ell \Bigl(z(t), u \Bigr) P\Bigl(c_i = i | z(t), \psi \Bigr) \Bigr] \Biggr) \dd t.
+    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) - (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) +
+    \ln  P\Bigl(c_i = i | x(t), \psi \Bigr)  \Biggr) \dd t.
 \end{align*}
 
 \begin{algorithm}
@@ -63,28 +67,29 @@ The likelihood is modified to account for the probabilistic control as
       \small
       \hspace*{\algorithmicindent} \textbf{Input}: $x(0) = (q(0), \dot{q}(0))$
       \begin{algorithmic}[1]
-        \State $\gamma \leftarrow  [z(0)]$ \Comment{Initial States}
+        \State $\phi \leftarrow  [z(0)]$ \Comment{Initial States}
           % \algrenewcommand\algorithmicindent{0em} % No indent
             \For{$t \in 0:\Delta t:T$} 
-              \State $k \sim \text{Categorical}(P(x(t); \psi))$ \Comment{Sample a bin number}
-              \State $u \sim \text{Bernoulli}(\theta_k)$      
+              \State $i \sim \text{Categorical}\Bigl(P(x(t); \psi)\Bigr)$ \Comment{Sample a bin number}
+              \State $u \sim \text{Bernoulli} \Bigl(\textrm{Sigmoid}(\theta_i) \Bigr)$      
               \State $x(t+\Delta t) = (1-u)A_1x(t) + u \; A_2x(t) $
-              \State $\gamma \leftarrow \gamma \cup [x(t+\Delta t)]$
+              \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$
             \EndFor
-          \State \textbf{return} $\gamma$
+          \State \textbf{return} $\phi$
       \end{algorithmic}
   \end{algorithm}
   
 The resulting switching system is shown in Figure~\ref{fig:switching_plot}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cartpole with Wall Contacts}
-
+\label{ssec:cartpole_with_walls}
 
 In this section, we take the classical cartpole swing-up problem and introduce
 contact events from two barriers as shown Figure~\ref{fig:cartpole}. 
 %
 We demonstrate the performance of the mixture of expert controllers in
-simulation and real-world experiments
+simulation and real-world experiments.
 %
 Lastly, we compare the performance of the mixture of expert controllers against
 a single swing-up controller. 
@@ -93,7 +98,7 @@ a single swing-up controller.
 \subsubsection{System Model}
 \label{sssec:cartpole_model}
 
-The cartpole system consists of a freely rotating pendulum, riding on an
+The cartpole system consists of a freely rotating pendulum link, riding on an
 actuated cart.
 %
 The setup is enclosed by two rigid walls hanging $0.2$m from the bottom of the
@@ -141,15 +146,13 @@ $x^* = (q^*, \dot{q})^* = (0, 0)$.
 Once the system reaches within a small neighborhood of $x^*$, we employ Linear
 Quadratic Regulator (LQR) to stabilize at the desired equilibrium.
 %
-We use minimum trajectory loss (MTL) discussed
-in Section~\ref{sec:methods} with time horizon $T=1.5$s.
+We use minimum trajectory loss (MTL) discussed in
+Section~\ref{sssec:performance_objective} with time horizon $T=1.5$s.
 %
 In each parameter update, we sample $N_{\mathcal{D}}=4$ initial states through
 greedy and explorative techniques.
 %
-We invoke a variant of stochastic gradient descent known as
-\textsc{Adam}~\cite{kingma2014adam} to efficiently train the parameters with
-adaptive learning rates.
+
 
 \begin{figure}[H]
     \centering
@@ -159,13 +162,15 @@ adaptive learning rates.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{gapContourAndBins.eps}
+    \includegraphics[width=1.0\linewidth]{gapContourAndBins.eps}
+    \caption{Control switching as a function of gap function. There are total of two experts, one is active between the red boundaries}
     \label{fig:gapContour}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{MOESimExpPlots.eps}
+    \includegraphics[width=1.0\linewidth]{cropped_MOE.png}
+    \caption{Top row: Pendulum swing-up before impact. Bottom row: Velocity jump and control switching at impact}
     \label{fig:cartpole_trajectory}
 \end{figure}
 

@@ -195,6 +195,7 @@ techniques.
             % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
             \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
             \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
+            \State $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
             \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
           \EndFor
         \State \textbf{return} $\phi$
@@ -227,27 +228,41 @@ This technique uses a gating network to divide the input space $x \in
 \mathcal{X} \subset \mathbb{R}^{2m}$ into state partitions within which a single
 expert is active.
 %
-The objective is to learn the $N_F$ expert models and the gating network that
+The objective is to learn the expert models and the gating network that
 best fit the dataset.
 %
 
-Since the prominence of machine learning techniques, the expert models and the
-gating network are commonly parameterized by neural networks.
+The expert models and the gating networks can take several forms. 
 %
-Let $F(x)$ denote a collection of expert models, i.e. $F(x) = \{F_1(x), \dots,
-F_{N_{F}(x)}\}$.
+Gaussian experts and gating networks are commonly used in the MOE framework to
+find a multi-modal probabilistic model from a small amount of
+data~\cite{bishop2006pattern}.
 %
-The parameters of the experts are also given by the set $\theta=\{\theta_1, \dots,
-\theta_{N_{F}} \}$.
+However, as the observations from the dataset grow large, the Gaussian experts
+impose large computational and memory overhead~\cite{harkonen2022mixtures}.
+%
+Moreover, Gaussian gating networks can only provide a quadratic parameterization
+of the boundaries of the state partitions.
+%
+Hence, we leverage the universal approximation capabilities of neural networks
+for both the experts and the gating network.
+%
+Let $F(x)$ denote a collection of $N_F$ expert models $F(x) = \{F_1(x),
+\dots, F_{N_{F}(x)}\}$, whose parameters are given by the set
+$\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 % Henceforth, we assume that the number of state partitions is the same as the
 % number of available expert controller.
 %
-The gating network $P(x) : \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ determines 
-the probability of state $x$ belonging to each state partitions. 
+The gating network $P(x; \psi) : \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ is
+also a neural net with parameters $\psi$.
 %
-We apply the \textsc{softmax} function on the last layer of the gating network
-to convert the outputs into vector of probabilities that sum to one.
+The objective is to learn the decision parameters $(\psi, \theta)$ from observed
+data.
+
+The gating network $P(x)$ provides a vector of probabilities, whose
+components $P(i | x, \psi)$ represent the probability of state $x$ belonging to
+the state partition $i$.
 %
 We use a categorical probability distribution to sample a state partition based
 on the outputs of the gating network as follows~\cite{harkonen2022mixtures} 
@@ -258,27 +273,55 @@ on the outputs of the gating network as follows~\cite{harkonen2022mixtures}
 \noindent where $c_i$ is the bin corresponding to the $i^{th}$ expert and $\psi$
 is the parameters of the gating network.
 %
+The prediction from the mixture of experts is given by the linear combination over
+the \it{responsibility} \normalfont of each state partition.
+%
+\begin{align*}
+  F_o(x) = \sum_{i=1}^{N_F}F_i(x)P(c_i=i | x, \psi)
+\end{align*}
+A single controller is active in each state partition hence the prediction $F_o(x)$ is equivalent to 
+\begin{align*}
+  j &= \underset{i}{\textrm{argmax}} \{ P(c_i=i | x, \psi) \}\\
+  F_o(x) &= F_j(x)
+\end{align*}
+
+
 
 There are several Bayesian inference techniques to learn the parameters of the
 expert models and the gating network, one of which is \it{expectation
 maximization} \normalfont (EM).
 %
-In this technique, we compose a likelihood function   
+In this technique, we compose the log likelihood function $\ln \{P(y | \theta,
+\psi) \}$ as~\cite{bishop2006pattern}   
 \begin{equation}
-  \mathcal{L}(\norm{f(x)-y}{} | \theta, \psi) = -\sum_{i=1}^{N_F} \norm{f_i(x; \theta_i)-y}{} P(c_i = i | x, \psi)
+  \ln \{P(y | \theta, \psi) \} = \ln \Bigl\{ \sum_{i=1}^{N_F} \mathcal{N}(y | F_i(x), s) P(c_i = i | x, \psi) \Bigr\}
   \label{eq:likelihood}
 \end{equation}
-\noindent where $\norm{f_i(x) - y}{}$ is the error in the current prediction.
+\noindent where $\mathcal{N}$ is the Gaussian distribution with mean $F_i(x)$
+and standard deviation $s$. We can simplify this expression to get 
+\begin{align}
+  \ln \{P(y | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{f_i(x) - y}{}^2 + \ln \{P(c_i=i | x, \psi) \}
+  \label{eq:log_normal_likelihood}
+\end{align}
+\noindent where $\norm{F_i(x) - y}{}$ is the error in the current prediction.
 %
-The likelihood measures how likely the current parameters $(\psi, \theta)$ are
-to generate the sampled data $y$. 
+We can remove the constants in~\eqref{eq:log_normal_likelihood} and define the
+final form of the likelihood function as
+\begin{align}
+  \mathbb{L}(y | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - y}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
+  \label{eq:likelihood_def}
+\end{align}
+Notice that the likelihood measures how likely the current parameters $(\psi,
+\theta)$ are to generate the sampled data $y$. 
 %
-% For instance, if two sets of decision parameters are sampled such that  $
-% \mathcal{L}(\norm{f(x)-y}{} | \theta_1, \psi_1) > \mathcal{L}(\norm{f(x)-y}{} |
-% \theta_2, \psi_2)$, it implies that the parameters $(\psi_1, \theta_1)$ are more
-% likely to generate the sample $y$ than $(\psi_1, \theta_1)$.
+The goal is to maximize the likelihood and consequently minimize prediction
+error.
 %
-The standard EM approach evaluates the expectation of~\eqref{eq:likelihood} over
-many samples of $x$ and iteratively updates the parameters $(\psi, \theta)$ to
-maximize the likelihood and consequently minimize prediction error.
+The likelihood~\eqref{eq:likelihood_def} is maximum when the parameter $\theta_i$
+has the lowest prediction error and the highest probability of getting selected
+by the gating network.
+%
+The standard EM approach evaluates the expectation of~\eqref{eq:likelihood_def}
+over many samples of $x$ and uses gradient-based techniques to iteratively
+update the parameters $(\psi, \theta)$.
 %
