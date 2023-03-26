@@ -2,6 +2,7 @@
 \section{Background}
 
 \subsection{Passivity-Based Control (PBC)}
+\label{ssec:pbc}
 
 Suppose we have a robotic system whose Hamiltonian $H$ can be expressed as
 %
@@ -169,28 +170,63 @@ an approximate solution to the PDEs.
 where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bayesian Learning}
+\label{ssec:bayesianLearning}
 
-The objective of Bayesian learning is to determine a stochastic model (target
-function) that best fits observed data $\mathcal{D}$ with inherent noise. Let
-this stochastic target function be represented by $F(x; \theta) : \mathcal{X}
-\rightarrow \mathbb{R}^t$, where $\theta \in \Theta \subset \mathcal{R}^v$ is a
-multivariate random variable that parameterizes the model. Given prior belief on
-the distribution of the parameters $p(\theta)$, Bayesian learning finds a
-posterior distribution $p(\theta \mid \mathcal{D})$ over $\theta$ that maximizes
-the likelihood of the target function generating the dataset
-$\mathcal{D}$~\cite{bishop2006pattern}. This can be expressed in terms of Bayes'
-theorem as 
+Suppose we are given a finite dataset from a noisy source, for which we are trying to fit a regression model.
+%
+The goal is not only to predict the underlying deterministic source, but also the uncertainty introduced by the noisy dataset.
+%
+Bayesian learning uses the expressive power of stochastic models to best represent the data source and the model uncertainty~\cite{bishop2006pattern}.
+
+
+Let $F(x; \theta)$ represent the stochastic model whose parameters $\theta$ are multivariate random variables.
+%
+These parameters are samples drawn from a posterior probability distribution.
+%
+The objective is to find the posterior distribution that minimizes the prediction error $\norm{F(x) -  Y_x}{}$, where $Y_x$ is a vector of observations corresponding to the inputs $x$.
+%
+As discussed in Section~\ref{ssec:mixture_of_experts}, we can use \it{expectation maximization} \normalfont (EM) to learn the posterior distribution.
+%
+To do so, we define the likelihood as 
+\begin{equation*}
+  P(Y_x | \theta)  =  \sum_{i=1}^{N_F} \mathcal{N}(y | F_i(x), s),
+\end{equation*}
+\noindent where $s$ is the standard deviation.
+%
+While the EM approach is capable of finding the parameters $\theta$ that minimize the predicition error, this technique is prone to overfitting.
+%
+Given finite number of observations, EM finds low variance posterior distributions \it{biased to the training data} \normalfont.
+The risk of overfitting is especially an issue when we are modelling the noise in the data source, which requires some amount of variance.
+%
+The solution to this problem involves finding a \it{bias-variance tradeoff} \normalfont, where the training adjusts the parameters based to the likelihood, but 
+also enforces the posteriors to hold some variance.
+%
+Bias-variance tradeoff is achieved with the introduction of a prior distribution, which adds a regularlization term to the likelihood~\cite{bishop2006pattern}.
+%
+In supervised learning, regularization terms restrict the training from learning a complex model, minimizing the risk of overfitting~\cite{santos2022avoiding}.
+%
+Similarly, the prior distribution prevents the learned parameters from becoming point-estimates.
+%
+
+
+The posterior distribution $P(\theta | Y_x)$ is defined interms of the likelihood and prior with Bayes' theorem as 
 \begin{align}
-  p(\theta | \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}
-  = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{\int_\theta p(\mathcal{D} \mid \theta') p(\theta') d\theta'},
+  P(\theta | Y_x) = \frac{P(Y_x | \theta) P(\theta) }{P(Y_x)}
+  = \frac{P(Y_x | \theta) P(\theta) }{\int_\theta P(Y_x | \theta') P(\theta')  d\theta'},
 \end{align}
-where $p(\mathcal{D} \mid \theta)$ is the likelihood function and
-$p(\mathcal{D})$ is the evidence. While the likelihood and prior distribution
-can be expressed explicitly, the evidence is intractable. This calls for
-techniques that approximate or find the exact posterior distribution, some of
-which are discussed in the following section.
+where  $P(\theta)$ is the prior and $P(\mathcal{D})$ is the evidence.
+%
+The relative weighting between the likelihood and the prior is parameterized by the standard deviation $s$ of the likelihood. The higher the standard deviation, 
+the more weight we give to the regularlization enforced by the prior.
+%
+The rate at which we update the prior distribution also determines the regularization weight.
+%
+While the likelihood and prior distribution
+can be expressed explicitly, the evidence is intractable. Hence, we leverage Bayesian inference techniques to approximate or find the exact posterior distribution.
+We discuss two techniques in the following section.
+
 
 \subsubsection{Posterior Distribution}
 
@@ -298,3 +334,4 @@ $p(F|x, \mathcal{D})$ is given by~\cite{jospin2020hands}
   \label{eqn:predictive_variance}
 \end{equation}
 %
+

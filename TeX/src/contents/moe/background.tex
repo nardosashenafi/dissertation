@@ -300,7 +300,7 @@ In this technique, we compose the log likelihood function $\ln \{P(y | \theta,
 \noindent where $\mathcal{N}$ is the Gaussian distribution with mean $F_i(x)$
 and standard deviation $s$. We can simplify this expression to get 
 \begin{align}
-  \ln \{P(y | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{f_i(x) - y}{}^2 + \ln \{P(c_i=i | x, \psi) \}
+  \ln \{P(y | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{F_i(x) - y}{}^2 + \ln \{P(c_i=i | x, \psi) \}
   \label{eq:log_normal_likelihood}
 \end{align}
 \noindent where $\norm{F_i(x) - y}{}$ is the error in the current prediction.

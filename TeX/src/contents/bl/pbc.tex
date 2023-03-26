@@ -1,6 +1,7 @@
 
 \section{Bayesian Neural PBC}
 
+
 \subsection{Control Design for Smooth Dynamical Systems}
 In this subsection, we formulate the Bayesian learning framework that minimizes
 the effects of system parameter uncertainties and measurement errors. 
@@ -43,14 +44,7 @@ Hence, the posterior distribution $q(\xi)$ is an MPD over the multivariate
 random variable $\xi$, where $\xi = [\theta, s]$ and $z$ is the distribution
 parameters over $\xi$.
 %
-\begin{rem}
-    For continuous posterior distribution, the \textsc{Elbo} given in
-    equation~\eqref{eq:elbo} is redefined using differential entropy, which
-    expresses the prior and posterior in terms of their probability density
-    functions (PDF). In this case, the likelihood
-    in~\eqref{eqn:likelihood_neuralpbc} is also a PDF and the \textsc{Elbo} is
-    not bounded by zero.
-\end{rem}
+
 
 We take two approaches to selecting the distribution parameters $z_0$ of the
 prior. The simplest approach is to use an uninformed prior with randomly
@@ -62,8 +56,105 @@ distribution is centered around the parameters learned from the deterministic
 technique discussed in Section~\ref{sssec:ml-pbc-deterministic}.
 
 
-System parameter uncertainties and measurement noise can deteriorate the
-performance of controllers when employed on real systems. 
+\subsection{Cost Function}
+\label{ssec:cost}
+
+The cost function $J$ helps impose various desired behaviors in the learned
+controller. In this section, we present three performance objectives, their
+corresponding likelihood functions and the desired behavior they impose.
+
+\begin{enumerate}
+    \item Trajectory tracking: Let $x^\star$ denote the desired equilibrium of a
+    dynamical system and $\gamma : t \to \phi(t; x_0, u^\theta)$ represent a
+    prediction from the initial condition $x_0$ with the current control law
+    $u^\theta$. The objective of this task is to find a closed-loop controller
+    that can track an expert trajectory $\gamma^\star$ obtained from a path
+    planner. To impose this behavior, the running cost is a function of the
+    distance from the current trajectory $\gamma$ to $\gamma^\star$, defined in
+    terms of the transverse coordinates $\gamma_\bot-\gamma^\star_\bot$ along
+    the preferred orbit, using the ideas outlined
+    in~\cite{shiriaev2009transverse,manchester2010transverse}. In this setting,
+    the prediction converges to $\gamma^\star$ if and only if
+    $\gamma_\bot-\gamma^\star_\bot \xrightarrow{t \to \infty}{} 0$. In order to
+    encourage this behavior, we define the cost function as
+    %
+    \begin{equation}
+        % J_{\textrm{MSE}} =  \frac{1}{N} \sum_{n=0}^N \Big( \norm{x(t_n) - \hat{x}(t_n)}{} + \norm{u(t_n) - \hat{u}(t_n)}{} \Big)
+        J_{track}(\gamma_\bot) =  \sum_{x_\bot \in \gamma_\bot, \; x^\star_\bot \in \gamma^\star_\bot} |\left| x_\bot-x^\star_\bot | \right |^2
+        \label{eq:xperploss}   
+    \end{equation}
+    %
+    Thus, the likelihood can be constructed to minimize the cost $J_{track}$ as follows.
+    \begin{align}
+        p(\gamma_\bot | \theta) = \prod_{x_\bot \in \gamma_\bot, \; x^\star_\bot \in \gamma^\star_\bot}\mathcal{N}(x^\star_\bot , \Sigma),
+        \label{eq:track_likelihood}
+    \end{align}
+    %
+    where $\Sigma$ parameterizes the variance of the likelihood. On top of the
+    target function parameters $\theta$, we wish to learn the posterior over the
+    variance $\Sigma$ of the likelihood. This allows us to adaptively tune the
+    weights on the components of $x_\bot-x^\star_\bot$ on the overall cost, such
+    that we achieve optimum trajectory tracking. This is most advantageous when
+    the states of a system have high variance and the weights on
+    $x_\bot-x^\star_\bot$ need to be selected in such a way that one state does
+    not dominate the cost $J_{track}$.
+    %
+    Hence, the posterior distribution $p(\theta | \mathcal{D})$ is a multivariate
+    probability distribution over random variable $\xi$, where $\xi = [\theta,
+    \Sigma]$.
+    \item Set distance loss: Let $\mathcal{S}$ represent a small convex
+    neighborhood containing $x^\star$. The objective is to find a policy that
+    pulls trajectories to the goal set $\mathcal{S}$. The cost function suitable
+    for this task is set distance, $J_{\textrm{set}}$, between the current
+    prediction $\gamma$ and the goal set $\mathcal{S}$:
+    %
+    \begin{equation}
+        J_{\textrm{set}}(\gamma)
+        = \underset{t}{\inf} \, {\{ \norm{a - b}{}: a \in \gamma(t),\, b \in \mathcal{S} \}}.  
+        \label{eq:set_distance}
+    \end{equation}
+    % 
+    For instance, the set $\mathcal{S}$ may be chosen as a ball of radius
+    $r$ around $x^\star$ in the standard norm topology. 
+    %
+    Here, $r$ becomes a hyperparameter of the training algorithm. With a
+    particular choice of $\mathcal{S}$, if at any point along the prediction
+    $\gamma$, a state $x$ is closer than $r$ to $x^\star$, no penalty is
+    incurred by $J_{\textrm{set}}$. The corresponding likelihood function is
+    given by 
+    \begin{align}
+        p(J_{\textrm{set}}(\gamma) | \theta) = \mathcal{N}(0, s^2),
+        \label{eq:set_likelihood}
+    \end{align}
+    where $s$ is a hyperparameter that represents the standard deviation of the
+    likelihood.
+    %
+    \item Terminal loss: encourages trajectories to remain as close to the
+    desired state as possible at time $T$. Terminal loss, $\ell_T$, is the
+    distance between the final state of the prediction $\gamma$ and $x^\star$,
+    which is given by
+    %
+    \begin{equation}
+        J_T(\gamma) = \ell_{\textrm{set}}(\gamma) + \ell_T\left(\gamma\right).
+        \label{eq:nn_controller_j} 
+    \end{equation}
+    %
+    The corresponding likelihood function is given by 
+    \begin{align}
+        p(J_T(\gamma) | \theta) = \mathcal{N}(0, s^2),
+        \label{eq:terminal_likelihood}
+    \end{align}
+\end{enumerate}
+
+\subsubsection{Uncertainty Modelling}
+
+In Section~\ref{sec:bl_justification}, we have shown the deteriorated performance caused by system model discrepancies.
+%
+Moreover, in Section~\ref{ssec:bayesianLearning}, we have discussed how the variance in the stochastic control can prevent the Bayesian training from overfitting on inaccurate observations.
+%
+In this section, we give more structure to the desired variance of the Bayesian control.
+%
+We rigorously model the system parameter and measurement uncertainties of the system in order to guide the variance of the controller.
 %
 Hence, in the Bayesian framework, we inject these uncertainties directly into
 the training loop in order to learn a controller that works for a wide range of
@@ -91,7 +182,7 @@ equation (SDE).
 where $\dd W_t$ is a correlated noise process, such as Wiener process, on the
 states due to measurement uncertainties, and $\nabla_x u(x)$ is the coefficient
 of the first-order Taylor approximation of $u^{\theta}(x)$ around zero noise. 
-  
+
 \begin{rem}
     Introducing uncertainties to the deterministic training finds a point
     estimate of the optimal controller parameter, which may be interpreted
@@ -103,9 +194,9 @@ of the first-order Taylor approximation of $u^{\theta}(x)$ around zero noise.
     problem is alleviated by Bayesian inference which allows one to
     marginalize over the posterior parameter
     distribution~\cite{bishop2006pattern}.
-\end{rem}  
+\end{rem}
 
-
+\subsubsection{Training}
 %
 This Bayesian framework extends the deterministic training process discussed in
 Section~\ref{sssec:ml-pbc-deterministic}, by replacing lines 7 to 10 of
@@ -943,8 +1034,9 @@ The solid line in Figure~\ref{fig:comparison} shows the average $J_T$ over the
 10 trajectories for each $p_{max}$ and the error band represents the standard
 deviation over the accumulated losses.
 
-\begin{figure}
-    % \includegraphics[options]{name}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{simulationComparison.eps}
     \label{fig:comparison}
 \end{figure}
 
@@ -976,7 +1068,7 @@ torque commands with the Raspberry Pi via ROS wireless communication protocols.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\columnwidth]{rendering.JPG}
+    \includegraphics[width=0.7\columnwidth]{rendering.JPG}
     \caption{Rimless Wheel Assembly}
     \label{fig:hardware}
 \end{figure}

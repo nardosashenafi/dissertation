@@ -1,8 +1,30 @@
 \section{Theoretical Justification of Robustness}
 \label{sec:bl_justification}
 
+In Section~\ref{ssec:bayesianLearning}, we discussed how a Bayesian approach to regression achieves bias-variance tradeoff and combats the risk of overfitting. 
+%
+We translate the same idea to the data-driven control design problem.
+%
+For instance, the \textsc{NeuralPbc} framework discussed in Section~\ref{ssec:pbc} assumes a nominal system model given by $f(x, u)$.
+%
+The parameters of the desired Hamiltonian are updated from a finite dataset generated from this model.
+%
+A robust controller would not overfit to a point-esimate with the assumption that the finite trajectory observations represent the real system. 
+%
+System parameter and measurement uncertainties in the real system can generate vastly different trajectories, which the deterministic (point-esimate) controller may find foreign.
+%
+We propose a Bayesian learning framework where the controllers are given by stochastic functions.
+%
+In this framework, we achieve the performance objective with wide range of control inputs sampled from the stochastic control, which can be viewed as training an ensemble of controllers.
+%
+This provides a conservative control policy that is robust to uncertainties.
 
-In this section, we demonstrate the improved robustness properties of Bayesian
+
+The variance in the stochastic control is the most beneficial when there is an unknown discrepancy between the nominal model and the real system.
+%
+In this section, we show the relationship between the model uncertainties and the variance of the stochastic control.
+%
+We also demonstrate the significant effects of these model discrepancies on the performance objective and the improved robustness properties of Bayesian
 learning over point-estimates of a policy. This theoretical justification is
 given by a toy example, where closed-form calculation of the point-estimates and
 posterior distributions for the optimal controller is provided.
