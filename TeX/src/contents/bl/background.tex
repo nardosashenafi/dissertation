@@ -174,64 +174,99 @@ are parameterized by neural networks.
 \subsection{Bayesian Learning}
 \label{ssec:bayesianLearning}
 
-Suppose we are given a finite dataset from a noisy source, for which we are trying to fit a regression model.
+Suppose we are given a finite dataset from a noisy source, for which we are
+trying to fit a regression model.
 %
-The goal is not only to predict the underlying deterministic source, but also the uncertainty introduced by the noisy dataset.
+The goal is not only to predict the underlying deterministic source, but also
+the uncertainty introduced by the noisy dataset.
 %
-Bayesian learning uses the expressive power of stochastic models to best represent the data source and the model uncertainty~\cite{bishop2006pattern}.
+Bayesian learning uses the expressive power of stochastic models to best
+represent the data source and the prediction uncertainty~\cite{bishop2006pattern}.
 
 
-Let $F(x; \theta)$ represent the stochastic model whose parameters $\theta$ are multivariate random variables.
+Let $F(x; \theta)$ denote the stochastic model whose parameters $\theta$ are
+multivariate random variables.
 %
 These parameters are samples drawn from a posterior probability distribution.
 %
-The objective is to find the posterior distribution that minimizes the prediction error $\norm{F(x) -  Y_x}{}$, where $Y_x$ is a vector of observations corresponding to the inputs $x$.
+The objective is to find the posterior distribution that minimizes the quadratic
+prediction error $(F(x) -  Y_x)^2$, where $Y_x$ is the observation
+corresponding to the input $x$.
 %
-As discussed in Section~\ref{ssec:mixture_of_experts}, we can use \it{expectation maximization} \normalfont (EM) to learn the posterior distribution.
+As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
+\it{expectation maximization} \normalfont (EM) to learn the posterior
+distribution.
 %
-To do so, we define the likelihood as 
+To do so, we define the likelihood in terms of the quadratic prediction error as
 \begin{equation*}
-  P(Y_x | \theta)  =  \sum_{i=1}^{N_F} \mathcal{N}(y | F_i(x), s),
+  P(Y_x | \theta)  = \mathcal{N}(Y_x | F(x), s).
 \end{equation*}
-\noindent where $s$ is the standard deviation.
 %
-While the EM approach is capable of finding the parameters $\theta$ that minimize the predicition error, this technique is prone to overfitting.
+While the EM approach is capable of finding the parameters $\theta$ that
+minimize the prediction error, this technique is prone to overfitting.
 %
-Given finite number of observations, EM finds low variance posterior distributions \it{biased to the training data} \normalfont.
-The risk of overfitting is especially an issue when we are modelling the noise in the data source, which requires some amount of variance.
+Given finite number of observations, EM finds low variance posterior
+distribution \it{biased to the training
+data}\normalfont~\cite{bishop2006pattern}. 
 %
-The solution to this problem involves finding a \it{bias-variance tradeoff} \normalfont, where the training adjusts the parameters based to the likelihood, but 
-also enforces the posteriors to hold some variance.
+The risk of overfitting is especially an issue when we are modelling the noise
+in the data source, which requires some amount of variance.
 %
-Bias-variance tradeoff is achieved with the introduction of a prior distribution, which adds a regularlization term to the likelihood~\cite{bishop2006pattern}.
+The solution to this problem involves finding a \it{bias-variance
+tradeoff}\normalfont, where the training adjusts the parameters based on the
+likelihood, but also enforces the posterior to hold some variance to prevent
+overfitting.
 %
-In supervised learning, regularization terms restrict the training from learning a complex model, minimizing the risk of overfitting~\cite{santos2022avoiding}.
+% We can observe the importance of bias-variance tradeoff directly from the
+% prediction error as follows.
+% %
+% Let us add and subtract the average prediction $\mathbb{E}_{\mathbb{D}}(F(x))$
+% from the prediction error, where $\mathbb{D}$ is a collection of datasets $Y_x$. We get
+% \begin{align*}
+%   (F(x) - Y_x)^2 &= (F(x) - \mathbb{E}_{\mathbb{D}}[F(x)] + \mathbb{E}_{\mathbb{D}}[F(x)] - Y_x)^2 \\
+%   &= (F(x) - \mathbb{E}_{\mathbb{D}}[F(x)])^2 + (\mathbb{E}_{\mathbb{D}}[F(x)] - Y_x)^2 + 2(F(x) - \mathbb{E}_{\mathbb{D}}[F(x)])(\mathbb{E}_{\mathbb{D}}[F(x)] - Y_x)
+% \end{align*}
+% The prediction error over the entire dataset $\mathbb{D}$ is given by the expectation
+% \begin{align*}
+%   \mathbb{E}_{\mathbb{D}}[(F(x) - Y_{x})^2] = (\mathbb{E}_{\mathbb{D}}[F(x)] - Y_x)^2 + \mathbb{E}_{\mathbb{D}}[\{F(x) - \mathbb{E}_{\mathbb{D}}(F(x)) \}^2]
+% \end{align*}
 %
-Similarly, the prior distribution prevents the learned parameters from becoming point-estimates.
+Bias-variance tradeoff is achieved with the introduction of a prior
+distribution, which adds a regularlization term to the
+likelihood~\cite{bishop2006pattern}.
+%
+In supervised learning, regularization terms restrict the training from learning
+a complex model, minimizing the risk of overfitting~\cite{santos2022avoiding}.
+%
+Similarly, the prior distribution prevents the learned parameters from becoming
+point-estimates.
 %
 
 
-The posterior distribution $P(\theta | Y_x)$ is defined interms of the likelihood and prior with Bayes' theorem as 
+The posterior distribution $P(\theta | Y_x)$ is defined in terms of the likelihood and prior with Bayes' theorem as 
 \begin{align}
   P(\theta | Y_x) = \frac{P(Y_x | \theta) P(\theta) }{P(Y_x)}
-  = \frac{P(Y_x | \theta) P(\theta) }{\int_\theta P(Y_x | \theta') P(\theta')  d\theta'},
+  = \frac{P(Y_x | \theta) P(\theta) }{\int_\theta P(Y_x | \theta') P(\theta')  d\theta'}, 
+  \label{eq:bayes_posterior}
 \end{align}
-where  $P(\theta)$ is the prior and $P(\mathcal{D})$ is the evidence.
+where  $P(\theta)$ is the prior and $P(Y_x)$ is the evidence.
 %
-The relative weighting between the likelihood and the prior is parameterized by the standard deviation $s$ of the likelihood. The higher the standard deviation, 
+The relative weighting between the likelihood and the prior is parameterized by
+the standard deviation $s$ of the likelihood. The higher the standard deviation,
 the more weight we give to the regularlization enforced by the prior.
 %
-The rate at which we update the prior distribution also determines the regularization weight.
+The rate at which we update the prior distribution also determines the
+regularization weight.
 %
-While the likelihood and prior distribution
-can be expressed explicitly, the evidence is intractable. Hence, we leverage Bayesian inference techniques to approximate or find the exact posterior distribution.
-We discuss two techniques in the following section.
 
 
 \subsubsection{Posterior Distribution}
 
-Bayesian learning provides various techniques to infer the posterior distribution
-over the parameters $\theta$. Two of the most famous techniques are discussed as follows.
+While the likelihood and prior distributions in~\eqref{eq:bayes_posterior} can
+be expressed explicitly, the evidence is intractable. We leverage Bayesian
+inference techniques to approximate or find the exact posterior distribution
+without the use of the evidence. Two of the most famous techniques are
+discussed as follows.
 \begin{enumerate}
   \item Markov Chain Monte Carlo (MCMC) methods: learn the exact posterior
   distribution by collecting samples of $\theta$ either through random walk
@@ -302,18 +337,16 @@ lower bound (\textsc{Elbo}). The \textsc{Elbo}, $\mathcal{L}$, is given
 by~\cite{cohen2016bayesian}
 \begin{align}
   \begin{split}
-  \mathcal{L}(\mathcal{D},z) &= \mathbb{E}_{\theta \sim q} \left[\log(p(\theta, \mathcal{D};z)) - \log(q(\theta;z)) \right], \\
-  p(\theta, \mathcal{D};z) &= p(\mathcal{D} \mid \theta;z)p(\theta),
+  \mathcal{L}(Y_x,z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(Y_x \mid \theta;z)P(\theta)) - \log(Q(\theta;z)) \right].
   \end{split}
   \label{eq:elbo}
 \end{align}
-where $p(\mathcal{D} \mid \theta;z)$ is the likelihood function. 
 \end{enumerate}
 \begin{rem}
   For continuous posterior distribution, the \textsc{Elbo} given in
   equation~\eqref{eq:elbo} is redefined using differential entropy, which
   expresses the prior and posterior in terms of their probability density
-  functions. In this case, the likelihood $p(\theta \mid \mathcal{D};z)$ is also
+  functions. In this case, the likelihood $P(\theta \mid Y_x;z)$ is also
   a probability density function and the \textsc{Elbo} is not bounded by zero.
 \end{rem}
 
@@ -322,7 +355,7 @@ and make predictions that integrate over
 uncertainties~\cite{tipping2003bayesian}. These predictions can be found by
 marginalizing the model over the posterior as follows~\cite{jospin2020hands}.
 \begin{equation}
-  \hat{F}(x) = \frac{1}{N} \sum_{\theta \sim q} F(x, \theta),
+  \hat{F}(x) = \frac{1}{N} \sum_{\theta \sim Q} F(x, \theta),
   \label{eqn:marginalization}
 \end{equation} 
 where $N$ is the number of samples drawn from the posterior. Moreover, Bayesian
