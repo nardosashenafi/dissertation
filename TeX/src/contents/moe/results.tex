@@ -161,15 +161,15 @@ The dynamics of the system
 is given by~\eqref{eq:hybrid_dynamics} where 
 \begin{equation}
     \begin{gathered}
-        M(q) = \bmat{m_c + m_p & -m_p+l_{cm} \cos(\theta) \\
-        -m_pl_{cm}\cos(\theta) & m_p l_{cm}^2+I_1} \\
-        C(q, \dot{q}) = \bmat{b  & m_pl_{cm}\sin(\theta) \\
-                -m_p\sin(\theta)/2 & 0} \\
-        G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta)}^\top \\
+        M(q) = \bmat{m_c + m_p & -m_p+l_{cm} \cos(\theta_p) \\
+        -m_pl_{cm}\cos(\theta_p) & m_p l_{cm}^2+I_1} \\
+        C(q, \dot{q}) = \bmat{b  & m_pl_{cm}\sin(\theta_p) \\
+                -m_p\sin(\theta_p)/2 & 0} \\
+        G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta_p)}^\top \\
         B = [1 \; 0]^\top
     \end{gathered}
 \end{equation}
-\noindent where $q = [x_c; \theta]$, $x_c$ is the location of the cart, $\theta$
+\noindent where $q = [x_c; \theta_p]$, $x_c$ is the location of the cart, $\theta_p$
 is the angle of the pendulum from the vertical and $g$ is the acceleration due
 to gravity. 
 %
@@ -318,7 +318,7 @@ to stabilize it to the upright.
 As shown in Figure~\ref{fig:continuous_control}, the single controller
 successfully swings up the pendulum closer to the upright.
 %
-But the controllers is not able to catch the pendulum post-impact.
+But the controller is not able to catch the pendulum post-impact.
 %
 Figure~\ref{fig:contandmoe} shows the performance of the MOE controllers in the
 same scenario as Figure~\ref{fig:continuous_control}.
