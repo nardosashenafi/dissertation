@@ -114,6 +114,7 @@ We present two viable choices for the running cost function.
 \end{enumerate}
 
 \subsubsection{State Sampling}
+\label{sssec:state_sampling}
 
 We intend to find a solution to the optimization problem
 in~\eqref{eq:moe_opt} for all initial states $x_0$ in the
@@ -160,7 +161,7 @@ The full training procedure is outlined in Algorithm~\eqref{algo:moe_training}.
 We leverage forward-mode auto-differentiation technique~\cite{revels2016forward}
 to back-propagate on the gradient of the likelihood with respect to the learned
 parameters.
-\begin{algorithm}
+\begin{algorithm}[tb]
     \setstretch{1.2}
       \caption{Solution to the Optimization Problem~\eqref{eq:moe_opt}}
       \label{algo:moe_training}

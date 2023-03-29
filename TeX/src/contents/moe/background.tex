@@ -279,11 +279,11 @@ the \it{responsibility} \normalfont of each state partition.
 \begin{align*}
   F_o(x) = \sum_{i=1}^{N_F}F_i(x)P(c_i=i | x, \psi)
 \end{align*}
-A single controller is active in each state partition hence the prediction $F_o(x)$ is equivalent to 
-\begin{align*}
-  j &= \underset{i}{\textrm{argmax}} \{ P(c_i=i | x, \psi) \}\\
-  F_o(x) &= F_j(x)
-\end{align*}
+% A single controller is active in each state partition hence the prediction $F_o(x)$ is equivalent to 
+% \begin{align*}
+%   j &= \underset{i}{\textrm{argmax}} \{ P(c_i=i | x, \psi) \}\\
+%   F_o(x) &= F_j(x)
+% \end{align*}
 
 
 
@@ -291,28 +291,29 @@ There are several Bayesian inference techniques to learn the parameters of the
 expert models and the gating network, one of which is \it{expectation
 maximization} \normalfont (EM).
 %
-In this technique, we compose the log likelihood function $\ln \{P(y | \theta,
+In this technique, we compose the log likelihood function $\ln \{P(Y_x | \theta,
 \psi) \}$ as~\cite{bishop2006pattern}   
 \begin{equation}
-  \ln \{P(y | \theta, \psi) \} = \ln \Bigl\{ \sum_{i=1}^{N_F} \mathcal{N}(y | F_i(x), s) P(c_i = i | x, \psi) \Bigr\}
+  \ln \{P(Y_x | \theta, \psi) \} = \ln \Bigl\{ \sum_{i=1}^{N_F} \mathcal{N}(Y_x | F_i(x), s) P(c_i = i | x, \psi) \Bigr\}
   \label{eq:likelihood}
 \end{equation}
 \noindent where $\mathcal{N}$ is the Gaussian distribution with mean $F_i(x)$
-and standard deviation $s$. We can simplify this expression to get 
+and standard deviation $s$, and $Y_x$ is the observation (dataset) corresponding
+to the input $x$. We can expand this expression to 
 \begin{align}
-  \ln \{P(y | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{F_i(x) - y}{}^2 + \ln \{P(c_i=i | x, \psi) \}
+  \ln \{P(Y_x | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{F_i(x) - Y_x}{}^2 + \ln \{P(c_i=i | x, \psi) \}
   \label{eq:log_normal_likelihood}
 \end{align}
-\noindent where $\norm{F_i(x) - y}{}$ is the error in the current prediction.
+\noindent where $\norm{F_i(x) - Y_x}{}$ is the error in the current prediction.
 %
 We can remove the constants in~\eqref{eq:log_normal_likelihood} and define the
 final form of the likelihood function as
 \begin{align}
-  \mathbb{L}(y | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - y}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
+  \mathbb{L}(y | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
   \label{eq:likelihood_def}
 \end{align}
 Notice that the likelihood measures how likely the current parameters $(\psi,
-\theta)$ are to generate the sampled data $y$. 
+\theta)$ are to generate the sampled data $Y_x$. 
 %
 The goal is to maximize the likelihood and consequently minimize prediction
 error.

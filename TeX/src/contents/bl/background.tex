@@ -16,13 +16,13 @@ potential energy. Hamilton's equations of motion are given by
 
 \begin{align}
     \begin{split}  
-      f(x, u) &= \bmat{\nabla_pH \\ -\nabla_qH}\ + \bmat{0 \\ \Omega(q)}u, \\
+      f(\hat{x}, u) &= \bmat{\nabla_pH \\ -\nabla_qH}\ + \bmat{0 \\ \Omega(q)}u, \\
       &\hspace{-0.15cm} y = \Omega(q)^\top \dot{q},
     \end{split}
     \label{eq:hamiltonian_dynamics}
 \end{align}
-\noindent where $\Omega(q) \in \mathbb{R}^{m \times n}$ is the input matrix, and $u
-\in \mathbb{R}^{n}$ is the control input.
+\noindent where $\hat{x} = (q, p)$, $\Omega(q) \in \mathbb{R}^{m \times n}$ is
+the input matrix, and $u \in \mathbb{R}^{n}$ is the control input.
 %
 % The system~\eqref{eq:hamiltonian_dynamics} is \textit{underactuated} if rank $\Omega
 % = n < m$.
@@ -32,40 +32,39 @@ design a stable closed-loop system.
 %
 A mechanical system is considered passive if it is dissipative, i.e.
 \begin{align}
-  H(x(t_1)) \leq H(x(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) dt,
+  H(\hat{x}(t_1)) \leq H(\hat{x}(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) dt,
 \end{align}
-\noindent for all initial state $x(t_0$) and all input $u$ under the supply rate
-$s = u^\top y$.
+\noindent for all initial state $\hat{x}(t_0$) and all input $u$ under the
+supply rate $s = u^\top y$.
 %
 From Lyapunov stability theory, the system~\eqref{eq:hamiltonian_dynamics} is
-passive and therefore the origin $x = (0, 0)$ is stable because 
+passive and therefore the origin $\hat{x} = (0, 0)$ is stable because 
 \begin{equation*}
   \begin{gathered}
-    \dot{H} = \frac{\partial H}{\partial x} f(x, u) \leq u^\top y, \\
+    \dot{H} = \frac{\partial H}{\partial \hat{x}} f(\hat{x}, u) \leq u^\top y, \\
     H \geq 0.
   \end{gathered}
 \end{equation*}
 
-The objective of passivity-based control (PBC) is to design a control
-law $u$ that imposes the desired storage function $H_d: \mathcal{X} \rightarrow
-\mathbb{R}$ on the closed-loop system, rendering it passive and therefore
-stable~\cite{van2000l2}.
+The objective of passivity-based control (PBC) is to design a control law $u$
+that imposes the desired storage function $H_d$ on the closed-loop system,
+rendering it passive and therefore stable~\cite{van2000l2}.
 %
 The dynamics of the resulting closed-loop system is 
 \begin{align}
   \begin{split}  
-    f(x, u) &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
+    f(\hat{x}, u) &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
   \end{split}
   \label{eq:desired_hamiltonian_dynamics}
 \end{align}
-\noindent and it has a new desired stable equilibrium at $x^*$.
+\noindent and it has a new desired stable equilibrium at $\hat{x}^*$.
 
 From~\eqref{eq:hamiltonian_dynamics}
 and~\eqref{eq:desired_hamiltonian_dynamics}, we can find the energy shaping term
 that creates a passive closed-loop system as
 %
 \begin{equation}
-  u_{es}(x) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right).
+  u_{es}(\hat{x}) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right).
   \label{eq:esc}
 \end{equation}
 \noindent where $\Omega^\dagger = \left( \Omega^\top \Omega  \right)^{-1}
@@ -73,8 +72,8 @@ that creates a passive closed-loop system as
 asymptotically stable system. The resulting controller is
 \begin{align}
   \begin{split} 
-    u &= u_{es}(x) + u_{di}(x), \\
-    &u_{di}(x) = - K_{v} \, y
+    u &= u_{es}(\hat{x}) + u_{di}(\hat{x}), \\
+    &u_{di}(\hat{x}) = - K_{v} \, y
   \end{split}
   \label{eq:damping_and_es_control}
 \end{align}
@@ -86,31 +85,31 @@ form of $H_d$ as
     \label{eq:pdes}
 \end{align}
 where $\Omega^\perp \Omega = 0$ and $H_d$ has a minimum at the desired
-equilibrium $(q^\star, p^*)$. 
+equilibrium $\hat{x}^* = (q^\star, p^*)$. 
 %
-However, the closed-form solution to the partial differential
-equations (PDEs) in~\eqref{eq:pdes} is intractable. 
+However, for high-dimensional systems, the closed-form solution to the partial
+differential equations (PDEs) in~\eqref{eq:pdes} may be intractable. 
 
 \subsubsection{Neural PBC}
 
 The deterministic \textsc{NeuralPbc} framework presented in~\cite{neuralpbc}
 solves the PDEs~\eqref{eq:pdes} by rewriting the PBC problem as the following 
-optimization problem
+optimization scheme:
 \begin{equation}
   \begin{aligned}
       \underset{\theta}{\textrm{minimize}} 
       & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\%
       \textrm{subject to}
-      & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
+      & & f(\hat{x}, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
       & & u^{\theta} &= -\Omega^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} \Omega^\top \nabla_p H_d^{\theta},%
       % & \quad x(0) &= x_0 \in \mathcal{X}, \\%
   \end{aligned}
   \label{eq:neural_pbc_finite_optim}
 \end{equation}
-where $T>0$ is the time horizon, $\ell: \mathcal{X} \times \mathcal{U}
-\rightarrow \mathbb{R}$ is a running cost function to be defined, and $\phi(
-x_0, u^\theta, T)$ is a closed-loop trajectory generated from the initial state
-$x_0$ under the current control law $u^\theta$.
+where $T>0$ is the time horizon, $\phi( x_0, u^\theta, T)$ is a closed-loop
+trajectory generated from the initial state $x_0$ under the current control law
+$u^\theta$ and $\ell$ is a running cost function that parameterizes the
+performance of the current control.
 %
 The \textsc{NeuralPbc} technique adds three important features to the classical 
 PBC framework.
@@ -131,30 +130,41 @@ $H_d$
   H_d(q, p) = \frac{1}{2} p^\top M_d^{-1}(q) p + V_d(q),
   \label{eq:idapbc_desired_hamiltonian}
 \end{equation}
-such that the control input must satisfy the PDEs given by 
-\begin{equation}
-  G^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} = 0.
-  \label{eq:pde_idapbc}
-\end{equation}
-The objective is to learn $V_d$ and the entries of $M_d$ and $J_2$ matrices.
-Once $V_d$, $M_d$ and $J_2$ are obtained, the energy-shaping control and the
-damping injection term are given by
+\noindent where the minimum of the closed-loop potential energy $V_d(q)$ is at
+the desired equilibrium coordinate $q^*$.
 %
+The resulting passive closed loop system is given by~\cite{ortega2002stabilization}
+\begin{equation}
+  \bmat{\dot{q} \\ \dot{p}}  =
+  \bmat{0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - GK_vG^\top}
+  \bmat{\nabla_q H_d \\ \nabla_p H_d},
+  \label{eq:pch}
+\end{equation}
+where $J_2 = -J_2^\top$ and $M_d \succ 0$ is a positive-definite matrix.
+%
+We set the closed loop systems in~\eqref{eq:hamiltonian_dynamics}
+and~\eqref{eq:pch} equal to each other to find the energy-shaping and the damping control terms as
 \begin{align}
   \begin{split}
-  u_{es} &= G^{\dagger} \left(\nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p\right), \\
-  u_{di} &= -K_v G^\top \nabla_p H_d,
+  u_{es} &= \Omega^{\dagger} \left(\nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p\right), \\
+  u_{di} &= -K_v \Omega^\top \nabla_p H_d,
   \end{split}
   \label{eq:idapbc_ues}
 \end{align}
 %
-respectively, where $G^{\dagger} = \left(G^\top G\right)^{-1} G^\top$.
+We build a constraint from~\eqref{eq:idapbc_ues} to extract $V_d$ and the
+matrices $M_d$ and $J_2$. The resulting PDEs are given by 
+\begin{equation}
+  \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} = 0.
+  \label{eq:pde_idapbc}
+\end{equation}
+%
+Similar to \textsc{NeuralPbc}, the closed-form solution to the PDEs
+in~\eqref{eq:pde_idapbc} may be intractable. 
 
-The closed-form solution to the PDEs in~\eqref{eq:pde_idapbc} is intractable.
-Hence, the deterministic \textsc{Neural-IdaPbc} framework introduced
-in~\cite{neuralidapbc} formulates the following optimization problem that finds
-an approximate solution to the PDEs.
-
+The deterministic \textsc{Neural-IdaPbc} framework introduced
+in~\cite{neuralidapbc} finds an approximate solution to the PDEs from the
+following optimization problem.
 \begin{equation}
   \begin{aligned}
       \underset{\theta }{\textrm{minimize}} 
@@ -163,25 +173,64 @@ an approximate solution to the PDEs.
       &&\quad M_d^\theta &= \big( M_d^\theta \big)^\top \succ 0, \\
       &&\quad J_2^\theta &= -\big( J_2^\theta \big)^\top, \\
       % &&\quad q^\star &= \underset{q}{\textrm{argmin}} \; V_d^\theta.  \\
-      &&\quad q^\star &= \underset{q}{\textrm{argmin}}\; V_d^\theta.
+      &&\quad q^\star &= \underset{q}{\textrm{argmin}}\; V_d^\theta,
   \end{aligned}    
   \label{eq:idapbc_finite_optim}%
 \end{equation}
 where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
+%
+To enforce the constraints shown in~\eqref{eq:idapbc_finite_optim}, we redefine
+$M^\theta_d, J^\theta_2$ and $V^\theta_d$ as follows.
+%
+We constrain the positive-definiteness of $M^\theta_d$ with the Cholesky
+decomposition 
+\begin{align*}
+  M^\theta_d = L_{\theta}(q)L_{\theta}^\top(q) + \delta_M I_n,
+\end{align*}
+\noindent where $\delta_M > 0$ is a small constant and $I_n$ is the $n \times n$
+identity matrix.
+%
+The matrix $L_{\theta} \in \mathbb{R}^{n \times n}$ is a lower-triangular matrix
+whose $\nicefrac{n(n+1)}{2}$ entries are outputs of a neural network. 
+%
+The skew-symmetrix matrix $J_2$ is constructed as 
+\begin{align*}
+  J_2^\theta(q, p) = A_\theta(q, p) - A^\top_\theta(q, p)
+\end{align*}
+\noindent where the entries of $A_{\theta}(q, p)$ are given by neural nets.
+%
+Lastly, we design a fully-connected neural network for $V^\theta_d$ such that it
+has a minimum at $q^*=0$ as follows.
+%
+Let $V^\theta_d$ be a deep neural net with $j$ layers and all bias terms set to
+zero. We denote this with
+\begin{equation}
+  V_d^\theta(x) = \Phi \Bigl( W_j\sigma(W_{j-1}\sigma(\ldots W_2\sigma(W_1x))) \Bigr),
+  \label{eq:Vdnet_constraint}
+\end{equation}
+\noindent where $W_i$ holds the weights of layer $i$ and $\sigma$ is the activation function.
+%
+The activation function is chosen such that $\sigma(0) = 0$, ensuring that
+$\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.
+%
+Several choices for the activation function include \textsc{Elu}, \textsc{Tanh} and \textsc{Relu}.
+%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bayesian Learning}
 \label{ssec:bayesianLearning}
 
-Suppose we are given a finite dataset from a noisy source, for which we are
-trying to fit a regression model.
+Suppose we are given a finite dataset from an unknown noise process, for which
+we are trying to fit a regression model.
 %
-The goal is not only to predict the underlying deterministic source, but also
-the uncertainty introduced by the noisy dataset.
+The goal is not only to predict the average outputs of the source, but also
+the uncertainty of the noise process.
 %
 Bayesian learning uses the expressive power of stochastic models to best
-represent the data source and the prediction uncertainty~\cite{bishop2006pattern}.
+represent the data source and report the uncertainty in
+predictions~\cite{bishop2006pattern}.
 
 
 Let $F(x; \theta)$ denote the stochastic model whose parameters $\theta$ are
@@ -190,19 +239,19 @@ multivariate random variables.
 These parameters are samples drawn from a posterior probability distribution.
 %
 The objective is to find the posterior distribution that minimizes the quadratic
-prediction error $(F(x) -  Y_x)^2$, where $Y_x$ is the observation
-corresponding to the input $x$.
+prediction error $\norm{F(x; \theta) -  Y_x}{}^2$, where $Y_x$ is an observation
+the training dataset corresponding to the input $x$.
 %
 As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
-\it{expectation maximization} \normalfont (EM) to learn the posterior
+\it{expectation maximization} \normalfont (EM) to learn the optimal posterior
 distribution.
 %
 To do so, we define the likelihood in terms of the quadratic prediction error as
 \begin{equation*}
-  P(Y_x | \theta)  = \mathcal{N}(Y_x | F(x), s).
+  P(Y_x | \theta)  = \mathcal{N}(Y_x | F(x; \theta), s),
 \end{equation*}
 %
-While the EM approach is capable of finding the parameters $\theta$ that
+Even though the EM approach finds optimal parameters $\theta$ that
 minimize the prediction error, this technique is prone to overfitting.
 %
 Given finite number of observations, EM finds low variance posterior
@@ -213,7 +262,7 @@ The risk of overfitting is especially an issue when we are modelling the noise
 in the data source, which requires some amount of variance.
 %
 The solution to this problem involves finding a \it{bias-variance
-tradeoff}\normalfont, where the training adjusts the parameters based on the
+trade-off}\normalfont, where the training adjusts the parameters based on the
 likelihood, but also enforces the posterior to hold some variance to prevent
 overfitting.
 %
@@ -231,34 +280,40 @@ overfitting.
 %   \mathbb{E}_{\mathbb{D}}[(F(x) - Y_{x})^2] = (\mathbb{E}_{\mathbb{D}}[F(x)] - Y_x)^2 + \mathbb{E}_{\mathbb{D}}[\{F(x) - \mathbb{E}_{\mathbb{D}}(F(x)) \}^2]
 % \end{align*}
 %
-Bias-variance tradeoff is achieved with the introduction of a prior
-distribution, which adds a regularlization term to the
+Bias-variance trade-off is achieved with the introduction of a prior
+distribution, which adds a regularization term to the
 likelihood~\cite{bishop2006pattern}.
 %
 In supervised learning, regularization terms restrict the training from learning
 a complex model, minimizing the risk of overfitting~\cite{santos2022avoiding}.
 %
 Similarly, the prior distribution prevents the learned parameters from becoming
-point-estimates.
+\it{overconfident} \normalfont in their predictions.
 %
-
-
-The posterior distribution $P(\theta | Y_x)$ is defined in terms of the likelihood and prior with Bayes' theorem as 
+In this construction, the posterior distribution $P(\theta | Y_x)$ is
+defined in terms of the likelihood and prior with Bayes' theorem as 
 \begin{align}
   P(\theta | Y_x) = \frac{P(Y_x | \theta) P(\theta) }{P(Y_x)}
   = \frac{P(Y_x | \theta) P(\theta) }{\int_\theta P(Y_x | \theta') P(\theta')  d\theta'}, 
   \label{eq:bayes_posterior}
 \end{align}
-where  $P(\theta)$ is the prior and $P(Y_x)$ is the evidence.
+where  $P(\theta)$ is the prior and $P(Y_x)$ is the evidence or the
+normalization constant of the posterior.
 %
 The relative weighting between the likelihood and the prior is parameterized by
 the standard deviation $s$ of the likelihood. The higher the standard deviation,
-the more weight we give to the regularlization enforced by the prior.
+the more weight we give to the regularization enforced by the prior.
 %
 The rate at which we update the prior distribution also determines the
 regularization weight.
 %
-
+The posterior in~\eqref{eq:bayes_posterior} shows that the likelihood and the
+prior are in a tug of war. The likelihood pulls the parameters towards
+minimizing the prediction error, but the prior distribution gives priority to the
+initial distribution of the decision parameters.
+%
+This tug of war prevents the posterior from finding a near zero-variance
+solution, and consequently achieving the bias-variance trade-off.
 
 \subsubsection{Posterior Distribution}
 
@@ -268,69 +323,74 @@ inference techniques to approximate or find the exact posterior distribution
 without the use of the evidence. Two of the most famous techniques are
 discussed as follows.
 \begin{enumerate}
-  \item Markov Chain Monte Carlo (MCMC) methods: learn the exact posterior
-  distribution by collecting samples of $\theta$ either through random walk
-  (e.g. Metropolis-Hastings) or following the gradient of the likelihood (e.g.
-  Hamiltonian Monte Carlo). Metropolis-Hastings methods collect samples of
-  $\theta$ from a conditional probability distribution until the samples
-  converge to an equilibrium distribution per the properties of irreducible and
-  aperiodic Markov chains~\cite{gilks1995markov}. Hamiltonian Monte Carlo (HMC)
-  method, shown in detail in Algorithm~\ref{algo:hmc}, also finds the
-  equilibrium distribution of the Markov chain, but unlike Metropolis-Hastings,
-  it efficiently searches the parameter space through the gradient of the
-  likelihood. In the case of HMC, the Markov chain is generated from two
-  first-order differential equations shown in lines 5-7 of
-  Algorithm~\ref{algo:hmc}. While HMC method learns the exact posterior
-  distribution, it has slow convergence properties for high-dimensional
-  parameters. In such cases, techniques such as variational inference compromise
-  accuracy of the posterior distribution for speed of convergence.
+  \item \textbf{Markov Chain Monte Carlo (MCMC) methods}: find the exact
+  posterior distribution from a collection of samples of $\theta$.
+  %
+  MCMC methods collect these samples from a proposal distribution
+  $\tilde{Q}(\theta^{(\tau)} | \theta^{(\tau-1)})$, where the sequence of
+  samples $\theta^\tau$ form a Markov Chain~\cite{bishop2006pattern}.
+  %
+  The proposal distribution is known up to its normalization constant and is
+  sufficiently simple to sample from. 
+  %
+  We accept or reject each candidate sample according to the following rule:
+  \begin{align*}
+    \nu &\sim \mathcal{U}(0, 1), \\
+    A(\theta^{(\tau)}, \theta^{(\tau-1)}) &= \min \Biggl(1, \frac{P(Y_x | \theta^{(\tau)})P(\theta^{(\tau)})}{P(Y_x | \theta^{(\tau-1)})P(\theta^{(\tau-1)})} \Biggr),
+  \end{align*}
+  \noindent where $\mathcal{U}$ is the uniform distribution. If
+  $A(\theta^{(\tau)}, \theta^{(\tau-1)}) \geq \nu$, then we accept the sample. 
+  %
+  Otherwise, we discard the candidate and resample from $\tilde{Q}(\theta^{(\tau)} |
+  \theta^{(\tau-1)})$.
+  %
+  MCMC methods such as Metropolis-Hastings collect the next sample through
+  random walk~\cite{gilks1995markov}, while other gradient-based techniques such
+  as Hamiltonian Monte Carlo (HMC) method, efficiently search the
+  parameter space through the gradient of the likelihood.
+  %
+  The complete HMC approach is provided in Algorithm~\eqref{algo:hmc}.
+  %
+  Even though the HMC method learns the exact posterior distribution, it has
+  slow convergence properties for high-dimensional parameters. In such cases,
+  techniques such as variational inference compromise accuracy of the posterior
+  distribution for speed of convergence.
   
-%   \begin{algorithm}[H]
-%       \centering
-%       \caption{Gibb's Sampling}\label{algo:gibbs}
-%       \begin{algorithmic}[1]
-%           \State Select initial state $\theta = \{\theta_i: i = 1, \dots ,\theta_v\}$
-%           \State $\tilde{p}(\theta | \mathcal{D}) = p(\mathcal{D} | \theta) p(\theta)$ \Comment{Compute posterior upto a normalization constant}
-%           \State Select a transition probability of the Markov Chain $p(\theta_i | \theta_{\backslash i})$
-%           \For{$t = 1, \dots, T$}
-%           \State Sample $\theta_1^{t+1} \sim p(\theta_1 | \theta_2^{t}, \theta_3^{t}, \dots, \theta_v^{t})$
-%           \State Sample $\theta_2^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \theta_3^{t}, \dots, \theta_v^{t})$
-%           \State Sample $\theta_3^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \theta_2^{t+1}, \dots, \theta_v^{t})$ 
-%           \State Sample $\theta_v^{t+1} \sim p(\theta_1 | \theta_1^{t+1}, \dots, \theta_{v-1}^{t})$ 
-%           \EndFor
-%           \State \textbf{Return}  $\theta^{T}$
-%       \end{algorithmic}
-% \end{algorithm}
-\begin{algorithm}[tb]
+\begin{algorithm}[H]
     \centering
     \setstretch{1.5}
     \caption{Hamiltonian Monte Carlo}\label{algo:hmc}
     \begin{algorithmic}[1]
-      \State Select initial state $\theta$ and momentum $r$ from prior knowledge
-      \State Select regularization coefficient $\lambda$
+      \State Select regularization coefficient $\lambda_r$
       \State Create a set $\Theta$ to collect samples of $\theta$
       % \State Define the prior distribution with distribution parameters $\theta_0$ 
-      \State Define $p(\theta, \mathcal{D}) \propto \exp(-E(\theta, \mathcal{D}))$, \; $E(\theta, \mathcal{D}) = \sum_{d \in \mathcal{D}}\vectornorm{F(x;\theta) - d}^2 + \lambda \vectornorm{\theta}^2$
-      \For{$t = 0:\Delta t: T$}
-      \State $r(t + \Delta t/2) = r(t) - \dfrac{\Delta t}{2} \dfrac{\partial E}{\partial \theta_i}(\theta(t), \mathcal{D})$
-      \State $\theta(t + \Delta t) = \theta(t) + \Delta t \; r(t + \Delta t/2) $ 
-      \State $r(t + \Delta t) = r(t + \Delta t/2) - \dfrac{\Delta t}{2}\dfrac{\partial E}{\partial \theta_i}(\theta(t + \Delta t), \mathcal{D})$
-      \State $\nu \sim \text{Uniform}[0, 1]$
-      \If {$E(\theta(t + \Delta t), \mathcal{D}) < E(\theta(t), \mathcal{D})$}
-      \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
-      \ElsIf{$\nu < \exp( E(\theta(t), \mathcal{D}) - E(\theta(t+\Delta t), \mathcal{D})) $}
-      \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
-      \ElsIf{$\nu > \exp( E(\theta(t), \mathcal{D}) - E(\theta(t+\Delta t), \mathcal{D})) $}
-      \State Reject $\theta(t + \Delta t)$ 
-      \EndIf
-      \EndFor
+      \State Define $P(\theta, Y_x) \propto \exp(-\mathbb{L}(\theta, Y_x))$, \; $\mathbb{L}(\theta, Y_x) = \vectornorm{F(x;\theta) - Y_x}^2 + \lambda_r \vectornorm{\theta}^2$
+      \State $i=0$
+      \While {i < \textsc{maximum iteration}}
+        \State Select initial state $\theta$ and momentum $r$ from prior knowledge
+        \For{$t = 0:\Delta t: T$}
+          \State $m(t + \nicefrac{\Delta t}{2}) = m(t) - \dfrac{\Delta t}{2} \dfrac{\partial \mathbb{L}}{\partial \theta_i}(\theta(t), Y_x)$
+          \State $\theta(t + \Delta t) = \theta(t) + \Delta t \; m(t + \nicefrac{\Delta t}{2}) $ 
+          \State $m(t + \Delta t) = m(t + \nicefrac{\Delta t}{2}) - \dfrac{\Delta t}{2}\dfrac{\partial \mathbb{L}}{\partial \theta_i}(\theta(t + \Delta t), Y_x)$
+          \State $\nu \sim \mathcal{U}(0, 1)$
+          \If {$\mathbb{L}(\theta(t + \Delta t), Y_x) < \mathbb{L}(\theta(t), Y_x)$}
+          \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
+          \ElsIf{$\nu < \exp \Bigl( \mathbb{L}(\theta(t), Y_x) - \mathbb{L}(\theta(t+\Delta t), Y_x) \Bigr) $}
+          \State $\Theta$ \leftarrow \; $\Theta \cup \theta(t + \Delta t)$ 
+          \ElsIf{$\nu > \exp \Bigr( \mathbb{L}(\theta(t), Y_x) - \mathbb{L}(\theta(t+\Delta t), Y_x) \Bigl) $}
+          \State Reject $\theta(t + \Delta t)$ 
+          \State $i \leftarrow i + 1$
+          \State \textbf{break} \Comment{Exit for-loop}
+        \EndIf
+        \EndFor
+      \EndWhile
       \State \textbf{Return} $\Theta$
     \end{algorithmic}
 \end{algorithm}
 
 %
-\item Variational Inference (VI): this technique selects a posterior
-distribution $q(\theta;z)$ from the conjugate families of the likelihood and
+\item \textbf{Variational Inference (VI)}: this technique selects a posterior
+distribution $Q(\theta;z)$ from the conjugate families of the likelihood and
 prior distributions. The goal is to learn the distribution parameters $z$ that
 minimize the Kullback-Leibler divergence or equivalently maximize the evidence
 lower bound (\textsc{Elbo}). The \textsc{Elbo}, $\mathcal{L}$, is given
@@ -350,21 +410,20 @@ by~\cite{cohen2016bayesian}
   a probability density function and the \textsc{Elbo} is not bounded by zero.
 \end{rem}
 
-The power of Bayesian learning lies in its ability to build a target function
-and make predictions that integrate over
-uncertainties~\cite{tipping2003bayesian}. These predictions can be found by
-marginalizing the model over the posterior as follows~\cite{jospin2020hands}.
+% \subsubsection{Prediction}
+
+Once we find the exact or approximate posterior, the prediction for state $x$ is
+given by marginalizing the model over the posterior as
+follows~\cite{jospin2020hands}.
 \begin{equation}
-  \hat{F}(x) = \frac{1}{N} \sum_{\theta \sim Q} F(x, \theta),
+  \hat{F}(x) = \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta),
   \label{eqn:marginalization}
 \end{equation} 
-where $N$ is the number of samples drawn from the posterior. Moreover, Bayesian
-frameworks can quantify the confidence in the predictions through the variance
-of the predictive distribution, $p(F \mid x, \mathcal{D})$. The variance of
-$p(F|x, \mathcal{D})$ is given by~\cite{jospin2020hands}
+where $N_Q$ is the number of samples drawn from the posterior. Bayesian
+frameworks can quantify the confidence in the predictions through the
+variance~\cite{jospin2020hands}
 \begin{equation}
-  \Sigma_{F \mid x,\mathcal{D}} = \frac{1}{N-1} \sum_{\theta \sim q} \vectornorm{F(x,\theta) - \frac{1}{N} \sum_{\theta \sim q} F(x, \theta)}^2.
+  \Sigma_{F \mid x,Y_x} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
   \label{eqn:predictive_variance}
 \end{equation}
 %
-

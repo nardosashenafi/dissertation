@@ -1,18 +1,48 @@
 
 \section{Bayesian Neural PBC}
 
+In this section, we present a unified framework that simultaneously combines
+the \textsc{NeuralPbc} technique and rigorously addresses model uncertainties using
+Bayesian learning.
+%
+Motivated by~\cite{sirichotiyakul2020data}, we incorporate uncertainties into
+the dynamics and cast the passivity-based control synthesis problem as a
+stochastic optimization problem.
+%
+The closed-loop storage (energy-like) function, from which the control law is
+derived, is not restricted to a certain form and instead represented by a neural
+network whose parameters are random variables.
+%
+% The second aim is to develop an algorithm that find a suitable family of
+% parameters for the energy-like function such that the behavior of the
+% closed-loop trajectories optimizes a certain performance objective.
+%
+We apply Bayesian learning and develop an algorithm that finds a suitable
+probability distribution of the neural net parameters automatically.
+%
+In contrast to deterministic optimization, this approach provides a probability
+distribution over the neural net parameters instead of a point estimate,
+providing a way to reason about model uncertainties and measurement noise during
+the learning process.
+%
+We demonstrate the efficacy and robustness of our current framework with a
+comparison against our deterministic framework~\cite{sirichotiyakul2020data}.
+The comparison is performed on benchmark underactuated control problems--the
+simple pendulum and the inertia wheel pendulum--both in simulation and
+real-world experiments. 
+
 
 \subsection{Control Design for Smooth Dynamical Systems}
 In this subsection, we formulate the Bayesian learning framework that minimizes
 the effects of system parameter uncertainties and measurement errors. 
 %
 In this framework, the neural net parameterization of $H^\theta_d$ given in
-Section~\ref{sssec:ml-pbc-deterministic} is replaced by a Bayesian neural
+Section~\ref{ssec:pbc} is replaced by a Bayesian neural
 network whose parameters are uncorrelated random variables sampled from a
 multivariate probability distribution (MPD).
 %
 The goal is to learn the distribution parameters $z$ of the posterior MPD
-$q(\theta;z)$ that maximize the \textsc{Elbo} given in~\eqref{eq:elbo}. 
+$Q(\theta;z)$ that maximize the \textsc{Elbo} given in~\eqref{eq:elbo}. 
 %
 % For continuous probability distributions, ELBO is redefined in terms of
 % continuous entropy as
@@ -27,12 +57,24 @@ prior distribution.
 %
 The likelihood function is chosen to be a Gaussian probability
 distribution of the form
-\begin{equation}
-    p(J \mid \theta) = \mathcal{N}\left(0, s \right),
-    % \text{likelihood} = \frac{1}{\sqrt{2\pi}s}\exp{\left(-\frac{1}{2} \left ( \frac{-\ell(\gamma, u)}{s}\right)^2 \right)}
+\begin{align}
+    P(J \mid \theta) = \mathcal{N}\left(0, s \right), 
     \label{eqn:likelihood_neuralpbc}
-\end{equation}
+\end{align}
 where $s$ is the standard deviation of the likelihood and a hyperparameter. 
+%
+The average running cost $J$ measures the performance of the trajectories
+generated from the initial states $x_0$ sampled from the collection
+$\mathcal{D}_N$.
+%
+We use the state sampling technique discussed in
+Section~\ref{sssec:state_sampling} to evaluate the expectation of the running
+cost as 
+\begin{align*}
+    J(\phi, u) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)].
+\end{align*}
+$\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
+ 
 %
 With the choice of the likelihood given in \eqref{eqn:likelihood_neuralpbc},
 maximizing the \textsc{Elbo} pulls the loss $J(\theta)$ to zero.
@@ -56,8 +98,8 @@ distribution is centered around the parameters learned from the deterministic
 technique discussed in Section~\ref{sssec:ml-pbc-deterministic}.
 
 
-\subsection{Cost Function}
-\label{ssec:cost}
+\subsubsection{Cost Function}
+\label{sssec:cost}
 
 The cost function $J$ helps impose various desired behaviors in the learned
 controller. In this section, we present three performance objectives, their

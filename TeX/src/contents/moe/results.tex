@@ -6,8 +6,8 @@ and real-world experiments.
 In the first case study, we learn a gating network that switches between two
 unstable closed-loop systems to result in a piecewise-stable system.
 %
-Then, we find switching expert controllers for the cartpole system enclosed with
-wall barriers.
+Then, we find switching MOE controllers to swing up the classical cartpole
+mechanism enclosed with wall barriers.
 %
 
 \subsection{Stable Switching Between Unstable Systems}
@@ -30,7 +30,7 @@ We aim to learn the parameters $\psi$ of the gating network $P(x;
 = (0, 0)$.
 %
 The gating network is a fully-connected neural net with one hidden layer (2 input states 
-\rightarrow 6 neurons \rightarrow 4 neurons \rightarrow 1 output) and an \textsc{Elu} activation
+\rightarrow 6 neurons \rightarrow 4 outputs) and an \textsc{Elu} activation
 function~\cite{clevert2015fast}.
 %
 We constrain the maximum number of state partitions to $4$.
@@ -65,9 +65,9 @@ The likelihood is modified to account for the probabilistic control as
       \caption{Stable Switching between Unstable Systems}
       \label{algo:switching_A1A2}
       \small
-      \hspace*{\algorithmicindent} \textbf{Input}: $x(0) = (q(0), \dot{q}(0))$
+      \hspace*{\algorithmicindent} \textbf{Input}: $x(0)$
       \begin{algorithmic}[1]
-        \State $\phi \leftarrow  [z(0)]$ \Comment{Initial States}
+        \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
           % \algrenewcommand\algorithmicindent{0em} % No indent
             \For{$t \in 0:\Delta t:T$} 
               \State $i \sim \text{Categorical}\Bigl(P(x(t); \psi)\Bigr)$ \Comment{Sample a bin number}
@@ -84,7 +84,8 @@ The resulting switching system is shown in Figure~\ref{fig:final_switching}.
 %
 The training uses only 3 out of the 4 state partitions available.
 %
-The solution matches the analytical solution to the stable switching system given as~\cite{liberzon2003switching}
+The state partition in Figure~\ref{fig:final_switching} matches the analytical
+solution to the stable switching system given as~\cite{liberzon2003switching}
 \begin{equation*}
     \dot{x} = \begin{cases}
         A_1x, \; x_1x_2 \leq 0, \\
@@ -94,6 +95,9 @@ The solution matches the analytical solution to the stable switching system give
 \noindent where $x=[x_1, x_2]$.
 %
 The training progress is shown in Figure~\ref{fig:switching_training}.
+%
+The three rows in the figure depict the performance of the training after 0, 200
+and 1400 parameter updates, respectively.
 %
 The sampled trajectory on the top left figure shows that the initial parameters
 created unstable switching between the two systems.
@@ -110,9 +114,9 @@ partition at the origin.
     \caption{Final stable switching system. Left: Control input $u=\{0, 1\}$ in
     the state space. Purple corresponds to $u=0$ or $\dot{x} = A_1x$. Yellow
     corresponds to $u=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
-    -5]$ and converges at the origin shown by the red star. Right: State
-    partition. The training converged to 3 state partitions that can stabilize
-    the system.}
+    -5]$ and converges to the origin shown by the red star. Right: State
+    partition from the output of the gating network. The training converged to 3
+    state partitions that can stabilize the system.}
     \label{fig:final_switching}
 \end{figure}
 
@@ -135,7 +139,7 @@ contact events from two barriers as shown Figure~\ref{fig:cartpole_contact}.
 We demonstrate the performance of the mixture of expert controllers in
 simulation and real-world experiments.
 %
-Lastly, we compare the performance of the mixture of expert controllers against
+Lastly, we compare the performance of the MOE controllers against
 a single swing-up controller. 
 
 
@@ -199,11 +203,12 @@ greedy and explorative techniques.
 The gating network is a fully-connected neural net with two hidden layers (state input
 \rightarrow 4 neurons \rightarrow 3 neurons \rightarrow  1 output).
 % 
-We constrain the number state partitions to 3.
+We constrain the maximum number of state partitions to 3.
 %
-There are 3 neural net experts corresponding to each state partition.
+There are a total of 3 neural net experts, each corresponding to a state
+partition.
 %
-Each one is a fully-connected neural net with two hidden layers (state input
+The experts are fully-connected neural net with two hidden layers (state input
 \rightarrow 10 neurons \rightarrow 4 neurons \rightarrow  1 output).
 %
 The output of the experts correspond to the force applied on the cart.
@@ -255,8 +260,17 @@ between two state partitions.
 Even though the gating network can provide up to three state partitions, the
 training converges to utilizing only two.
 %
-Figure~\ref{fig:cartpole_trajectory} shows that the control switches between
-experts as the velocity jumps due to impact.
+Figure~\ref{fig:cartpole_trajectory} shows that the system successfully avoids
+contacts during the swing-up phase, which otherwise would have prevented the
+pendulum from pumping energy from the downward equilibrium.
+%
+By the time the pendulum approaches the upright equilibrium, it is moving at
+such high speed that LQR cannot stabilize it.
+%
+But from several trajectories, we have observed that the system leverages the
+impact from the wall to lower the speed of the pendulum.
+%
+Then, the control law switches between experts as the velocity jumps due to impact.
 %
 The magnitude of the control is such that the MOE controllers apply rapid
 braking during contact, allowing LQR to catch the pendulum post-impact.
@@ -269,7 +283,7 @@ controllers.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{moe_traj_control.eps}
-    \caption{An 8-second trajectory starting from downward equilibrium at rest.
+    \caption{A sample trajectory starting from downward equilibrium at rest.
     The contours correspond to the outputs of the MOE controllers during impact
     ($x_c=0.36m, \dot{x}_c = 0\nicefrac{m}{s}$). The solid line
     splitting the state space horizontally in half shows the boundary between
@@ -279,25 +293,32 @@ controllers.
     \label{fig:cartpole_trajectory}
 \end{figure}
 
-Figure~\ref{fig:gapContour} shows the relationship between the gap function and the state partitions.
+Figure~\ref{fig:gapContour} shows the relationship between the gap function and
+the state partitions.
 %
 The red lines represent the boundaries of the state partitions and the contour
-shows the gap function corresponding to the states.
+depicts the level sets of the gap function.
 %
-The states within the boundaries of the red lines have large gap values, hence
-contact events do not occur in this region.
+Notice that the states within the boundaries of the red lines have large gap
+values, hence contact events do not occur in this region.
 %
-This shows that the gating network has dedicated one expert for the swing-up
-task.
+This shows that the gating network has dedicated one expert for states with low
+risk of contact.
 %
 The regions outside the red boundaries correspond to the second expert, which is
-activated to catch the pendulum just after impact, as shown in the trajectory of
+activated to prevent contact during swing-up and to catch the pendulum just
+after impact, as shown in the trajectory of
 Figure~\ref{fig:cartpole_trajectory}.
-
+%
+This demonstrates that the state partition depends on the occurrence of contact
+events.
+%
+Moreover, the multi-modal nature of MOE controllers allow us to leverage the
+advantages or prevent the adverse effects of contacts and impacts.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{gapContourAndBins.eps}
+    \includegraphics[width=0.7\linewidth]{gapContourAndBins.eps}
     \caption{The blue contours represent the level sets of the gap function. The red lines show the boundaries of the state partition. There are a total of two experts, one is active between the red boundaries and the other is responsible for regions outside the red lines.}
     \label{fig:gapContour}
 \end{figure}
@@ -330,7 +351,7 @@ pendulum post-impact.
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.7\linewidth]{cont.eps}
-    \caption{A 9-second trajectory generated by the single controller. }
+    \caption{A sample trajectory generated by the single controller. }
     \label{fig:continuous_control}
 \end{figure}
 
