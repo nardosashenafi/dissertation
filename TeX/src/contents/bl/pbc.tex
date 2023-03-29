@@ -552,7 +552,14 @@ robustness against model uncertainty and measurement noise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Inertia Wheel Pendulum}
 \label{subsec:iwp}
-
+In this section, we validate the proposed control design framework on the
+problem of swinging-up and stabilizing the inverted position of an inertia wheel
+pendulum (IWP), shown in Fig.~\ref{fig:iwp}. We provide experimental results
+from simulation and real-world hardware in order to thoroughly demonstrate the
+efficacy and robustness claims of Bayesian inference. 
+%
+We use the deterministic solution for \textsc{NeuralPbc} as the baseline
+on which we compare the performance of the Bayesian solution. \\
 The IWP mechanism consists of a pendulum with an actuated wheel instead of a static
 mass.
 %
@@ -735,7 +742,7 @@ is more robust against measurement noise.
 
 \subsubsection{Hardware Tests} 
 The controllers from deterministic and Bayesian training schemes are
-evaluated on hardware. 
+evaluated on the hardware shown in Figure~\ref{fig:iwp_hardware}. 
 %
 We deliberately modify the hardware and test the controllers without any
 additional training.
@@ -766,7 +773,12 @@ Table~\ref{tab:modified_params}.
     \end{tabular}
     \label{tab:modified_params}
 \end{table}
-    
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{hardware.eps}
+    \caption{Inertia Wheel Pendulum Hardware}
+    \label{fig:iwp_hardware}
+\end{figure}
 The system starts from rest at the downward position. 
 %
 A small disturbance in the $q_1$ direction is introduced to start the swing-up.
