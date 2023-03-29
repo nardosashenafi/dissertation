@@ -42,56 +42,217 @@ In this framework, the neural net parameterization of $H^\theta_d$ given in
 Section~\ref{ssec:pbc} is replaced by a Bayesian neural
 network whose weights and biases are samples drawn from a posterior distribution.
 %
-The goal is to learn the posterior distribution that achieves the performance objective under system parameter and measurement uncertainties. 
+The goal is to learn this posterior that achieves the performance objective under system parameter and measurement uncertainties. 
 %
-We pose the search over the posterior as the following optimization problem.
 
+
+Let $\phi(x_0, u^\theta, T)$ denote a closed loop trajectory integrated from the Hamilton's equation of motion in~\eqref{eq:hamiltonian_dynamics}.
+The trajectory starts from the initial state $x_0$ and spans for the time horizon $T$.
 %
-The computation of the \textsc{Elbo} requires the likelihood function and the
-prior distribution.
+We sample the initial state $x_0$ through greedy and explorative state sampling techniques discussed in Section~\ref{sssec:state_sampling}.
+The control law $u^\theta$ consists of the energy shaping and damping terms found from the desired Hamiltonian $H^\theta_d$ as shown in equation~\eqref{eq:damping_and_es_control}.
 %
-The likelihood function is chosen to be a Gaussian probability
-distribution of the form
+To generate this trajectory, we first sample the parameters $\theta$ from the prior distribution $P(\theta)$.
+%
+
+We take two approaches to selecting the prior distribution.
+The simplest approach is to use an uninformed prior given by a uniform distribution;
+this choice encourages
+exploration but has slow convergence properties. The second approach uses an
+informed prior that warm-starts the Bayesian training around the solution of the
+deterministic training. To do so, the prior
+distribution is a Gaussian probability distribution centered around the parameters learned from the deterministic
+\textsc{NeuralPbc} technique discussed in Section~\ref{ssec:pbc}.
+
+With the trajectories generated from the prior distribution samples, we compose a performance objective as follows.
+\begin{align*}
+    J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)], 
+\end{align*}
+\noindent where $\mathcal{D}_N$ is a collection of initial states sampled with explorative and greedy state sampling techniques (Section~\ref{sssec:state_sampling}), and
+$\ell$ is the running cost of the trajectories. We provide three options for the running cost in the next section.
+%
+In order to update the posterior distribution based on the performance of the generated trajectories, we compose the likelihood function as
 \begin{align}
     P(J \mid \theta) = \mathcal{N}\left(0, s \right), 
     \label{eqn:likelihood_neuralpbc}
 \end{align}
-where $s$ is the standard deviation of the likelihood and a hyperparameter. 
+\noindent where $s$ is the standard deviation of the likelihood.
 %
-The average running cost $J$ measures the performance of the trajectories
-generated from the initial states $x_0$ sampled from the collection
-$\mathcal{D}_N$.
+Notice that the likelihood is maximum when the expectation of the running cost $J$ is minimum.
 %
-We use the state sampling technique discussed in
-Section~\ref{sssec:state_sampling} to evaluate the expectation of the running
-cost as 
-\begin{align*}
-    J(\phi, u) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)].
-\end{align*}
-$\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
- 
-%
-With the choice of the likelihood given in \eqref{eqn:likelihood_neuralpbc},
-maximizing the \textsc{Elbo} pulls the loss $J(\theta)$ to zero.
-%
-On top of the neural net parameters $\theta$, we wish to learn the posterior
-over the standard deviation $s$ of the likelihood. 
-%
-Hence, the posterior distribution $q(\xi)$ is an MPD over the multivariate
-random variable $\xi$, where $\xi = [\theta, s]$ and $z$ is the distribution
-parameters over $\xi$.
-%
+\begin{rem}
+    On top of the neural net parameters $\theta$, we can learn the posterior
+    over the standard deviation $s$ of the likelihood. 
+    This automatically finds the weighting between the likelihood and prior distributions, achieving optimal \textit{bias-variance trade-off}.
+    In this scenario, the posterior distribution is a multivariate probability distribution over the parameters $\theta$ and $s$. 
+\end{rem}
 
+From here, we can use Hamiltonian Monte Carlo or variational inference (Section~\ref{ssec:bayesianLearning}) to find the posterior distribution from the likelihood and the prior.
+%
+We first pose the search over the posterior as the following optimization problem.
+\begin{equation}
+    \begin{aligned}
+        \underset{P(\theta | J)}{\textrm{minimize}} 
+        & & J(\phi, u) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]  , \\
+        \textrm{subject to}
+        & & \bmat{\dot{q} \\ \dot{p}} &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
+        & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
+        & & p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p), \\
+        & & \theta &\sim P(\theta | J).
+    \end{aligned}
+    \label{eq:smooth_bayesian_pbc}
+\end{equation}
+We expand on the use of HMC and variational inference to solve the optimization problem.
+%
+\begin{enumerate}
+    \item \textbf{Hamiltonian Monte Carlo (HMC)}: represents the posterior with a large collection of samples denoted by $\Theta$.
+    %
+    We draw the first sample $\theta^{(\tau=0)}$ from the prior distribution and construct the likelihood from the performance objective as $P(J | \theta^{(\tau=0)})$.
+    %
+    The likelihood and the prior distributions are known in closed form, hence the joint distribution $P(\theta^{(\tau=0)}, J)$ is given by
+    \begin{align*}
+        P(\theta^{(\tau=0)}, J) = P(J|\theta^{(\tau=0)})P(\theta^{(\tau=0)}).
+    \end{align*}
+    We generate the next sample from a Markov Chain, which is given the following first order differential equations~\cite{bishop2006pattern}
+    %
+    % The Markov Chain is constructed from two coupled first order differential equations, taken from the classical dynamics of a particle in motion.
+    \begin{equation}
+        \begin{gathered}
+            m^{\tau + \nicefrac{\Delta \tau}{2}} = m^{\tau} - \dfrac{\Delta \tau}{2} \dfrac{\partial P(\theta^{\tau}, J)}{\partial \theta^{\tau}} \\
+            \theta^{\tau + \Delta \tau} = \theta^{\tau} + m^{\tau + \nicefrac{\Delta \tau}{2}} \; \Delta t \\
+            m^{\tau + \Delta \tau} = m(\tau + \nicefrac{\Delta \tau}{2}) - \dfrac{\Delta t}{2}\dfrac{\partial P(\theta^{\tau + \Delta \tau}, J)}{\partial \theta^{\tau + \Delta \tau}}
+        \end{gathered}
+        \label{eq:leapfrog}
+    \end{equation}
 
-We take two approaches to selecting the distribution parameters $z_0$ of the
-prior. The simplest approach is to use an uninformed prior with randomly
-initialized $z_0$ to start the optimization problem; this choice encourages
-exploration but has slow convergence properties. The second approach uses an
-informed prior that warm-starts the Bayesian training around the solution of the
-deterministic training. To do so, $z_0$ is selected such that the prior
-distribution is centered around the parameters learned from the deterministic
-technique discussed in Section~\ref{sssec:ml-pbc-deterministic}.
+    %
+    \noindent where $\tau=0$ for the first sample and $\Delta \tau$ is the integration time step. 
+    This integration is commonly known as \textit{leap frog discretization}.
+    %
+    We accept or reject the sample $\theta^{\tau + \Delta \tau}$ based on the rule:
+    \begin{align*}
+        \nu &\sim \mathcal{U}(0, 1), \\
+        A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) &= \min \Biggl(1, \frac{P(\theta^{(\tau + \Delta \tau)}, J)}{P(\theta^{(\tau)}, J)} \Biggr),
+    \end{align*} 
+    If $A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) \geq \nu$, then we accept the sample. 
+    %
+    Otherwise, we discard the candidate and resample from the prior distribution.
+    %
+    The complete procedure is outlined in Algorithm~\eqref{algo:hmc}
+    %
+    We keep collecting these samples until the average accumulated loss converges to the minimum achievable value. 
 
+    Once we obtain the collection samples, we use them to evaluate the controller as follows.
+    %
+    From the collection $\Theta$, we sample $N_Q$ parameters in a uniform fashion.
+    %
+    We evaluate the neural net $H^\theta_d$ and the corresponding energy shaping and damping control for each sample.
+    %
+    Then, we marginalize over the control law as 
+    \begin{equation*}
+        u(x) = \frac{1}{N_Q} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
+    \end{equation*} 
+    We repeat this computation for every state in a trajectory.
+
+    \begin{algorithm}[H]
+        \centering
+        \setstretch{1.5}
+        \caption{Bayesian \textsc{NeuralPbc} via Hamiltonian Monte Carlo}\label{algo:hmc}
+        \begin{algorithmic}[1]
+        \State $\Theta \leftarrow \{\}$ \Comment{Collection of samples}
+        \State Define prior $P(\theta)$
+        \While {$i < \texttt{maximum iteration}$}
+            \State $\tau=0, \theta^{0} \sim P(\theta)$, $m^0 = 0$, accepted=true
+            \While{accepted}
+                \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples}           
+                \State $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$\Comment{Sample a system parameter}
+                % \State $J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u^{\theta^{\tau}}, T), u^{\theta^{\tau}})]$\Comment{Performance of current parameter}
+                \State $J^\tau \leftarrow 0$,  $J^{\tau + \Delta \tau} \leftarrow 0$
+                \For{$(x_0) \sim \mathcal {D}_N$}
+                    \State $\phi \leftarrow \phi(x_0, u^{\theta^{\tau}}, T) $\Comment{Generate trajectory}
+                    \State $J^\tau  \gets J^\tau  + \ell(\phi; \theta^{\tau})/N_{\mathcal{D}}$ \Comment{Batch loss of current parameter}
+                \EndFor
+                % \State $P(\theta^{(\tau)}, J) = P(J|\theta^{(\tau)})P(\theta^{(\tau)})$
+                \State $m^{\tau + \Delta \tau}, \theta ^{\tau + \Delta \tau} \leftarrow \texttt{leap frog discretization}(m^{\tau}, \theta ^{\tau} )$\Comment{Equation~\eqref{eq:leapfrog}}
+                % \State $m^{\tau + \nicefrac{\Delta \tau}{2}} = m^{\tau} - \dfrac{\Delta \tau}{2} \dfrac{\partial P(\theta^{\tau}, J)}{\partial \theta^{\tau}} $ \Comment{Generate Markov Chain}
+                % \State $\theta^{\tau + \Delta \tau} = \theta^{\tau} + m^{\tau + \nicefrac{\Delta \tau}{2}} \; \Delta t $\Comment{Evaluate next parameter}
+                % \State $m^{\tau + \Delta \tau} = m(\tau + \nicefrac{\Delta \tau}{2}) - \dfrac{\Delta t}{2}\dfrac{\partial P(\theta^{\tau + \Delta \tau}, J)}{\partial \theta^{\tau + \Delta \tau}}$
+                % \State $J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u^{\theta^{\tau + \Delta \tau}}, T), u^{\theta^{\tau + \Delta \tau}})]$\Comment{Performance of next parameter}
+                \For{$(x_0) \sim \mathcal {D}_N$}
+                    \State $\phi \leftarrow \phi(x_0, u^{\theta^{\tau + \Delta \tau}}, T) $\Comment{Generate trajectory}
+                    \State $J^{\tau + \Delta \tau}  \gets J^{\tau + \Delta \tau}  + \ell(\phi; \theta^{\tau + \Delta \tau})/N_{\mathcal{D}}$ \Comment{Batch loss of next parameter}
+                \EndFor
+                % \State $P(\theta^{(\tau + \Delta \tau)}, J) = P(J|\theta^{(\tau + \Delta \tau)})P(\theta^{(\tau + \Delta \tau)})$
+                \State $\nu \sim \mathcal{U}(0, 1)$
+                \State $A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) = \min \Biggl(1, \dfrac{P(\theta^{(\tau + \Delta \tau)}, J^{(\tau + \Delta \tau)})}{P(\theta^{(\tau)}, J^{(\tau)})} \Biggr)$
+                \If {$A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) \geq \nu$}
+                    \State $\Theta$ \leftarrow \; $\Theta \cup \theta^{(\tau + \Delta \tau)}$ \Comment{Accept sampled parameter}
+                    \State $\tau = \tau + \Delta \tau$
+                    \Else
+                    \State $i \leftarrow i + 1$, accepted=false\Comment{Reject sampled parameter}
+                \EndIf
+            \EndWhile
+        \EndWhile
+        \State \textbf{Return} $\Theta$
+        \end{algorithmic}
+    \end{algorithm}
+
+    \item \textbf{Variation Inference (VI)}: intends to learn the distribution parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
+    %
+    Unlike HMC, we have a closed form probability distribution for the posterior.
+    We draw several samples from the current posterior and evaluate its performance through the joint distribution $P(\theta, J)$. 
+    Given the likelihood and the prior distributions, variational inference constructs the \textsc{Elbo} as
+    \begin{align}
+        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    \\
+        \label{eq:neuralpbc_elbo}    
+    \end{align}
+    We use stochastic gradient descent to iteratively update the distribution parameteres as follows:
+    \begin{align*}
+      z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
+    \end{align*}
+    The full variational inference training process is shown in Algorithm~\eqref{algo:vi}.
+    
+    The gradient ${\partial \mathcal{L}}/{\partial z}$ holds a rather complex form for two reasons.
+    First, the \textsc{Elbo} is evaluated from trajectories integrated from the differential equations in~\eqref{eq:hamiltonian_dynamics}.
+    We use a combination of adjoint method and auto-differentiation techniques~\cite{chen2018neural} to compute the
+    gradient ${\partial \mathcal{L}}/{\partial z}$ through the trajectories.
+    %
+    Secondly, computing ${\partial \mathcal{L}}/{\partial z}$ requires the derivative
+    of the sample $\theta$ with respect to the distribution parameters $z$, which is
+    intractable. We handle this complication by invoking the reparameterization
+    trick of the Automatic Differentiation Variational
+    Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic}.
+
+    \begin{algorithm}
+        \setstretch{1.2}
+        \caption{Bayesian \textsc{NeuralPbc} via variational inference}
+        \label{algo:vi}
+        \small
+        \begin{algorithmic}[1]
+            \algrenewcommand\algorithmicindent{0em} % No indent
+            \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+            \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
+            \While{$i < $ \texttt{maximum iteration}}
+            \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
+            \For{$i=1:Q_N$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
+            \State $J \gets 0$ \Comment{Batch loss}
+            \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
+                \For{$(x_0) \sim \mathcal {D}_N$}
+                \State $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$\Comment{Sample a system parameter}
+                \State $\phi \leftarrow \phi(x_0, u, T) $\Comment{Generate trajectory}
+                \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
+                \EndFor
+            \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{Q_N} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
+            \EndFor
+            \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
+            \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+            \State $i \;\:\gets i + 1$
+            \EndWhile
+            \State \textbf{return} $z$
+        \end{algorithmic}
+    \end{algorithm}
+  
+    \end{enumerate}
 
 \subsubsection{Cost Function}
 \label{sssec:cost}
@@ -102,52 +263,52 @@ corresponding likelihood functions and the desired behavior they impose.
 
 \begin{enumerate}
     \item Trajectory tracking: Let $x^\star$ denote the desired equilibrium of a
-    dynamical system and $\gamma : t \to \phi(t; x_0, u^\theta)$ represent a
+    dynamical system and $\phi(x_0, u^\theta, T)$ represent a
     prediction from the initial condition $x_0$ with the current control law
     $u^\theta$. The objective of this task is to find a closed-loop controller
-    that can track an expert trajectory $\gamma^\star$ obtained from a path
+    that can track an expert trajectory $\phi^\star$ obtained from a path
     planner. To impose this behavior, the running cost is a function of the
-    distance from the current trajectory $\gamma$ to $\gamma^\star$, defined in
-    terms of the transverse coordinates $\gamma_\bot-\gamma^\star_\bot$ along
+    distance from the current trajectory $\phi$ to $\phi^\star$, defined in
+    terms of the transverse coordinates $\phi_\bot-\phi^\star_\bot$ along
     the preferred orbit, using the ideas outlined
     in~\cite{shiriaev2009transverse,manchester2010transverse}. In this setting,
-    the prediction converges to $\gamma^\star$ if and only if
-    $\gamma_\bot-\gamma^\star_\bot \xrightarrow{t \to \infty}{} 0$. In order to
+    the prediction converges to $\phi^\star$ if and only if
+    $\phi_\bot-\phi^\star_\bot \xrightarrow{t \to \infty}{} 0$. In order to
     encourage this behavior, we define the cost function as
     %
     \begin{equation}
         % J_{\textrm{MSE}} =  \frac{1}{N} \sum_{n=0}^N \Big( \norm{x(t_n) - \hat{x}(t_n)}{} + \norm{u(t_n) - \hat{u}(t_n)}{} \Big)
-        J_{track}(\gamma_\bot) =  \sum_{x_\bot \in \gamma_\bot, \; x^\star_\bot \in \gamma^\star_\bot} |\left| x_\bot-x^\star_\bot | \right |^2
+        J_{track}(\phi_\bot) =  \sum_{x_\bot \in \phi_\bot, \; x^\star_\bot \in \phi^\star_\bot} |\left| x_\bot-x^\star_\bot | \right |^2
         \label{eq:xperploss}   
     \end{equation}
     %
     Thus, the likelihood can be constructed to minimize the cost $J_{track}$ as follows.
     \begin{align}
-        p(\gamma_\bot | \theta) = \prod_{x_\bot \in \gamma_\bot, \; x^\star_\bot \in \gamma^\star_\bot}\mathcal{N}(x^\star_\bot , \Sigma),
+        P(J_{track} | \theta) = \prod_{x_\bot \in \phi_\bot, \; x^\star_\bot \in \phi^\star_\bot}\mathcal{N}(x^\star_\bot , s),
         \label{eq:track_likelihood}
     \end{align}
     %
-    where $\Sigma$ parameterizes the variance of the likelihood. On top of the
-    target function parameters $\theta$, we wish to learn the posterior over the
-    variance $\Sigma$ of the likelihood. This allows us to adaptively tune the
-    weights on the components of $x_\bot-x^\star_\bot$ on the overall cost, such
-    that we achieve optimum trajectory tracking. This is most advantageous when
-    the states of a system have high variance and the weights on
-    $x_\bot-x^\star_\bot$ need to be selected in such a way that one state does
-    not dominate the cost $J_{track}$.
-    %
-    Hence, the posterior distribution $p(\theta | \mathcal{D})$ is a multivariate
-    probability distribution over random variable $\xi$, where $\xi = [\theta,
-    \Sigma]$.
+    % where $\Sigma$ parameterizes the variance of the likelihood. On top of the
+    % decision parameters $\theta$, we wish to learn the posterior over the
+    % variance $\Sigma$ of the likelihood. This allows us to adaptively tune the
+    % weights on the components of $x_\bot-x^\star_\bot$ on the overall cost, such
+    % that we achieve optimum trajectory tracking. This is most advantageous when
+    % the states of a system have high variance and the weights on
+    % $x_\bot-x^\star_\bot$ need to be selected in such a way that one state does
+    % not dominate the cost $J_{track}$.
+    % %
+    % Hence, the posterior distribution $p(\theta | \mathcal{D})$ is a multivariate
+    % probability distribution over random variable $\xi$, where $\xi = [\theta,
+    % \Sigma]$.
     \item Set distance loss: Let $\mathcal{S}$ represent a small convex
     neighborhood containing $x^\star$. The objective is to find a policy that
     pulls trajectories to the goal set $\mathcal{S}$. The cost function suitable
     for this task is set distance, $J_{\textrm{set}}$, between the current
-    prediction $\gamma$ and the goal set $\mathcal{S}$:
+    prediction $\phi$ and the goal set $\mathcal{S}$:
     %
     \begin{equation}
-        J_{\textrm{set}}(\gamma)
-        = \underset{t}{\inf} \, {\{ \norm{a - b}{}: a \in \gamma(t),\, b \in \mathcal{S} \}}.  
+        J_{\textrm{set}}(\phi)
+        = \underset{t}{\textrm{inf}} \, {\{ \norm{a - b}{}: a \in \phi(t),\, b \in \mathcal{S} \}}.  
         \label{eq:set_distance}
     \end{equation}
     % 
@@ -156,29 +317,29 @@ corresponding likelihood functions and the desired behavior they impose.
     %
     Here, $r$ becomes a hyperparameter of the training algorithm. With a
     particular choice of $\mathcal{S}$, if at any point along the prediction
-    $\gamma$, a state $x$ is closer than $r$ to $x^\star$, no penalty is
+    $\phi$, a state $x$ is closer than $r$ to $x^\star$, no penalty is
     incurred by $J_{\textrm{set}}$. The corresponding likelihood function is
     given by 
     \begin{align}
-        p(J_{\textrm{set}}(\gamma) | \theta) = \mathcal{N}(0, s^2),
+        P(J_{\textrm{set}} | \theta) = \mathcal{N}(0, s).
         \label{eq:set_likelihood}
     \end{align}
-    where $s$ is a hyperparameter that represents the standard deviation of the
-    likelihood.
+    % where $s$ is a hyperparameter that represents the standard deviation of the
+    % likelihood.
     %
     \item Terminal loss: encourages trajectories to remain as close to the
     desired state as possible at time $T$. Terminal loss, $\ell_T$, is the
-    distance between the final state of the prediction $\gamma$ and $x^\star$,
+    distance between the final state of the prediction $\phi$ and $x^\star$,
     which is given by
     %
     \begin{equation}
-        J_T(\gamma) = \ell_{\textrm{set}}(\gamma) + \ell_T\left(\gamma\right).
+        J_T(\phi) = \ell_{\textrm{set}}(\phi) + \ell_T\left(\phi\right).
         \label{eq:nn_controller_j} 
     \end{equation}
     %
     The corresponding likelihood function is given by 
     \begin{align}
-        p(J_T(\gamma) | \theta) = \mathcal{N}(0, s^2),
+        P(J_T | \theta) = \mathcal{N}(0, s).
         \label{eq:terminal_likelihood}
     \end{align}
 \end{enumerate}
@@ -220,6 +381,19 @@ where $\dd W_t$ is a correlated noise process, such as Wiener process, on the
 states due to measurement uncertainties, and $\nabla_x u(x)$ is the coefficient
 of the first-order Taylor approximation of $u^{\theta}(x)$ around zero noise. 
 
+\begin{equation}
+    \begin{aligned}
+        \underset{P(\theta | J)}{\textrm{minimize}} 
+        & & J(\phi, u) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]  , \\
+        \textrm{subject to}
+        & & \dd x &= \left(\bmat{\phantom{-}\nabla_p H \\-\nabla_q H} + \bmat{0 \\ G(q)}u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, \\
+        & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
+        & & p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p), \\
+        & & \theta &\sim P(\theta | J).
+    \end{aligned}
+    \label{eq:smooth_bayesian_pbc}
+\end{equation}
+
 \begin{rem}
     Introducing uncertainties to the deterministic training finds a point
     estimate of the optimal controller parameter, which may be interpreted
@@ -233,60 +407,6 @@ of the first-order Taylor approximation of $u^{\theta}(x)$ around zero noise.
     distribution~\cite{bishop2006pattern}.
 \end{rem}
 
-\subsubsection{Training}
-%
-This Bayesian framework extends the deterministic training process discussed in
-Section~\ref{sssec:ml-pbc-deterministic}, by replacing lines 7 to 10 of
-Algorithm~\ref{algo:neuralpbc} with Algorithm~\ref{algo:neural_bayes_pbc}.
-%
-% Similar to the deterministic training, the SGD update shown in line 8 of
-% Algorithm~\ref{algo:neural_bayes_pbc} can be replaced by more refined variants
-% such as \textsc{ADAM}, \textsc{ADAGrad}~\cite{lydia2019adagrad}, etc. 
-%
-% The computation of the gradient ${\partial \mathcal{L}}/{\partial z}$ comes with
-% two complications. First, the gradient requires differentiating the
-% \textsc{Elbo} through the solution $\phi(t;x_0;u^\theta)$ of an ODE. We address
-% this issue by using the adjoint method briefly discussed in
-% Section~\ref{sssec:ml-pbc-deterministic}. 
-%
-Similar to the deterministic training, we use the adjoint method to compute the
-gradient ${\partial \mathcal{L}}/{\partial z}$ through the solution of the SDE
-given in~\eqref{eq:sde_initial}.
-%
-Moreover, we invoke the reparameterization trick of the Automatic
-Differentiation Variational
-Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic} to compute the gradient
-of samples $\theta$ with respect to the distribution parameters $z$.
-%
-% Second, computing ${\partial \mathcal{L}}/{\partial z}$ requires the derivative
-% of the sample $\xi$ with respect to the distribution parameters $z$, which is
-% intractable. We handle this complication by invoking the reparameterization
-% trick of the Automatic Differentiation Variational
-% Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic}.
-
-
-
-\begin{algorithm}
-    \caption{Bayesian Learning}\label{algo:neural_bayes_pbc}
-    \small
-    \begin{algorithmic}[1]
-        % \algrenewcommand\algorithmicindent{0em} % No indent
-        % \State Select inform or uninformed prior $z$
-        \State $f \,\gets f(H,G)$ dynamics given by SDE~\eqref{eq:sde_initial} with $u = u^\theta$
-        \For{each $x_0 \in$ \texttt{batch}}
-        \State Initialize $\mathcal{L} = 0$
-        % \algrenewcommand\algorithmicindent{1.5em} % Change indent back to default
-        \For{i=1:N}
-            \State $\theta, s \sim q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
-            \State $\zeta \sim \mathcal{N}(\zeta_0,\sigma_{\zeta})$ \Comment{Sample system parameters}
-            \State $\gamma \gets$ integrate $f$ from $x_0$ 
-            \State $p(J, \theta) = \frac{1}{s\sqrt{2\pi}}\exp{\left(-\frac{1}{2} \left ( \frac{J(\theta)}{s}\right)^2 \right)} p(\theta)$
-            \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N}\left (\log[p(\ell, \theta)] - \log[q(\theta;z)]\right)$
-        \EndFor
-        \EndFor
-        \State $z \gets z + \alpha_i \left({\partial \mathcal{L}}/{\partial z}\right)$
-    \end{algorithmic}
-\end{algorithm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -309,7 +309,7 @@ to the input $x$. We can expand this expression to
 We can remove the constants in~\eqref{eq:log_normal_likelihood} and define the
 final form of the likelihood function as
 \begin{align}
-  \mathbb{L}(y | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
+  \mathbb{L}(Y_x | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
   \label{eq:likelihood_def}
 \end{align}
 Notice that the likelihood measures how likely the current parameters $(\psi,

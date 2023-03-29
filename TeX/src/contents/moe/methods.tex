@@ -143,7 +143,7 @@ desired state $x^*$.
 In a single batch training, we compute the running cost as an expectation
 over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
 \begin{align*}
-    J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]
+    J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \mathbb{L}(\phi(x_0, u, T))]
 \end{align*}
 \noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
 
