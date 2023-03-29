@@ -26,31 +26,26 @@ providing a way to reason about model uncertainties and measurement noise during
 the learning process.
 %
 We demonstrate the efficacy and robustness of our current framework with a
-comparison against our deterministic framework~\cite{sirichotiyakul2020data}.
+comparison against the deterministic framework~\cite{sirichotiyakul2020data}.
 The comparison is performed on benchmark underactuated control problems--the
 simple pendulum and the inertia wheel pendulum--both in simulation and
 real-world experiments. 
-
+%
 
 \subsection{Control Design for Smooth Dynamical Systems}
-In this subsection, we formulate the Bayesian learning framework that minimizes
-the effects of system parameter uncertainties and measurement errors. 
+\label{ssec:pbc_smooth_dynamics}
+
+In this section, we formulate the Bayesian learning framework that minimizes
+the effects of system parameter uncertainties and measurement errors for smooth dynamical systems. 
 %
 In this framework, the neural net parameterization of $H^\theta_d$ given in
 Section~\ref{ssec:pbc} is replaced by a Bayesian neural
-network whose parameters are uncorrelated random variables sampled from a
-multivariate probability distribution (MPD).
+network whose weights and biases are samples drawn from a posterior distribution.
 %
-The goal is to learn the distribution parameters $z$ of the posterior MPD
-$Q(\theta;z)$ that maximize the \textsc{Elbo} given in~\eqref{eq:elbo}. 
+The goal is to learn the posterior distribution that achieves the performance objective under system parameter and measurement uncertainties. 
 %
-% For continuous probability distributions, ELBO is redefined in terms of
-% continuous entropy as
-% %
-% \begin{equation}
-%     \mathcal{L}(x,z) = \mathbb{E}_{\theta \sim q} \left[\log(f(x|\theta;z)q(\theta)) - \log(q(\theta)) \right],
-%     \label{eqn:cont_entropy_elbo}
-% \end{equation}
+We pose the search over the posterior as the following optimization problem.
+
 %
 The computation of the \textsc{Elbo} requires the likelihood function and the
 prior distribution.
@@ -692,6 +687,17 @@ and model uncertainties.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Control Design for Hybrid Dynamical Systems}
+\label{ssec:pbc_hybrid}
+
+In this section, we extend the techniques of deterministic and Bayesian \textsc{NeuralPbc} to hybrid dynamical systems.
+%
+We introduce an accurate model of the hybrid dynamics into the deterministic \textsc{NeuralPbc} framework and infer a controller that either leverages the advantages of contact events and minimizes its adverse effects.
+%
+Moreover, we inject uncertainties in contact forces and post-impact velocities to \textsc{NeuralPbc} in order to design a robust controller through Bayesian learning.
+%
+
+
+
 
 \subsubsection{Deterministic \textsc{NeuralPbc}}
 \label{sssec:data_driven_neuralpbc}

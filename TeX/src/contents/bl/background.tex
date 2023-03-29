@@ -367,7 +367,7 @@ discussed as follows.
       \State Define $P(\theta, Y_x) \propto \exp(-\mathbb{L}(\theta, Y_x))$, \; $\mathbb{L}(\theta, Y_x) = \vectornorm{F(x;\theta) - Y_x}^2 + \lambda_r \vectornorm{\theta}^2$
       \State $i=0$
       \While {i < \textsc{maximum iteration}}
-        \State Select initial state $\theta$ and momentum $r$ from prior knowledge
+        \State Select initial state $\theta$ and momentum $m$ from prior knowledge
         \For{$t = 0:\Delta t: T$}
           \State $m(t + \nicefrac{\Delta t}{2}) = m(t) - \dfrac{\Delta t}{2} \dfrac{\partial \mathbb{L}}{\partial \theta_i}(\theta(t), Y_x)$
           \State $\theta(t + \Delta t) = \theta(t) + \Delta t \; m(t + \nicefrac{\Delta t}{2}) $ 
