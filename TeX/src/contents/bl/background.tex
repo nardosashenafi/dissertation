@@ -136,7 +136,7 @@ the desired equilibrium coordinate $q^*$.
 The resulting passive closed loop system is given by~\cite{ortega2002stabilization}
 \begin{equation}
   \bmat{\dot{q} \\ \dot{p}}  =
-  \bmat{0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - GK_vG^\top}
+  \bmat{0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - \Omega K_v \Omega^\top}
   \bmat{\nabla_q H_d \\ \nabla_p H_d},
   \label{eq:pch}
 \end{equation}
@@ -168,7 +168,7 @@ following optimization problem.
 \begin{equation}
   \begin{aligned}
       \underset{\theta }{\textrm{minimize}} 
-      &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| G^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
+      &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
       \textrm{subject to} 
       &&\quad M_d^\theta &= \big( M_d^\theta \big)^\top \succ 0, \\
       &&\quad J_2^\theta &= -\big( J_2^\theta \big)^\top, \\

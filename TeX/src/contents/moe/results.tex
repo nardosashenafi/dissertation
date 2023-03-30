@@ -185,6 +185,14 @@ outlined in Algorithm~\eqref{algo:moreau} with an integration time step $\Delta
 t=0.001$.
 %
 
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.6\linewidth]{MOEfirstImpact.png}
+    \caption{Cartpole with wall contacts}
+    \label{fig:cartpole_contact}
+\end{figure}
+
 \subsubsection{Training}
 \label{sssec:cartpole_training}
 
@@ -214,14 +222,13 @@ The experts are fully-connected neural net with two hidden layers (state input
 The output of the experts correspond to the force applied on the cart.
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\linewidth]{MOEfirstImpact.png}
-    \caption{Cartpole with wall contacts}
-    \label{fig:cartpole_contact}
-\end{figure}
-
 \subsubsection{Results}
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{cartpole_hardware.jpg}
+    \caption{Experimental setup of cartpole with wall contacts}
+    \label{fig:cartpole_hardware}
+\end{figure}
 
 We demonstrate the performance of the MOE controllers in simulation and hardware. 
 %

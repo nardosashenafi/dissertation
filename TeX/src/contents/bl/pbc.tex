@@ -216,7 +216,7 @@ We expand on the use of HMC and variational inference to solve the optimization 
         \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
         \label{eq:neuralpbc_elbo}    
     \end{align}
-    We use stochastic gradient descent to iteratively update the distribution parameteres as follows:
+    We use stochastic gradient descent to iteratively update the distribution parameters as follows:
     \begin{align*}
       z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
     \end{align*}
@@ -903,16 +903,16 @@ auto-differentiation techniques.
     \small
     \begin{algorithmic}[1]
         \algrenewcommand\algorithmicindent{0em} % No indent
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \State $\mathcal{D}_N \gets \{x0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $J \gets 0$\Comment{Batch loss}
-        \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
-            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+        \For{$(x_0) \sim \mathcal {D}_N$}
+            \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ \Comment{Batch loss}
         \EndFor
         \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
         \State \textbf{return} $\theta$
@@ -979,46 +979,7 @@ The magnitude of the samples $p_s$ determine the elevation of the terrain under
 each spoke, which consequently randomize the gap $g_N$, pre-impact velocities
 $\dot{q}^{-}$ and contact forces between each spoke and the ground.
 
-From Bayes' theorem, the posterior distribution $P(\theta |J)$ is a function of
-the prior distribution $P(\theta)$ and the likelihood function $P(J |
-\theta)$~\cite{bishop2006pattern}.
-\begin{align}
-  P(\theta | J) = \frac{P(J | \theta) P(\theta)}{\int P(J | \theta) P(\theta) \; d \theta}
-  \label{eq:bayes}
-\end{align} 
-The prior can be used to inject any former knowledge about the controller. 
-%
-For instance, an informed prior can be a normal distribution whose mean is the
-solution to the optimization problem in~\eqref{eq:hybrid_neuralpbc}. If there is
-no prior information, $P(\theta)$ can be set as a uniform distribution.
-%
-The likelihood function consists of the expected performance $J$ in the following form:
-\begin{align}
-  P(J|\theta) = \mathcal{N}(0, s),
-  \label{eq:likelihood}
-\end{align}
-\noindent where $s$ is the standard deviation of the likelihood.
-%
-
-
-There are various techniques to find the exact posterior
-distribution~\cite{bishop2006pattern}, but they have weak scalability
-for high-dimensional systems. Thus, we use variational inference, a technique
-that approximates the posterior with the distribution $Q(\theta;z)$ selected
-from the conjugate family of the prior~\cite{cohen2016bayesian}. 
-%
-The goal is to learn the distribution parameters $z$ of the chosen posterior.
-%
-The performance objective that minimizes the loss $J$ while also matching the 
-approximate posterior $Q$ to the exact one is
-\begin{align}
-  \mathcal{L}(J, z) = \mathbb{E}_{\theta \sim Q}[ \log{(P(J | \theta) P(\theta))} - \log{(Q(\theta;z))}]
-  \label{eq:elbo}
-\end{align}
-\noindent where $\mathcal{L}(J, z)$ is the evidence lower bound (\textsc{Elbo})~\cite{tipping2003bayesian}.
-%
-
-As outline in Algorithm~\eqref{algo:bayes_neuralpbc}, we update the distribution
+As outlined in Algorithm~\eqref{algo:bayes_neuralpbc}, we update the distribution
 parameters of the posterior $Q(\theta;z)$ through stochastic gradient descent. 
 %
 We use auto-differentiation techniques to take the gradient of the \textsc{Elbo}
@@ -1035,22 +996,22 @@ gradient of~\eqref{eq:elbo} through the samples drawn from the posterior.
     \small
     \begin{algorithmic}[1]
         \algrenewcommand\algorithmicindent{0em} % No indent
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
         \For{$i=1:Q_N$} \Comment{Samples to compute~\eqref{eq:elbo}}
         \State $J \gets 0$ \Comment{Batch loss}
         \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
-          \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
+          \For{$(x_0) \sim \mathcal {D}_N$}
             \State $p_s \sim \mathcal{U}(p_{min}, p_{max})$
-            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+            \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
           \EndFor
         \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{Q_N} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
         \EndFor
         \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
         \State \textbf{return} $z$
@@ -1163,7 +1124,7 @@ The performance objective is given by the accumulated loss
 \noindent where $\dot{x}^*$ is a constant 1 \nicefrac{m}{s}.
 %
 For the Bayesian training, we generate random terrain elevation parameters $p_s$
-from a uniform probability distribution $\mathcal{U} \sim[0, 3]$ centimeters.
+from a uniform probability distribution $\mathcal{U} \sim[0, 2]$ centimeters.
 
 
 \subsubsection{Simulated Experiments}
@@ -1206,18 +1167,17 @@ We compare the performance of the two controllers as follows.
 Similar to the Bayesian training, we sample the terrain elevation from
 $\mathcal{U} \sim[0, p_{max}]$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
 %
-For each value of $p_{max}$, we generate 10 random initial states $(q_0,
-\dot{q}_0)$ and integrate 10-second trajectories.
+For each value of $p_{max}$, we generate 10 random initial states $x_0$ and integrate 10-second trajectories.
 %
 The cost of each trajectory is calculated as per~\eqref{eq:loss}.
 %
-The solid line in Figure~\ref{fig:comparison} shows the average $J_T$ over the
-10 trajectories for each $p_{max}$ and the error band represents the standard
-deviation over the accumulated losses.
+The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
+10 trajectories for each $p_{max}$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{simulationComparison.eps}
+    \caption{Comparison of deterministic and Bayesian control for the rimless wheel.}
     \label{fig:comparison}
 \end{figure}
 
