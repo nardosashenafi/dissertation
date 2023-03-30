@@ -380,16 +380,22 @@ by~\cite{cohen2016bayesian}
 
 % \subsubsection{Prediction}
 
-Once we find the exact or approximate posterior, the prediction for state $x$ is
-given by marginalizing the model over the posterior as
-follows~\cite{jospin2020hands}.
+Once we find the exact or approximate posterior, the prediction for state $x$
+can be found in one of two ways. The first option is to marginalize the model
+over the posterior as follows~\cite{jospin2020hands}
 \begin{equation}
   \hat{F}(x) = \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta),
   \label{eqn:marginalization}
 \end{equation} 
-where $N_Q$ is the number of samples drawn from the posterior. Bayesian
-frameworks can quantify the confidence in the predictions through the
-variance~\cite{jospin2020hands}
+where $N_Q$ is the number of samples drawn from the posterior. 
+%
+The second option only takes one sample from the posterior, and it corresponds
+to the maximum aposteriori (MAP), i.e. 
+\begin{align} 
+  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | Y_x)
+\end{align}
+Bayesian frameworks can quantify the confidence in the
+predictions through the variance~\cite{jospin2020hands}
 \begin{equation}
   \Sigma_{F \mid x,Y_x} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
   \label{eqn:predictive_variance}
