@@ -105,15 +105,20 @@ We first pose the search over the posterior as the following optimization proble
 We expand on the use of HMC and variational inference to solve the optimization problem.
 %
 \begin{enumerate}
-    \item \textbf{Hamiltonian Monte Carlo (HMC)}: represents the posterior with a large collection of samples denoted by $\Theta$.
+    \item \textbf{Hamiltonian Monte Carlo (HMC)}: represents the posterior with
+    a large collection of samples denoted by $\Theta$.
     %
-    We draw the first sample $\theta^{(\tau=0)}$ from the prior distribution and construct the likelihood from the performance objective as $P(J | \theta^{(\tau=0)})$.
+    We draw the first sample $\theta^{(\tau=0)}$ from the prior distribution and
+    construct the likelihood from the performance objective as $P(J |
+    \theta^{(\tau=0)})$.
     %
-    The likelihood and the prior distributions are known in closed form, hence the joint distribution $P(\theta^{(\tau=0)}, J)$ is given by
+    The likelihood and the prior distributions are known in closed form, hence
+    the joint distribution $P(\theta^{(\tau=0)}, J)$ is given by
     \begin{align*}
         P(\theta^{(\tau=0)}, J) = P(J|\theta^{(\tau=0)})P(\theta^{(\tau=0)}).
     \end{align*}
-    We generate the next sample from a Markov Chain, which is given the following first order differential equations~\cite{bishop2006pattern}
+    We generate the next sample from a Markov Chain, which is given the
+    following first order differential equations~\cite{bishop2006pattern}
     %
     % The Markov Chain is constructed from two coupled first order differential equations, taken from the classical dynamics of a particle in motion.
     \begin{equation}
@@ -136,17 +141,22 @@ We expand on the use of HMC and variational inference to solve the optimization 
     \end{align*} 
     If $A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) \geq \nu$, then we accept the sample. 
     %
-    Otherwise, we discard the candidate and resample from the prior distribution.
+    Otherwise, we discard the candidate and resample from the prior
+    distribution.
     %
     The complete procedure is outlined in Algorithm~\eqref{algo:hmc}
     %
-    We keep collecting these samples until the average accumulated loss converges to the minimum achievable value. 
+    We keep collecting these samples until the average accumulated loss
+    converges to the minimum achievable value. 
 
-    Once we obtain the collection samples, we use them to evaluate the controller as follows.
+    Once we obtain the collection samples, we use them to evaluate the
+    controller as follows.
     %
-    From the collection $\Theta$, we sample $N_Q$ parameters in a uniform fashion.
+    From the collection $\Theta$, we sample $N_Q$ parameters in a uniform
+    fashion.
     %
-    We evaluate the neural net $H^\theta_d$ and the corresponding energy shaping and damping control for each sample.
+    We evaluate the neural net $H^\theta_d$ and the corresponding energy shaping
+    and damping control for each sample.
     %
     Then, we marginalize over the control law as 
     \begin{equation*}
@@ -203,10 +213,10 @@ We expand on the use of HMC and variational inference to solve the optimization 
     We draw several samples from the current posterior and evaluate its performance through the joint distribution $P(\theta, J)$. 
     Given the likelihood and the prior distributions, variational inference constructs the \textsc{Elbo} as
     \begin{align}
-        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    \\
+        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
         \label{eq:neuralpbc_elbo}    
     \end{align}
-    We use stochastic gradient descent to iteratively update the distribution parameteres as follows:
+    We use stochastic gradient descent to iteratively update the distribution parameters as follows:
     \begin{align*}
       z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
     \end{align*}
@@ -415,11 +425,12 @@ The resulting Bayesian \textsc{NeuralPbc} problem is given by
 
 \subsection{Simple Pendulum}
 
-In this section, we demonstrate the robustness properties of the controllers trained via
-Bayesian methods on the simple pendulum system. The system is simulated under
-measurement noise via stochastic differential equations~\eqref{eq:sde_initial}. Furthermore, the system parameter is
-varied in order to analyze the closed-loop system response under model
-uncertainties. \\
+In this section, we demonstrate the robustness properties of the controllers
+trained via Bayesian methods on the simple pendulum system. The system is
+simulated under measurement noise via stochastic differential
+equations~\eqref{eq:sde_initial}. Furthermore, the system parameter is varied in
+order to analyze the closed-loop system response under model uncertainties. 
+
 The equation of motion of a simple pendulum with measurement noise is given by
 %
 \begin{equation}
@@ -444,31 +455,40 @@ be clever enough to overcome gravitational forcing with a combination of
 built-up momentum and torque bandwidth.
 
 The objective of this case study is to stabilize the homoclinic orbit of the
-pendulum whose single parameter $a$ has the nominal and yet unconfirmed value $9.81$
-\unit{$s^{-2}$}. To this end, we learn a Bayesian control $u^\theta$ that can stabilize the pendulum even with system parameter uncertainties.
+pendulum whose single parameter $a$ has the nominal and yet unconfirmed value
+$9.81$ \unit{$s^{-2}$}. To this end, we learn a Bayesian control $u^\theta$ that
+can stabilize the pendulum even with system parameter uncertainties.
 
 \subsubsection{Training} 
-Algorithm~\ref{algo:hmc} is carried out with expert
-trajectories generated by the vanilla energy-shaping control
-(ESC)~\cite{underactuated}. The ESC takes the general form
+The goal of this training is to track the expert trajectories generated by the
+vanilla energy-shaping control (ESC)~\cite{underactuated}. The ESC takes the
+general form
 %
 \begin{equation}
-    u^\theta(q, \dot{q}; \theta) = \theta_1 \dot{q} + \theta_2 \cos{(q)} \dot{q} + \theta_3 \dot{q}^3,
+    u^\theta(q, \dot{q}; \theta^e) = \theta^e_1 \dot{q} + \theta^e_2 \cos{(q)} \dot{q} + \theta^e_3 \dot{q}^3,
     \label{eq:pendulum_esc}
 \end{equation}
 %
-where the weights $\{\theta_i\}_{i=1}^3$ satisfy $-\theta_1 = \theta_2 = 2a
-\theta_3 < 0$ in the vanilla ESC. 
+where $\theta^e$ represents the parameters of the expert. The weights
+$\{\theta^e_i\}_{i=1}^3$ satisfy $-\theta^e_1 = \theta^e_2 = 2a \theta^e_3 < 0$
+in the vanilla ESC. 
+%
+The Bayesian control is also linear over the decision parameters, i.e.
+\begin{align*}
+    u^\theta(q, \dot{q}; \theta) = \theta_1 \dot{q} + \theta_2 \cos{(q)} \dot{q} + \theta_3 \dot{q}^3,
+\end{align*}
+and unlike ESC, the learned parameters $\theta$ are samples drawn from the posterior.
 
-The running cost function is chosen to be the loss $J_{track}(\phi_\bot)$
-from homoclinic orbit $\phi^\star$ provided in~\eqref{eq:xperploss}; the
+
+The running cost function is chosen to be the loss $J_{track}(\phi_\bot)$ from
+homoclinic orbit $\phi^\star$ provided in~\eqref{eq:xperploss}; the
 corresponding likelihood is given by~\eqref{eq:track_likelihood}. We collect
-dataset $\mathcal{D}_N$ of initial states sampled with greedy and explorative techniques. For this particular experiment, we use
-Hamiltonian Monte Carlo outlined in Algorithm~\ref{algo:hmc} to infer the
-exact posterior distribution. We compare the
-Bayesian policy with
-the deterministic policy, which is simply given by the point-estimates of
-the expert vanilla ESC in~\eqref{eq:pendulum_esc}~\cite{acc}.
+dataset $\mathcal{D}_N$ of initial states sampled with greedy and explorative
+techniques. For this particular experiment, we use Hamiltonian Monte Carlo
+outlined in Algorithm~\ref{algo:hmc} to infer the exact posterior distribution.
+We compare the Bayesian policy with the deterministic policy, which is simply
+given by the point-estimates of the expert vanilla ESC
+in~\eqref{eq:pendulum_esc}~\cite{acc}.
 
 \subsubsection{Simulation Tests} 
 The homoclinic orbit of the pendulum is defined by the $2a$-level set of the
@@ -496,9 +516,9 @@ Figure~\ref{fig:bayes_compare}.
 %
 
 In addition to uncertainties in $a$, we test the deterministic and Bayesian
-policies with measurement noise, modelled as a Wiener process with variance
-$0.0005$ \unit{rad} in the $q$- and $0.05$ \unitfrac{rad}{s} in the
-$\dot{q}$-directions.
+policies with measurement noise, modeled as a Wiener process with standard
+deviation $0.0005$ \unit{rad} in the $q$-direction and $0.05$ \unitfrac{rad}{s}
+in the $\dot{q}$-direction.
 %
 These numbers are chosen to represent a typical error arising from an
 optical encoder with a resolution of 2048 pulses per revolution and its naive
@@ -512,8 +532,9 @@ These trajectories are then used to compute $\zeta$.
 The effects of noise on $\zeta$ are reflected by the error bands in
 Figure~\ref{fig:bayes_compare}.
 
-The results, shown in Figure~\ref{fig:bayes_compare}, demonstrate that Bayesian learning yields controllers that outperform 
-their deterministic counterpart throughout the whole range of $a$.
+The results, shown in Figure~\ref{fig:bayes_compare}, demonstrate that Bayesian
+learning yields controllers that outperform their deterministic counterpart
+throughout the whole range of $a$.
 %
 The marginalization method in~\eqref{eqn:marginalization} for selecting $\theta$
 from the learned distribution performs best when a uniform prior is used, while
@@ -639,19 +660,17 @@ A uniform distribution in $[-2\pi, 2\pi] \times [-2\pi, 2\pi] \times [-10, 10]
 \times [-10, 10]$ is chosen as the probability distribution from which samples
 of initial states $x_0$ are drawn for the \textsc{DAgger} strategy.
 %
-In each gradient descent step, we sample a batch of 4 initial states
-$\{x_0\}$ from $x_0 \sim \mathcal{N}(x^\star, \Sigma_0)$ and \textsc{DAgger}
-as discussed in Section~\ref{ssec:state_sampling}; these initial states are
+In each gradient descent step, we sample a batch of 4 initial states $\{x_0\}$
+from greedy and explorative state sampling techniques; these initial states are
 integrated forward with a time horizon of $t \in [0,3]$ seconds. 
 %
-In the Bayesian framework, the standard deviations $\sigma_{\zeta}$ of system
-parameters $\zeta = [I_1, I_2, mgl]$ are chosen to be $10\%$ of the nominal system
-parameters given in Section~\ref{sec:iwp}.
+In the Bayesian framework, the standard deviations $\sigma_{p}$ of system
+parameters $p_s = [I_1, I_2, mgl]$ are chosen to be $10\%$ of the nominal system
+parameters.
 %
-Moreover, we train on trajectories per the SDE
-in~\eqref{eq:neural_bayesian_inference} with measurement error represented
-by Wiener process with standard deviation of 0.001 and 0.02 on the joint
-angles and velocities, respectively.
+Moreover, we train on trajectories per the SDE in~\eqref{eq:sde_initial} with
+measurement error represented by Wiener process with standard deviation of 0.001
+and 0.02 on the joint angles and velocities, respectively.
 %
 % In each gradient descent step, a batch of 4 initial conditions $\{x_0\}$
 % generated by \textsc{DAgger} is integrated forward with using the Tsitouras
@@ -733,7 +752,7 @@ is more robust against measurement noise.
 %   
 \begin{figure}
     \centering
-    \includegraphics[clip,width=0.7\linewidth]{./figures/bandplot2.eps}%
+    \includegraphics[clip,width=0.6\linewidth]{./figures/bandplot2.eps}%
     \caption{\textsc{NeuralPBC} Performance metric ($J^T$) for various
     error in system parameters. Measurement noise included as Wiener process
     with standard deviation of $0.001$ and $0.02$ on joint angles and
@@ -742,6 +761,7 @@ is more robust against measurement noise.
 \end{figure}
 
 \subsubsection{Hardware Tests} 
+
 The controllers from deterministic and Bayesian training schemes are
 evaluated on the hardware shown in Figure~\ref{fig:iwp_hardware}. 
 %
@@ -757,7 +777,7 @@ Table~\ref{tab:modified_params}.
 %
 % The parameter error listed on the last column of Table~\ref{tab:modified_params}
 % is computed by $\|p - p_{\textrm{nom}}\| / \|p_{\textrm{nom}}\|$.
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{System parameters used in real-world experiments. The errors in the
     last column are $\|p_s - p^{\textrm{nom}}_{s}\| / \|p^{\textrm{nom}}_{s}\|$}.
@@ -774,12 +794,13 @@ Table~\ref{tab:modified_params}.
     \end{tabular}
     \label{tab:modified_params}
 \end{table}
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
-    \includegraphics[width=0.6\linewidth]{hardware.eps}
+    \includegraphics[width=0.55\linewidth]{hardware.eps}
     \caption{Inertia Wheel Pendulum Hardware}
     \label{fig:iwp_hardware}
 \end{figure}
+
 The system starts from rest at the downward position. 
 %
 A small disturbance in the $q_1$ direction is introduced to start the swing-up.
@@ -788,7 +809,19 @@ The state $x$ is recorded and~\eqref{eq:performance_metric} is the
 performance metric used to evaluate the controllers. The results are
 summarized in Figure~\ref{fig:neuralpbc_bar_plot}.
 %
-\begin{figure}[t]
+
+In all scenarios, our controllers are able to achieve the control objective
+despite the errors introduced in the system parameters.
+%
+% Furthermore, the controller from Bayesian training consistently outperforms the
+% controller from deterministic training, supporting the theoretical justification
+% discussed in Section~\ref{ssec:justification}. 
+%
+These results demonstrate that our approach enables a unified way to tackle
+nonlinear control problems while simultaneously incorporating prior knowledge
+and model uncertainties.
+%
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{./figures/pbc_bar.eps}
     \caption{
@@ -806,41 +839,31 @@ summarized in Figure~\ref{fig:neuralpbc_bar_plot}.
     }
     \label{fig:neuralpbc_bar_plot}
 \end{figure}
-
-In all scenarios, our controllers are able to achieve the control objective
-despite the errors introduced in the system parameters.
-%
-% Furthermore, the controller from Bayesian training consistently outperforms the
-% controller from deterministic training, supporting the theoretical justification
-% discussed in Section~\ref{ssec:justification}. 
-%
-These results demonstrate that our approach enables a unified way to tackle
-nonlinear control problems while simultaneously incorporating prior knowledge
-and model uncertainties.
-%
-  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Control Design for Hybrid Dynamical Systems}
 \label{ssec:pbc_hybrid}
 
-In this section, we extend the techniques of deterministic and Bayesian \textsc{NeuralPbc} to hybrid dynamical systems.
+In this section, we extend the techniques of deterministic and Bayesian
+\textsc{NeuralPbc} to hybrid dynamical systems.
 %
-We introduce an accurate model of the hybrid dynamics into the deterministic \textsc{NeuralPbc} framework and infer a controller that either leverages the advantages of contact events and minimizes its adverse effects.
+We introduce a contact model of the hybrid dynamics into the deterministic
+\textsc{NeuralPbc} framework and infer a controller that either leverages the
+advantages of contact events and minimizes its adverse effects.
 %
-Moreover, we inject uncertainties in contact forces and post-impact velocities to \textsc{NeuralPbc} in order to design a robust controller through Bayesian learning.
+Moreover, we inject uncertainties in contact forces and post-impact velocities
+to \textsc{NeuralPbc} in order to design a robust controller through Bayesian
+learning.
 %
 
 
-
-
-\subsubsection{Deterministic \textsc{NeuralPbc}}
+\subsubsection{Deterministic \textsc{NeuralPBC}}
 \label{sssec:data_driven_neuralpbc}
 
 In this framework, we aim to find a passive closed loop system for the hybrid
 dynamics~\eqref{eq:hybrid_dynamics} whose desired stable equilibrium is at
-$(q^*, \dot{q}^*)$.
+$x^* = (q^*, \dot{q}^*)$.
 %
 We formulate this problem as a search over the point-estimate parameters of
 $H_d$ given by a neural network.
@@ -860,36 +883,11 @@ This training framework can be posed as the following optimization problem.
 The performance objective $\ell$ is evaluated from closed loop trajectories
 generated from various initial states.
 %
-We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outline
+We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outlined
 in Algorithm~\eqref{algo:moreau} to resolve the complementarity constraint
 in~\eqref{eq:complementarity} and numerically integrate the measure differential
-equations~\eqref{eq:dynamics}.
+equations~\eqref{eq:hybrid_dynamics}.
 %
-
-We intend to find a solution to the optimization problem
-in~\eqref{eq:hybrid_dynamics} for all initial states $(q_0, \dot{q}_0)$ in the
-state space.
-%
-To efficiently sample the initial states, we use a combination of greedy and
-explorative state sampling techniques.
-%
-The greedy state sampling, commonly known as \textsc{DAgger}~\cite{ross2011no},
-generates trajectories using the current $H_d$ parameters and collects $N_d$
-samples from the visited states. 
-%
-This allows the training to refine the controller on the states it visits the
-most.
-%
-We recover from locally optimal solutions through explorative state sampling,
-which takes $N_r$ number of random samples from the state space.
-%
-In a single batch training, we compute the performance objective as an expectation
-over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
-\begin{align*}
-    J(\theta) = \mathbb{E}_{q_0, \dot{q}_0 \sim \mathcal{D}_N}[ \ell(\phi(t; q_0, \dot{q}_0), u^\theta)]
-\end{align*}
-\noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
-
 
 As outlined in Algorithm~\ref{algo:deter_neuralpbc}, we compose the cost
 $\ell$ from the $N_{\mathcal{D}}$ closed loop trajectories and update the
@@ -906,23 +904,23 @@ auto-differentiation techniques.
     \small
     \begin{algorithmic}[1]
         \algrenewcommand\algorithmicindent{0em} % No indent
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \State $\mathcal{D}_N \gets \{x0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $J \gets 0$\Comment{Batch loss}
-        \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
-            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+        \For{$(x_0) \sim \mathcal {D}_N$}
+            \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ \Comment{Batch loss}
         \EndFor
         \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
         \State \textbf{return} $\theta$
     \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Bayesian \textsc{NeuralPbc}}
+\subsubsection{Bayesian \textsc{NeuralPBC}}
 \label{sssec:bayesian_inference}
 
 Walking machines such as the rimless wheel are bound to experience undetermined
@@ -982,46 +980,7 @@ The magnitude of the samples $p_s$ determine the elevation of the terrain under
 each spoke, which consequently randomize the gap $g_N$, pre-impact velocities
 $\dot{q}^{-}$ and contact forces between each spoke and the ground.
 
-From Bayes' theorem, the posterior distribution $P(\theta |J)$ is a function of
-the prior distribution $P(\theta)$ and the likelihood function $P(J |
-\theta)$~\cite{bishop2006pattern}.
-\begin{align}
-  P(\theta | J) = \frac{P(J | \theta) P(\theta)}{\int P(J | \theta) P(\theta) \; d \theta}
-  \label{eq:bayes}
-\end{align} 
-The prior can be used to inject any former knowledge about the controller. 
-%
-For instance, an informed prior can be a normal distribution whose mean is the
-solution to the optimization problem in~\eqref{eq:hybrid_neuralpbc}. If there is
-no prior information, $P(\theta)$ can be set as a uniform distribution.
-%
-The likelihood function consists of the expected performance $J$ in the following form:
-\begin{align}
-  P(J|\theta) = \mathcal{N}(0, s),
-  \label{eq:likelihood}
-\end{align}
-\noindent where $s$ is the standard deviation of the likelihood.
-%
-
-
-There are various techniques to find the exact posterior
-distribution~\cite{bishop2006pattern}, but they have weak scalability
-for high-dimensional systems. Thus, we use variational inference, a technique
-that approximates the posterior with the distribution $Q(\theta;z)$ selected
-from the conjugate family of the prior~\cite{cohen2016bayesian}. 
-%
-The goal is to learn the distribution parameters $z$ of the chosen posterior.
-%
-The performance objective that minimizes the loss $J$ while also matching the 
-approximate posterior $Q$ to the exact one is
-\begin{align}
-  \mathcal{L}(J, z) = \mathbb{E}_{\theta \sim Q}[ \log{(P(J | \theta) P(\theta))} - \log{(Q(\theta;z))}]
-  \label{eq:elbo}
-\end{align}
-\noindent where $\mathcal{L}(J, z)$ is the evidence lower bound (\textsc{Elbo})~\cite{tipping2003bayesian}.
-%
-
-As outline in Algorithm~\eqref{algo:bayes_neuralpbc}, we update the distribution
+As outlined in Algorithm~\eqref{algo:bayes_neuralpbc}, we update the distribution
 parameters of the posterior $Q(\theta;z)$ through stochastic gradient descent. 
 %
 We use auto-differentiation techniques to take the gradient of the \textsc{Elbo}
@@ -1038,22 +997,22 @@ gradient of~\eqref{eq:elbo} through the samples drawn from the posterior.
     \small
     \begin{algorithmic}[1]
         \algrenewcommand\algorithmicindent{0em} % No indent
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$  \Comment{$N_{\mathcal{D}}$ initial state samples} 
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
         \For{$i=1:Q_N$} \Comment{Samples to compute~\eqref{eq:elbo}}
         \State $J \gets 0$ \Comment{Batch loss}
         \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
-          \For{$(q_0, \dot{q}_0) \sim \mathcal {D}_N$}
+          \For{$(x_0) \sim \mathcal {D}_N$}
             \State $p_s \sim \mathcal{U}(p_{min}, p_{max})$
-            \State $\phi$ = Moreau($q_0, \dot{q}_0$) \Comment Algorithm~\eqref{algo:moreau}
+            \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
           \EndFor
         \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{Q_N} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
         \EndFor
         \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
-        \State $\mathcal{D}_N \gets \{q_0, \dot{q}_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
+        \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
         \State \textbf{return} $z$
@@ -1166,7 +1125,7 @@ The performance objective is given by the accumulated loss
 \noindent where $\dot{x}^*$ is a constant 1 \nicefrac{m}{s}.
 %
 For the Bayesian training, we generate random terrain elevation parameters $p_s$
-from a uniform probability distribution $\mathcal{U} \sim[0, 3]$ centimeters.
+from a uniform probability distribution $\mathcal{U} \sim[0, 2]$ centimeters.
 
 
 \subsubsection{Simulated Experiments}
@@ -1209,18 +1168,17 @@ We compare the performance of the two controllers as follows.
 Similar to the Bayesian training, we sample the terrain elevation from
 $\mathcal{U} \sim[0, p_{max}]$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
 %
-For each value of $p_{max}$, we generate 10 random initial states $(q_0,
-\dot{q}_0)$ and integrate 10-second trajectories.
+For each value of $p_{max}$, we generate 10 random initial states $x_0$ and integrate 10-second trajectories.
 %
 The cost of each trajectory is calculated as per~\eqref{eq:loss}.
 %
-The solid line in Figure~\ref{fig:comparison} shows the average $J_T$ over the
-10 trajectories for each $p_{max}$ and the error band represents the standard
-deviation over the accumulated losses.
+The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
+10 trajectories for each $p_{max}$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{simulationComparison.eps}
+    \caption{Comparison of deterministic and Bayesian control for the rimless wheel.}
     \label{fig:comparison}
 \end{figure}
 

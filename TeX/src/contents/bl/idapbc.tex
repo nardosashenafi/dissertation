@@ -7,8 +7,9 @@ adverse effects of system parameter uncertainties.
 We parametrize the function $V_d^\theta$ and the entries of $L_\theta$ and
 $A_\theta$ matrices with Bayesian neural networks. 
 %
-The goal is to learn the distribution parameters $z$ of the posterior
-multivariate probability distribution $q(\theta;z)$ that maximize the
+We invoke variational inference to find the approximate posterior over the
+parameters $\theta$. The goal is to learn the distribution parameters $z$ of the
+posterior multivariate probability distribution $Q(\theta;z)$ that maximize the
 \textsc{Elbo} given in~\eqref{eq:elbo}.
 %
 
@@ -17,11 +18,10 @@ The computation of the \textsc{Elbo} requires the likelihood function and the
 prior distribution.
 %
 In order to compute the likelihood, we first draw samples of $\theta$ from the
-posterior $q(\theta;z)$, and evaluate the PDEs given in~\eqref{eq:pde_vd} and
-~\eqref{eq:pde_md_reduced} over discretized states within the configuration
-space $\mathcal{Q}$. Then, the likelihood is given by
+posterior $Q(\theta;z)$, and evaluate the PDEs given in~\eqref{eq:pde_idapbc}.
+Then, the likelihood is given by
 \begin{equation}
-    p(\left\| l_{1k,\textrm{IDA}}(q) \right\|^2 + \left\| l_{2,\textrm{IDA}}(q) \right\|^2 \mid \theta) = \mathcal{N}\left(0, s \right),
+    P( \left\| l_{\textrm{IDA}} (x) \right\|^2 \mid \theta) = \mathcal{N}\left(0, s \right),
     \label{eqn:likelihood_idapbc}
 \end{equation}
 where $\mathcal{N}$ represents the Gaussian probability distribution, and $s$ is
@@ -33,20 +33,9 @@ in~\eqref{eq:elbo} coaxes the loss $l_{\text{IDA}}(x)$ to zero.
 
 
 %
-We take two approaches to selecting the distribution parameters $z_0$ of the
-prior $p(\theta;z)$. The simplest approach is to use an uninformed prior with
-randomly initialized $z_0$ to start the optimization problem; this choice
-encourages exploration but has slow convergence properties. The second approach
-uses an informed prior that warm-starts the Bayesian training around the
-solution of the deterministic training. To do so, $z_0$ is selected such that
-the prior distribution is centered around the parameters learned from the
-deterministic technique discussed in Section~\ref{sssec:deter_idapbc}.
-
-
-%
 We update the distribution parameters $z$ along the gradient $\partial
 \mathcal{L}/\partial z$ until the \textsc{Elbo} converges and the objective
-function of~\eqref{eq:finite_optim_reduced} reaches the threshold
+function $\left\| l_{\textrm{IDA}} (x) \right\|^2$ reaches the threshold
 $\epsilon_{tol}$.
 %
 We invoke the reparameterization trick of the Automatic Differentiation
@@ -62,9 +51,9 @@ Hence, in the Bayesian framework, we inject these uncertainties directly into
 the training loop in order to learn a controller that works for a wide range of
 system parameters.
 %
-To model these uncertainties, we sample a set of system parameters $\zeta$ from
-a normal distribution $\mathcal{N}(\zeta_0, \sigma_{\zeta})$ centered around the
-nominal parameter $\zeta_0$, where $\sigma_{\zeta}$ represents the uncertainty
+To model these uncertainties, we sample a set of system parameters $p_s$ from
+a normal distribution $\mathcal{N}(\hat{p}_s, \sigma_{p})$ centered around the
+nominal parameter $\hat{p}_s$, where $\sigma_{p}$ represents the uncertainty
 in system parameters.
 %
 Each time we compute the PDE loss $l_{\text{IDA}}$ for a batch of discrete
@@ -97,9 +86,9 @@ q_1, q_2 \right) \in [-2\pi, 2\pi] \times [-50, 50]$.
 In the deterministic setting, the nominal system parameters reported in
 Table~\ref{tab:modified_params} are used for $H(q,p)$ during training. 
 %
-In the Bayesian setting, the standard deviations $\sigma_{\zeta}$ of system
-parameters $\zeta = [I_1, I_2, mgl]$ are chosen to be $10\%$ of the nominal system
-parameters given in Section~\ref{sec:iwp}.
+In the Bayesian setting, the standard deviations $\sigma_{p}$ of system
+parameters $p_s = [I_1, I_2, mgl]$ are chosen to be $10\%$ of the nominal system
+parameters given in Section~\ref{subsec:iwp}.
 %
 We use variational inference to estimate a Gaussian posterior distribution
 over uncorrelated parameters.

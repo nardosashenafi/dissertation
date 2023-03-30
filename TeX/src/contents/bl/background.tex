@@ -136,7 +136,7 @@ the desired equilibrium coordinate $q^*$.
 The resulting passive closed loop system is given by~\cite{ortega2002stabilization}
 \begin{equation}
   \bmat{\dot{q} \\ \dot{p}}  =
-  \bmat{0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - GK_vG^\top}
+  \bmat{0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - \Omega K_v \Omega^\top}
   \bmat{\nabla_q H_d \\ \nabla_p H_d},
   \label{eq:pch}
 \end{equation}
@@ -168,7 +168,7 @@ following optimization problem.
 \begin{equation}
   \begin{aligned}
       \underset{\theta }{\textrm{minimize}} 
-      &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| G^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
+      &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
       \textrm{subject to} 
       &&\quad M_d^\theta &= \big( M_d^\theta \big)^\top \succ 0, \\
       &&\quad J_2^\theta &= -\big( J_2^\theta \big)^\top, \\
@@ -380,16 +380,22 @@ by~\cite{cohen2016bayesian}
 
 % \subsubsection{Prediction}
 
-Once we find the exact or approximate posterior, the prediction for state $x$ is
-given by marginalizing the model over the posterior as
-follows~\cite{jospin2020hands}.
+Once we find the exact or approximate posterior, the prediction for state $x$
+can be found in one of two ways. The first option is to marginalize the model
+over the posterior as follows~\cite{jospin2020hands}
 \begin{equation}
   \hat{F}(x) = \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta),
   \label{eqn:marginalization}
 \end{equation} 
-where $N_Q$ is the number of samples drawn from the posterior. Bayesian
-frameworks can quantify the confidence in the predictions through the
-variance~\cite{jospin2020hands}
+where $N_Q$ is the number of samples drawn from the posterior. 
+%
+The second option only takes one sample from the posterior, and it corresponds
+to the maximum aposteriori (MAP), i.e. 
+\begin{align} 
+  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | Y_x)
+\end{align}
+Bayesian frameworks can quantify the confidence in the
+predictions through the variance~\cite{jospin2020hands}
 \begin{equation}
   \Sigma_{F \mid x,Y_x} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
   \label{eqn:predictive_variance}
