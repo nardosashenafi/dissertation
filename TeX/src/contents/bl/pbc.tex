@@ -66,7 +66,7 @@ distribution is a Gaussian probability distribution centered around the paramete
 
 With the trajectories generated from the prior distribution samples, we compose a performance objective as follows.
 \begin{align*}
-    J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)], 
+    J(\phi, u^\theta) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u^\theta, T), u^\theta)], 
 \end{align*}
 \noindent where $\mathcal{D}_N$ is a collection of initial states sampled with explorative and greedy state sampling techniques (Section~\ref{sssec:state_sampling}), and
 $\ell$ is the running cost of the trajectories. We provide three options for the running cost in the next section.
@@ -93,7 +93,7 @@ We first pose the search over the posterior as the following optimization proble
 \begin{equation}
     \begin{aligned}
         \underset{P(\theta | J)}{\textrm{minimize}} 
-        & & J(\phi, u) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]  , \\
+        & & J(\phi, u^\theta) &= \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u^\theta, T), u^\theta)]  , \\
         \textrm{subject to}
         & & \bmat{\dot{q} \\ \dot{p}} &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
         & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
@@ -239,7 +239,7 @@ We expand on the use of HMC and variational inference to solve the optimization 
             \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
                 \For{$(x_0) \sim \mathcal {D}_N$}
                 \State $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$\Comment{Sample a system parameter}
-                \State $\phi \leftarrow \phi(x_0, u, T) $\Comment{Generate trajectory}
+                \State $\phi \leftarrow \phi(x_0, u^\theta, T) $\Comment{Generate trajectory}
                 \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
                 \EndFor
             \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_Q} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
@@ -254,7 +254,7 @@ We expand on the use of HMC and variational inference to solve the optimization 
   
     \end{enumerate}
 
-\subsubsection{Cost Function}
+\subsubsection{Performance Objective}
 \label{sssec:cost}
 
 The cost function $J$ helps impose various desired behaviors in the learned
@@ -385,7 +385,7 @@ The resulting Bayesian \textsc{NeuralPbc} problem is given by
 \begin{equation}
     \begin{aligned}
         \underset{P(\theta | J)}{\textrm{minimize}} 
-        & & & J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u, T), u)]  , \\
+        & & & J(\phi, u) = \mathbb{E}_{x_0 \sim \mathcal{D}_N}[ \ell(\phi(x_0, u^\theta, T), u^\theta)]  , \\
         \textrm{subject to}
         & & \dd x &= \left(\bmat{\phantom{-}\nabla_p H \\-\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, \\
         & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
@@ -559,7 +559,8 @@ from simulation and real-world hardware in order to thoroughly demonstrate the
 efficacy and robustness claims of Bayesian inference. 
 %
 We use the deterministic solution for \textsc{NeuralPbc} as the baseline
-on which we compare the performance of the Bayesian solution. \\
+on which we compare the performance of the Bayesian solution. 
+
 The IWP mechanism consists of a pendulum with an actuated wheel instead of a static
 mass.
 %
