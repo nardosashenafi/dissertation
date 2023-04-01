@@ -4,7 +4,7 @@
 In this section, we provide a brief introduction to contact modeling with the
 linear complementarity formulation.
 %
-We also present a basic introduction to the mixture of experts architecture and
+We also present a summary of the mixture of experts architecture and
 its uses in machine learning.
 
 \subsection{Contact Modeling with Linear Complementarity Problem}
@@ -37,8 +37,8 @@ friction exerted on the system.
 % these contact forces to the generalized coordinates.
 %
 In contrast to smooth dynamical systems, the hybrid
-system~\eqref{eq:hybrid_dynamics} exhibits contact and impact forces that enforce
-the geometric and kinematic constraints of contact surfaces.
+system~\eqref{eq:hybrid_dynamics} exhibits contact forces that enforce
+the geometric and kinematic constraints of surfaces in contact.
 %
 For instance, the contact force between two objects in collision characterizes
 the no-penetration conditions and the post-impact velocities of the objects.
@@ -189,12 +189,12 @@ techniques.
     \begin{algorithmic}[1]
       \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
         % \algrenewcommand\algorithmicindent{0em} % No indent
-          \For{$t \in 0:\Delta t:T$} 
+          \For{$t = 0:\Delta t:T$} \Comment{Time stepping}
             \State $t_M = t + \nicefrac{\Delta t}{2}$
-            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $
+            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
             % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
             \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
-            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$
+            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$\Comment{Apply contact forces}
             \State $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
             \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
           \EndFor
@@ -247,37 +247,42 @@ of the boundaries of the state partitions.
 Hence, we leverage the universal approximation capabilities of neural networks
 for both the experts and the gating network.
 %
+
+
 Let $F(x)$ denote a collection of $N_F$ expert models $F(x) = \{F_1(x),
-\dots, F_{N_{F}(x)}\}$, whose parameters are given by the set
+\dots, F_{N_{F}}(x)\}$, whose parameters are given by the set
 $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 % Henceforth, we assume that the number of state partitions is the same as the
 % number of available expert controller.
 %
-The gating network $P(x; \psi) : \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ is
-also a neural net with parameters $\psi$.
+The gating network $\mathbf{P}(x| \psi) := (P_1(x| \psi), \\ \dots, P_{N_F}(x|
+\psi))$ is a collection of probabilities, where $P_i(x | \psi)$ denotes the
+probability of state $x$ belonging to state partition $i, i \in \{1, \dots, N_F \}$. 
+%
+We parameterize the gating network with a neural network $\mathbf{P}(x| \psi) :
+\mathcal{X} \rightarrow \mathbb{R}^{N_F}$ with parameters $\psi$, and the output
+corresponds to the vector $[P_1(x| \psi), \dots, P_{N_F}(x| \psi)]$.
+%
+We use a \textsc{Softmax} activation function on the last layer to ensure that the
+probabilities $P_i(x | \psi)$ over all state partitions $i$ sum to one.
 %
 The objective is to learn the decision parameters $(\psi, \theta)$ from observed
 data.
 
-The gating network $P(x)$ provides a vector of probabilities, whose
-components $P(i | x, \psi)$ represent the probability of state $x$ belonging to
-the state partition $i$.
-%
 We use a categorical probability distribution to sample a state partition based
 on the outputs of the gating network as follows~\cite{harkonen2022mixtures} 
 \begin{align}
-  c_i | x, \psi \sim \text{Categorical}(P(x; \psi)) 
+  i | x, \psi \sim \text{Categorical}(\mathbf{P}(x| \psi)). 
   \label{eq:gating_categorical}
 \end{align}
-\noindent where $c_i$ is the bin corresponding to the $i^{th}$ expert and $\psi$
-is the parameters of the gating network.
 %
-The prediction from the mixture of experts is given by the linear combination over
-the \it{responsibility} \normalfont of each state partition.
+The prediction from the mixture of experts $F(x; \theta)$ is given by the linear
+combination over the \it{responsibility} \normalfont of each state partition.
 %
 \begin{align*}
-  F_o(x) = \sum_{i=1}^{N_F}F_i(x)P(c_i=i | x, \psi)
+  I &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \}\\
+  F(x; \theta) &= F_I(x; \theta_I)
 \end{align*}
 % A single controller is active in each state partition hence the prediction $F_o(x)$ is equivalent to 
 % \begin{align*}
@@ -291,38 +296,38 @@ There are several Bayesian inference techniques to learn the parameters of the
 expert models and the gating network, one of which is \it{expectation
 maximization} \normalfont (EM).
 %
-In this technique, we compose the log likelihood function $\ln \{P(Y_x | \theta,
-\psi) \}$ as~\cite{bishop2006pattern}   
+In this technique, we compose the expectation over the log likelihood
+as~\cite{bishop2006pattern}   
 \begin{equation}
-  \ln \{P(Y_x | \theta, \psi) \} = \ln \Bigl\{ \sum_{i=1}^{N_F} \mathcal{N}(Y_x | F_i(x), s) P(c_i = i | x, \psi) \Bigr\}
-  \label{eq:likelihood}
-\end{equation}
-\noindent where $\mathcal{N}$ is the Gaussian distribution with mean $F_i(x)$
-and standard deviation $s$, and $Y_x$ is the observation (dataset) corresponding
-to the input $x$. We can expand this expression to 
-\begin{align}
-  \ln \{P(Y_x | \theta, \psi) \} = \sum_{i=1}^{N_F} \ln \Bigr\{ \frac{1}{(2 \pi s)^{\nicefrac{1}{2}}} \Bigl\} - \frac{1}{2s}\norm{F_i(x) - Y_x}{}^2 + \ln \{P(c_i=i | x, \psi) \}
+  \mathbb{L}(\mathbb{D} | \theta, \psi) := \frac{1}{N} \sum_{j=1}^{N} \sum_{i=1}^{N_F} -\norm{F_i(x_j; \theta_i) - y_j}{}^2 P_i(x_j | \psi) 
   \label{eq:log_normal_likelihood}
-\end{align}
-\noindent where $\norm{F_i(x) - Y_x}{}$ is the error in the current prediction.
+\end{equation}
+\noindent where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N)\}$ is a collection
+of $N$ training datasets, and $\norm{F_i(x_j; \theta_i) - y_j}{}$ is the error in the
+prediction made by the expert $i$.
 %
-We can remove the constants in~\eqref{eq:log_normal_likelihood} and define the
-final form of the likelihood function as
-\begin{align}
-  \mathbb{L}(Y_x | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
-  \label{eq:likelihood_def}
-\end{align}
+% We can expand this expression to 
+% \begin{align}
+%   \ln \{P(Y_x | \theta, \psi) \} = \sum_{j=1}^{N} \ln  \Biggl\{ \sum_{i=1}^{N_F} \mathcal{N}( \norm{F_i(x_j) - y_j}{}, s) P_i(x_j, \psi) \Biggr\}.
+%   \label{eq:log_normal_likelihood}
+% \end{align}
+% %
+% We can extract the relevant parts of~\eqref{eq:log_normal_likelihood} and define the
+% final form of the likelihood function as
+% \begin{align}
+%   \mathbb{L}(Y_x | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
+%   \label{eq:likelihood_def}
+% \end{align}
 Notice that the likelihood measures how likely the current parameters $(\psi,
-\theta)$ are to generate the sampled data $Y_x$. 
+\theta)$ are to generate the sampled data $\mathbb{D}$. 
 %
 The goal is to maximize the likelihood and consequently minimize prediction
 error.
 %
-The likelihood~\eqref{eq:likelihood_def} is maximum when the parameter $\theta_i$
+The likelihood~\eqref{eq:log_normal_likelihood} is maximum when the parameter $\theta_i$
 has the lowest prediction error and the highest probability of getting selected
 by the gating network.
 %
-The standard EM approach evaluates the expectation of~\eqref{eq:likelihood_def}
-over many samples of $x$ and uses gradient-based techniques to iteratively
-update the parameters $(\psi, \theta)$.
+The standard EM approach evaluates~\eqref{eq:log_normal_likelihood} and uses
+gradient-based techniques to iteratively update the parameters $(\psi, \theta)$.
 %

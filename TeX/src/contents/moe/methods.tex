@@ -24,7 +24,7 @@ in~\eqref{eq:gating_categorical}.
 %
 The control input at state $x$ is
 \begin{align*}
-    u(x; \psi, \theta) = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x; \psi)) \}
+    u(x; \psi, \theta) = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x| \psi)) \}
 \end{align*} 
 %
 Without prior knowledge injected to the gating network, the samples from the
@@ -33,10 +33,10 @@ of the expert controllers.
 %
 We use the running cost $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
 \mathbb{R}$ to measure the performance of the sampled experts, which we discuss
-in depth in Section~\ref{sssec:performance_objective}.
+in depth in the next section.
 %
 The running cost plays the role of \it{prediction error} \normalfont in the
-construction of the likelihood as shown in~\eqref{eq:likelihood_def}.
+construction of the likelihood as shown in~\eqref{eq:log_normal_likelihood}.
 %
 The goal is to learn the decision parameters $(\psi, \theta)$ that minimize the
 running cost for all initial states in the state space.
@@ -45,16 +45,16 @@ We pose the search over the parameters of the experts and the gating network as
 \begin{equation}
     \begin{aligned}
         \underset{\psi, \theta}{\textrm{minimize}} 
-        & & & \ell \Bigl(\phi,u(\phi; \psi, \theta) \Bigr)  , \\%
+        & & & \ell (x,u)  , \\%
         \textrm{subject to}
         & & M(q) &\dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
-        & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x; \psi)) \}
+        & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (P(x| \psi)) \}
     \end{aligned}
     \label{eq:moe_opt}
 \end{equation}
 %
-In Section~\ref{sssec:training_moe}, we provide a procedure to solve the
-optimization problem~\ref{eq:moe_opt}. 
+In the coming sections, we provide a procedure to solve the
+optimization problem~\eqref{eq:moe_opt}. 
 
 \subsubsection{Performance Objective}
 \label{sssec:performance_objective}
@@ -66,8 +66,8 @@ We present two viable choices for the running cost function.
     incur a cost on the control authority as follows.
     \begin{equation}
         \begin{gathered}
-            \ell(x, u) = \frac{1}{2}(x - x^*)^\top Q (x - x^*) + \frac{1}{2} u^\top R u , \\
-            \ell(\phi, u) = \int_0^{T}  \ell(x(t), u)\dd t,
+            \ell(x, u) = \frac{1}{2}(x - x^*)^\top Q (x - x^*) + \frac{1}{2} u^\top R u , 
+            % \ell(\phi, u) = \int_0^{T}  \ell(x(t), u)\dd t,
         \end{gathered}
     \label{eq:accumulatedLoss}
     \end{equation}
@@ -77,11 +77,44 @@ We present two viable choices for the running cost function.
     This construction encourages trajectories to reach the desired equilibrium
     with minimum effort and shortest time.
     %
-    The corresponding likelihood is given by 
+
+    We construct the corresponding likelihood as follows.
+    %
+    At each integration step, we evaluate the performance of each expert as
+    shown in Algorithm~\ref{algo:accumulated_loss}.
+    %
+    The running cost of each expert is weighed by its \textit{responsibility} $P_i(x | \psi)$.
+    The resulting likelihood is given by
     \begin{align}
-        \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Biggl[ - \ell \Bigl(x(t), F_i \Bigr) + \ln \Bigl\{ P\Bigl(c_i = i | x(t), \psi \Bigr)  \Bigr\} \Biggr] \Biggr) \dd t.
+        \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Bigl[ - \ell \Bigl(x(t), F_i \Bigr) P_i\Bigl(x(t) | \psi \Bigr) \Bigr] \Biggr) \dd t.
         \label{eq:accumulated_likelihood}
     \end{align}
+    %
+    % Notice that for each state $x(t)$, we need to test the performance of each expert. 
+    % %
+    % For instance, if there are $100$ states in a trajectory and $3$ experts, we need to evaluate $\ell$ $300$ times.
+
+    \begin{algorithm}[H]
+        \setstretch{1.2}
+        \caption{Accumulated Loss}
+        \label{algo:accumulated_loss}
+        \small
+        \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
+        \begin{algorithmic}[1]
+            \State $\mathbb{L} \leftarrow 0$
+            % \algrenewcommand\algorithmicindent{0em} % No indent
+                \For{$t = 0:\Delta t:T$}     
+                \For{$j=1:N_F$}\Comment{Evaluate performance of each expert}
+                    \State $\hat{x} \leftarrow \texttt{Moreau's one time step}(x(t), F_j(x(t), \theta_j))$\Comment{Algorithm~\eqref{algo:moreau}}
+                    \State $\mathbb{L} \leftarrow \mathbb{L} - \ell(\hat{x}, F_j)P_j(\hat{x} | \psi)$
+                \EndFor
+                \State $i \sim \text{Categorical}\Bigl(P(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+                \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$
+                \EndFor
+            \State \textbf{return} $\phi, \mathbb{L}$
+        \end{algorithmic}
+    \end{algorithm}
+  
     \item Minimum trajectory loss (MTL): While a trivial choice, accumulated
     loss may not reflect the desired behavior of some dynamical systems.
     %
@@ -101,8 +134,8 @@ We present two viable choices for the running cost function.
     Hence, we compose MTL as
     \begin{equation}
         \begin{gathered}
-            t_{min} = \underset{t}{\textrm{argmin}} \; \ell(x(t), u)  \\
-            \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} + \sum_{t=0}^{t_{min}} \ln \{P(c_i=i| x(t), \psi) \} 
+            t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x, u): x \in \phi(x_0, u, T) \}  \\
+            \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
         \end{gathered} 
     \end{equation}
     \noindent where $C > 0$ is a normalization factor.
@@ -111,6 +144,31 @@ We present two viable choices for the running cost function.
     short time trajectories, but it equally rewards two trajectories
     as long as they both reached the desired state within the time horizon $T$. 
     %
+    Moreover, MTL does not need to evaluate the performance of each expert at
+    every integration step, as shown in Algorithm~\eqref{algo:mtl}; this greatly
+    reduces the computational cost.
+    %
+    
+    \begin{algorithm}[H]
+        \setstretch{1.2}
+        \caption{Minimum Trajectory Loss}
+        \label{algo:mtl}
+        \small
+        \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
+        \begin{algorithmic}[1]
+            \State $\phi \leftarrow \{x_0\}$
+            % \algrenewcommand\algorithmicindent{0em} % No indent
+                \For{$t = 0:\Delta t:T$}     
+                    \State $i \sim \text{Categorical}\Bigl(P(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+                    \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$\Comment{Algorithm~\eqref{algo:moreau}}
+                    \State $\phi \leftarrow \phi \cup x(t + \Delta t)$\Comment{Save trajectory}
+                \EndFor
+                \State $t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x, u): x \in \phi\}$
+                \State $\mathbb{L} = - \ell(\phi(t_{min}), u) \sum_{t=0}^{t_{min}}P_i(\phi(t) | \psi)  $
+
+            \State \textbf{return} $\phi, \mathbb{L}$
+        \end{algorithmic}
+    \end{algorithm}
 \end{enumerate}
 
 \subsubsection{State Sampling}
@@ -173,8 +231,8 @@ parameters.
           \While{$i < $ \texttt{maximum iteration}}
           \State $J \gets 0$\Comment{Batch loss}
           \For{$z_0 \in \mathcal {D}_N$}
-              \State $\phi$ = Moreau($x_0, \psi, \theta$) \Comment Algorithm~\eqref{algo:moreau}
-              \State $J \gets J + \mathbb{L}(\phi)/N_{\mathcal{D}}$ \Comment{Batch loss}
+              \State $\phi, \mathbb{L}$ = \texttt{Performance objective}($x_0, \psi, \theta$) \Comment{Algorithm~\eqref{algo:accumulated_loss} or~\eqref{algo:mtl}}
+              \State $J \gets J + \mathbb{L}/N_{\mathcal{D}}$ 
           \EndFor
           \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
           \State $\psi \gets \psi + \alpha_i \nicefrac{\partial J}{\partial \psi}$

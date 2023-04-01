@@ -25,7 +25,7 @@ Even if both systems are unstable, it is possible to find a state-dependent
 switching rule that makes the resulting switched system
 stable~\cite{liberzon2003switching}. 
 %
-We aim to learn the parameters $\psi$ of the gating network $P(x;
+We aim to learn the parameters $\psi$ of the gating network $P(x|
 \psi)$ such that the switching system converges to the desired equilibrium $x^*
 = (0, 0)$.
 %
@@ -40,13 +40,13 @@ Each state partition has a corresponding controller parameter $\theta_i \in
 %
 The control law is a sample from the Bernoulli probability distribution
 \begin{align}
-    u(\theta_i) = \begin{cases}
+    F_i(\theta_i) = \begin{cases}
        0, & \theta_i > \frac{1}{2}, \\
        1, & \theta_i \leq \frac{1}{2},
     \end{cases}
 \end{align}
-\noindent where $u = 0$ corresponds to the first dynamics $\dot{x} = A_1
-x$ and $u=1$ corresponds to $\dot{x} = A_2x$.
+\noindent where $F_i = 0$ corresponds to the first dynamics $\dot{x} = A_1
+x$ and $F_i=1$ corresponds to $\dot{x} = A_2x$.
 %
 We use the \textsc{Sigmoid} activation function to limit $\theta_i$ between 0
 and 1.
@@ -56,8 +56,7 @@ Algorithm~\eqref{algo:switching_A1A2}.
 %
 The likelihood is modified to account for the probabilistic control as
 \begin{align*}
-    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) - (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) +
-    \ln  P\Bigl(c_i = i | x(t), \psi \Bigr)  \Biggr) \dd t.
+    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \Bigl[ \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) \Bigr] P\Bigl(c_i = i | x(t), \psi \Bigr)  \Biggr) \dd t.
 \end{align*}
 
 \begin{algorithm}
@@ -70,9 +69,9 @@ The likelihood is modified to account for the probabilistic control as
         \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
           % \algrenewcommand\algorithmicindent{0em} % No indent
             \For{$t \in 0:\Delta t:T$} 
-              \State $i \sim \text{Categorical}\Bigl(P(x(t); \psi)\Bigr)$ \Comment{Sample a bin number}
-              \State $u \sim \text{Bernoulli} \Bigl(\textrm{Sigmoid}(\theta_i) \Bigr)$      
-              \State $x(t+\Delta t) = (1-u)A_1x(t) + u \; A_2x(t) $
+              \State $i \sim \text{Categorical}\Bigl(P(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+              \State $F_i \sim \text{Bernoulli} \Bigl(\textrm{Sigmoid}(\theta_i) \Bigr)$      
+              \State $x(t+\Delta t) = (1-F_i)A_1x(t) + F_i \; A_2x(t) $
               \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$
             \EndFor
           \State \textbf{return} $\phi$
@@ -111,9 +110,9 @@ partition at the origin.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.92\linewidth]{switching_results.eps}
-    \caption{Final stable switching system. Left: Control input $u=\{0, 1\}$ in
-    the state space. Purple corresponds to $u=0$ or $\dot{x} = A_1x$. Yellow
-    corresponds to $u=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
+    \caption{Final stable switching system. Left: Control input $F_i=\{0, 1\}$ in
+    the state space. Purple corresponds to $F_i=0$ or $\dot{x} = A_1x$. Yellow
+    corresponds to $F_i=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
     -5]$ and converges to the origin shown by the red star. Right: State
     partition from the output of the gating network. The training converged to 3
     state partitions that can stabilize the system.}

@@ -1,19 +1,25 @@
 
 
-Many robotics applications involve hybrid systems that exhibit both continuous
-and discrete state transitions. Common examples of hybrid systems are
-contact-rich mechanisms such as legged robots and manipulators. These systems
-constantly experience contact forces from their interaction with the
-environment, causing them to exhibit mode changes. Controlling contact-rich
-robots comes with two main complications. First, it is difficult to find a
-controller that can achieve the desired performance in all modes of the hybrid
-system.
+Many robotics applications consist of hybrid systems that exhibit both
+continuous and discrete state transitions. Common examples of hybrid systems are
+contact-rich mechanisms such as legged robots and manipulators. These mechanisms
+experience contact forces from their interaction with the environment, causing
+them to undergo mode changes. Controlling contact-rich robots comes with two
+main complications. First, it is difficult to find one optimal controller that
+can achieve the desired performance in all modes of the hybrid system.
 %
-One solution to this problem is to manually switch between several controllers
-by using some event trigger that implies mode changes in the dynamics.
+For instance, multiagent manipulation~\cite{ashenafi2021nonholonomic} uses a
+group of robots to cooperatively execute a task, such as maneuvering an object in
+space.
 %
-For instance, fuzzy control~\cite{kahraman2020fuzzy, katic2003survey} is
-commonly used to generate if-then rules for the control of bipedal robots.
+As we change the number of robots establishing contact with the object, we find
+unique optimal control schemes for each contact mode.
+%
+In these scenarios, it may be best to detect event triggers during mode changes and
+manually switch between several optimal controllers.
+%
+% For instance, fuzzy control~\cite{kahraman2020fuzzy, katic2003survey} is
+% commonly used to generate if-then rules for the control of bipedal robots.
 However, such techniques do not scale well to contact-rich systems with numerous
 modes. A dynamical system with $k$ contact events can have up to $2^k$ contact
 combinations. It is quite tedious, and in some cases impossible, to parameterize
@@ -21,8 +27,8 @@ the effects of these contact combinations and find individual controllers for
 each mode. Moreover, it is difficult to parameterize the relationship between
 the states and the conditional that triggers the control switch. 
 %
-In this work, we propose a control learning framework that learns a mixture of
-expert controllers for contact-rich systems.
+To address this issue, we propose a data-driven framework that
+learns a mixture of expert controllers for contact-rich systems.
 %
 This technique infers the experts and a gating network, which determines the
 control switching scheme based on observed states.
@@ -32,10 +38,10 @@ objective that characterizes the desired behavior of the resulting closed-loop
 system.
 
 
-The other complication in the control of hybrid systems is that they operate in
+The second complication in the control of hybrid systems is that they operate in
 an environment that is not known completely or modeled accurately.
 %
-For instance, a legged robot needs to perform robustly in uneven terrain.
+For instance, a legged robot needs to perform robustly on uneven terrain.
 Similarly, manipulators need to hold a firm grip on objects of all textures and
 shapes.
 %
@@ -51,41 +57,44 @@ While this technique offers more flexibility on how the control policies are
 inferred from unknown dynamics, they do not provide the physical structure
 required to infer stability properties.
 %
-Thus, data-driven techniques trained in simulation, such as neural
+On the other hand, data-driven techniques trained in simulation, such as neural
 passivity-based control (\textsc{NeuralPbc}~\cite{neuralpbc} and
 \textsc{Neural-Idapbc}~\cite{neuralidapbc}) offer more insight on the stability
-of the system and just as capable control strategies.
+of the system but strongly rely on the dynamical model.
 %
-Nevertheless, training in simulation relies strongly on the
-dynamical model, and the use of inaccurate models may lead to poor performance
-or even instability.
+The use of inaccurate models may lead to poor performance or even instability.
 %
 This raises concerns regarding model uncertainties, especially in hybrid dynamical
 systems.
 %
 
-Bayesian learning (BL)~\cite{gal2016improving,thakur} offers an alternative method to
-simultaneously combat model uncertainties while preserving the useful physical
-structure in a data-driven framework.
+Bayesian learning (BL)~\cite{gal2016improving,thakur} offers an alternative
+method to simultaneously combat model uncertainties while preserving the useful
+stability analysis in data-driven frameworks.
 %
-A common approach is shown in~\cite{sadigh2015safe, shen2022online,
-pmlr-v54-linderman17a}, where a stochastic dynamical model is constructed via BL
-techniques, and utilized in data-driven control synthesis executed in
-simulation. 
+BL is typically used to characterize uncertainties of a dynamical system with a
+stochastic model.
 %
-For instance, BL is used to model uncertainties caused by disturbances, such as
-the effect of wind gusts on quadcopters and the motion of other vehicles in
-autonomous driving~\cite{sadigh2015safe}. 
+For instance, \cite{sadigh2015safe} models uncertainties caused by disturbances,
+such as the effect of wind gusts on quadcopters via Bayesian inference.
+%
+Similar approach is shown in~\cite{shen2022online, pmlr-v54-linderman17a}, where
+a stochastic dynamical model is constructed via BL techniques, and utilized in
+data-driven control synthesis executed in simulation. 
+%
+% For instance, BL is used to model uncertainties caused by disturbances, such as
+% the effect of wind gusts on quadcopters and the motion of other vehicles in
+% autonomous driving~\cite{sadigh2015safe}. 
 %
 % Nonlinear dynamics can be decomposed into segments of linear dynamics, and learn
 % the linear dynamical units and their transition probabilities through
 % BL~\cite{pmlr-v54-linderman17a}. 
-The authors of~\cite{shen2022online} perform Bayesian learning online to
-characterize time-varying kinematic and dynamical models of industrial robots.
-%
-Another approach to combating model uncertainties is to surpass the process of
-learning the stochastic model and instead directly learn the controller through
-BL. 
+% The authors of~\cite{shen2022online} perform Bayesian learning online to
+% characterize time-varying kinematic and dynamical models of industrial robots.
+% %
+% Another approach to combating model uncertainties is to surpass the process of
+% learning the stochastic model and instead directly learn the controller through
+% BL. 
 %
 Adaptive control framework is provided in~\cite{fan2020bayesian}, where the
 search for the control is given by a quadratic program that imposes
@@ -98,15 +107,21 @@ Inspired by this technique, we merge the structure and stability properties of
 passivity-based control (PBC) with the robustness properties of BL.  
 
 
-In this work, we present a unified framework that simultaneously combine
-deterministic data-driven techniques and rigorously address model uncertainties
-using Bayesian learning.
+In this work, we present a unified framework that simultaneously combines
+data-driven techniques and rigorously addresses model uncertainties using Bayesian
+learning.
 %
 We aim to apply BL and develop an algorithm that finds a suitable probability
-distribution of the target function/policy automatically.
+distribution of the policy automatically.
 %
 In contrast to deterministic optimization, this approach provides a probability
-distribution over the parameters of the target function instead of point
+distribution over the parameters of the controller instead of point
 estimates, providing a way to reason about model uncertainties and measurement
 noise during the learning process.
 %
+We first demonstrate the efficacy of this technique on smooth systems, such as
+the simple pendulum and the inertia wheel pendulum, in simulation and real-world
+experiment.
+%
+Then we extend the framework to contact-rich systems and evaluate its
+performance on the rimless wheel, a simplified walking machine.
