@@ -186,9 +186,28 @@ t=0.001$.
 %
 
 
+% \begin{figure}[tb]
+%     \centering
+%     \includegraphics[width=0.6\linewidth]{MOEfirstImpact.png}
+%     \caption{Cartpole with wall contacts}
+%     \label{fig:cartpole_contact}
+% \end{figure}
+
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.6\linewidth]{MOEfirstImpact.png}
+    \begin{tikzpicture}
+    
+        \node [](image) at (0,0) {
+            \includegraphics[width=0.5\textwidth]{cartpole.eps}
+        };
+        \draw[dotted, very thick,black] (0.1,-1.5) -- ++(0.0,3.5);
+        \draw[-stealth, very thick,black]  (0.1,0.0) arc (90:50:1.0); 
+        \node[] at (0.4,0.3) {\small $\theta_p$};
+        \draw[-stealth, very thick,black] (0.0,1.5) -- ++(-3.6, 0.0) node[above right,black]{\small $d$};
+        \draw[-stealth, very thick,black] (0.1,-1.5) -- ++(2.0, 0.0) node[above,black]{\small $x_c$};
+
+        
+    \end{tikzpicture}
     \caption{Cartpole with wall contacts}
     \label{fig:cartpole_contact}
 \end{figure}

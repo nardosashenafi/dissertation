@@ -1,32 +1,43 @@
 
 
-Many robotics applications involve hybrid systems that exhibit both continuous and 
-discrete state transitions. Common examples of hybrid systems are contact-rich mechanisms such as legged robots and manipulators.
-These systems constantly experience contact forces from their interaction with the environment, causing them to exhibit mode changes.
-Controlling contact-rich robots comes with two main complications.
-First, it is difficult to find a controller that can achieve the desired performance in all modes of the hybrid system.
+Many robotics applications involve hybrid systems that exhibit both continuous
+and discrete state transitions. Common examples of hybrid systems are
+contact-rich mechanisms such as legged robots and manipulators. These systems
+constantly experience contact forces from their interaction with the
+environment, causing them to exhibit mode changes. Controlling contact-rich
+robots comes with two main complications. First, it is difficult to find a
+controller that can achieve the desired performance in all modes of the hybrid
+system.
 %
-One solution to this problem is to manually switch between several controllers by using some
-event trigger that implies mode changes in the dynamics.
+One solution to this problem is to manually switch between several controllers
+by using some event trigger that implies mode changes in the dynamics.
 %
-For instance, fuzzy control~\cite{kahraman2020fuzzy, katic2003survey} is commonly used to generate if-then rules for the control of bipedal robots.
-However such techniques do not scale well to contact-rich systems with numerous modes.
-A dynamical system with $k$ contact events can have up
-to $2^k$ contact combinations. It is quite tedious, and in some cases impossible, to parameterize the effects
-of these contact combinations and find individual controllers for each mode.
-Moreover, it is difficult to parameterize the relationship between the states and
-the conditional that triggers the control switch. 
+For instance, fuzzy control~\cite{kahraman2020fuzzy, katic2003survey} is
+commonly used to generate if-then rules for the control of bipedal robots.
+However, such techniques do not scale well to contact-rich systems with numerous
+modes. A dynamical system with $k$ contact events can have up to $2^k$ contact
+combinations. It is quite tedious, and in some cases impossible, to parameterize
+the effects of these contact combinations and find individual controllers for
+each mode. Moreover, it is difficult to parameterize the relationship between
+the states and the conditional that triggers the control switch. 
 %
-In this work, we propose a control learning framework that learns a mixture of expert controllers for contact-rich systems.
+In this work, we propose a control learning framework that learns a mixture of
+expert controllers for contact-rich systems.
 %
-This technique infers the experts and a gating network, which determines the control switching scheme based on observed states.
+This technique infers the experts and a gating network, which determines the
+control switching scheme based on observed states.
 %
-Moreover, we learn optimal expert controllers by injecting a performance objective that characterizes the desired behavior of the resulting closed-loop system.
+Moreover, we learn optimal expert controllers by injecting a performance
+objective that characterizes the desired behavior of the resulting closed-loop
+system.
 
 
-The other complication in the control of hybrid systems is that they operate in an environment that is not known completely or modeled accurately.
+The other complication in the control of hybrid systems is that they operate in
+an environment that is not known completely or modeled accurately.
 %
-For instance, a legged robot needs to perform robustly in uneven terrain. Similarly, manipulators need to hold a firm grip on objects of all textures and shapes.
+For instance, a legged robot needs to perform robustly in uneven terrain.
+Similarly, manipulators need to hold a firm grip on objects of all textures and
+shapes.
 %
 There are techniques that combine tools from optimization, probability theory,
 and machine learning to learn control strategies from inaccurate system models
