@@ -61,17 +61,17 @@ optimization problem~\eqref{eq:moe_opt}.
 %
 We present two viable choices for the running cost function. 
 \begin{enumerate}
-    \item Accumulated loss: is the total quadratic loss between the desired
+    \item \textbf{Accumulated loss}: is the total quadratic loss between the desired
     state $x^*$ and the states generated under the current control law. We also
     incur a cost on the control authority as follows.
     \begin{equation}
         \begin{gathered}
-            \ell(x, u) = \frac{1}{2}(x - x^*)^\top Q (x - x^*) + \frac{1}{2} u^\top R u , 
+            \ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u , 
             % \ell(\phi, u) = \int_0^{T}  \ell(x(t), u)\dd t,
         \end{gathered}
     \label{eq:accumulatedLoss}
     \end{equation}
-    \noindent where $Q \succ 0$ is positive definite matrix and $R \succeq 0$ is
+    \noindent where $\mathcal{Q} \succ 0$ is positive definite matrix and $\mathcal{R} \succeq 0$ is
     a positive semi-definite matrix.
     %
     This construction encourages trajectories to reach the desired equilibrium
@@ -115,8 +115,9 @@ We present two viable choices for the running cost function.
         \end{algorithmic}
     \end{algorithm}
   
-    \item Minimum trajectory loss (MTL): While a trivial choice, accumulated
-    loss may not reflect the desired behavior of some dynamical systems.
+    \item \textbf{Minimum trajectory loss (MTL)}: While a trivial choice,
+    accumulated loss may not reflect the desired behavior of some dynamical
+    systems.
     %
     For instance, suppose we want to swing-up the simple pendulum to the upright
     equilibrium. 

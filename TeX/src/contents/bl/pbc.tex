@@ -737,7 +737,7 @@ the joint angles and velocities, respectively.
 %
 Figure~\ref{fig:comparison_neuralpbc} shows the performance of deterministic and
 Bayesian trainings using an accumulated quadratic loss of the form
-\begin{equation} J^T = \frac{1}{2}\int_0^T \left(x^\top Qx + u^\top Ru \right) dt.
+\begin{equation} J^T = \frac{1}{2}\int_0^T \left(x^\top \mathcal{Q}x + u^\top \mathcal{R}u \right) dt.
 \label{eq:performance_metric} \end{equation}
 %
 The controller learned from the Bayesian training is marginalized over 10
@@ -1226,7 +1226,7 @@ positive torque is applied if the wheel stumbles backwards.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory.eps}
+    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory2.eps}
     \caption{Top: Torso orientation and velocity for 10-second trajectory. The
             solid black lines show the continuous phases and the dashed red
             lines show discrete transitions. Bottom: Horizontal hip speed}
@@ -1235,16 +1235,18 @@ positive torque is applied if the wheel stumbles backwards.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\columnwidth]{RW_deterministic_control.eps}
+    \includegraphics[width=0.9\columnwidth]{RW_deterministic_control2.eps}
     \caption{Torque command to torso as a function of torso angle and horizontal hip speed}
     \label{fig:deter_control}
 \end{figure}
-We compare the performance of the two controllers as follows.
+We compare the performance of the deterministic and Bayesian controllers as
+follows.
 %
 Similar to the Bayesian training, we sample the terrain elevation from
 $\mathcal{U} \sim[0, p_{max}]$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
 %
-For each value of $p_{max}$, we generate 10 random initial states $x_0$ and integrate 10-second trajectories.
+For each value of $p_{max}$, we generate 10 random initial states $x_0$ and
+integrate 10-second trajectories.
 %
 The cost of each trajectory is calculated as per~\eqref{eq:loss}.
 %
@@ -1260,8 +1262,8 @@ The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
 
 \subsubsection{Real-World Experiments}
 
-We test the performance of both controllers on the hardware shown in
-Figure~\ref{fig:hardware}.
+We test the performance of both the deterministic and Bayesian controllers on
+the hardware shown in Figure~\ref{fig:hardware}.
 %
 The robot consists of two set of $10$ spokes for stability.
 %

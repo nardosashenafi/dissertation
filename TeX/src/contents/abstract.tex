@@ -1,6 +1,33 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-In this work, we address two main difficulties in the control of contact-rich
-robotic systems.
+In this work, we provide several data-driven control design frameworks for
+contact-rich robotic systems.
 %
+These systems exhibit continuous and discrete state transitions, which makes
+them difficult to control with one optimal policy.
+%
+Hence, we design a control learning mechanism that provides a mixture of expert
+controllers parameterized by neural networks. 
+%
+This architecture also learns a gating network, which determines the control
+switching scheme based on the observed states.
+%
+Additionally, we address the adverse effects of model uncertainties in the
+control of contact-rich robots.
+%
+Lack of accurate environmental models can misrepresent the effects of contact
+forces on the system.
+%
+Optimal policies designed from such models can lead to poor performance or even
+instability.
+%
+In particular, we demonstrate the effects of system parameter uncertainties and 
+measurement error on the overall performance of the system.
+%
+Then, we leverage the stability properties of passivity-based control in
+conjunction with the robustness properties of Bayesian learning to infer
+stochastic controllers.
+%
+
+

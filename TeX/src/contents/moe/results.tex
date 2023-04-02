@@ -21,11 +21,11 @@ Suppose we have two linear closed-loop systems of the form
     \label{eq:unstable_closedloop}
 \end{equation}
 %
-Even if both systems are unstable, it is possible to find a state-dependent
+Even if the systems are not stable, it is possible to find a state-dependent
 switching rule that makes the resulting switched system
 stable~\cite{liberzon2003switching}. 
 %
-We aim to learn the parameters $\psi$ of the gating network $P(x|
+We aim to learn the parameters $\psi$ of the gating network $\mathbf{P}(x|
 \psi)$ such that the switching system converges to the desired equilibrium $x^*
 = (0, 0)$.
 %
@@ -56,7 +56,7 @@ Algorithm~\eqref{algo:switching_A1A2}.
 %
 The likelihood is modified to account for the probabilistic control as
 \begin{align*}
-    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \Bigl[ \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) \Bigr] P\Bigl(c_i = i | x(t), \psi \Bigr)  \Biggr) \dd t.
+    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \Bigl[ \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) \Bigr] P_i\Bigl(x(t)| \psi \Bigr)  \Biggr) \dd t.
 \end{align*}
 
 \begin{algorithm}
@@ -69,7 +69,7 @@ The likelihood is modified to account for the probabilistic control as
         \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
           % \algrenewcommand\algorithmicindent{0em} % No indent
             \For{$t \in 0:\Delta t:T$} 
-              \State $i \sim \text{Categorical}\Bigl(P(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+              \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
               \State $F_i \sim \text{Bernoulli} \Bigl(\textrm{Sigmoid}(\theta_i) \Bigr)$      
               \State $x(t+\Delta t) = (1-F_i)A_1x(t) + F_i \; A_2x(t) $
               \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$
@@ -109,7 +109,7 @@ equilibrium, allowing the training to learn the distinct boundaries of each
 partition at the origin. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\linewidth]{switching_results.eps}
+    \includegraphics[width=1.0\linewidth]{switching_results.eps}
     \caption{Final stable switching system. Left: Control input $F_i=\{0, 1\}$ in
     the state space. Purple corresponds to $F_i=0$ or $\dot{x} = A_1x$. Yellow
     corresponds to $F_i=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
@@ -202,7 +202,7 @@ t=0.001$.
         \draw[dotted, very thick,black] (0.1,-1.5) -- ++(0.0,3.5);
         \draw[-stealth, very thick,black]  (0.1,0.0) arc (90:50:1.0); 
         \node[] at (0.4,0.3) {\small $\theta_p$};
-        \draw[-stealth, very thick,black] (0.0,1.5) -- ++(-3.6, 0.0) node[above right,black]{\small $d$};
+        \draw[-stealth, very thick,black] (0.0,1.5) -- ++(-3.6, 0.0) node[above right,black]{\small $d=0.45$m};
         \draw[-stealth, very thick,black] (0.1,-1.5) -- ++(2.0, 0.0) node[above,black]{\small $x_c$};
 
         

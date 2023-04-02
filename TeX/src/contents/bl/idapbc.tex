@@ -21,7 +21,7 @@ In order to compute the likelihood, we first draw samples of $\theta$ from the
 posterior $Q(\theta;z)$, and evaluate the PDEs given in~\eqref{eq:pde_idapbc}.
 Then, the likelihood is given by
 \begin{equation}
-    P( \left\| l_{\textrm{IDA}} (x) \right\|^2 \mid \theta) = \mathcal{N}\left(0, s \right),
+    P( \left\| l_{\textrm{IDA}} (x) \right\| \mid \theta) = \mathcal{N}\left(0, s \right),
     \label{eqn:likelihood_idapbc}
 \end{equation}
 where $\mathcal{N}$ represents the Gaussian probability distribution, and $s$ is
@@ -152,9 +152,9 @@ training is narrower.
 %
 These results show that controllers trained via Bayesian learning are
 consistently more robust to errors in system parameters.
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
-    \includegraphics[clip,width=0.8\columnwidth]{./figures/bandplot1.eps}%
+    \includegraphics[clip,width=0.7\columnwidth]{./figures/bandplot1.eps}%
     \caption{
         %
         Accumulated quadratic cost ($J^T$) for a range of error in system
@@ -191,7 +191,7 @@ outperforms the deterministic counterpart, supporting the
 theoretical justification discussed in Section~\ref{sec:bl_justification}. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{./figures/idapbc_bar.eps}
+    \includegraphics[width=0.7\linewidth]{./figures/idapbc_bar.eps}
     \caption{
         %
         Normalized accumulated cost $J_{T}$ (lower is better) for

@@ -8,12 +8,14 @@ The learning approach efficiently explores the state space using the state
 sampling technique and enforces a desired behavior through a carefully
 designed loss function.
 %
-To improve the robustness properties of the controller, we parameterize
-the desired Hamiltonian with a Bayesian neural network, whose weights are
-sampled from a Gaussian posterior learned from Variational Inference techniques.
+To improve the robustness properties of the controller, we parameterize the
+desired Hamiltonian with a Bayesian neural network, whose weights are sampled
+from a Gaussian posterior learned from MCMC and variational inference
+techniques.
 %
-Through the simulation and real-world experiments, we demonstrate that our framework finds control laws that stabilize a desired
-equilibrium point of a dynamical system. 
+Through the simulation and real-world experiments, we demonstrate that our
+framework finds control laws that stabilize a desired equilibrium point of a
+dynamical system. 
 %
 Moreover, the Bayesian framework can handle significant system
 parameters uncertainties and measurement error.

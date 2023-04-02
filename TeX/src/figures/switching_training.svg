@@ -379,16 +379,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-15.105858"
-     inkscape:cy="118.45722"
+     inkscape:zoom="0.35"
+     inkscape:cx="-242.80643"
+     inkscape:cy="553.96057"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1848"
-     inkscape:window-height="1016"
-     inkscape:window-x="1992"
-     inkscape:window-y="27"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
@@ -398,7 +398,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -407,7 +407,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <g
-       transform="matrix(0.35277777,0,0,-0.35277777,-236.48711,114.27809)"
+       transform="matrix(0.35277777,0,0,-0.35277777,-204.73698,114.27809)"
        inkscape:label="ink_ext_XXXXXX"
        id="g823"
        clip-path="url(#clipPath3802)">
@@ -1503,7 +1503,7 @@
       </g>
     </g>
     <g
-       transform="matrix(0.35277777,0,0,-0.35277777,-236.48711,280.86681)"
+       transform="matrix(0.35277777,0,0,-0.35277777,-204.73698,280.86681)"
        inkscape:label="ink_ext_XXXXXX"
        id="g1545"
        clip-path="url(#clipPath3049)">
@@ -2600,7 +2600,7 @@
       </g>
     </g>
     <g
-       transform="matrix(0.35277777,0,0,-0.35277777,-236.48711,446.2208)"
+       transform="matrix(0.35277777,0,0,-0.35277777,-204.73698,446.2208)"
        inkscape:label="ink_ext_XXXXXX"
        id="g2267"
        clip-path="url(#clipPath3055)">
@@ -3700,7 +3700,7 @@
        id="rect3703"
        width="415.01785"
        height="198.81548"
-       x="-211.28867"
+       x="-179.53897"
        y="-121.53873"
        rx="0.56844932"
        ry="0.65396267" />
@@ -3709,7 +3709,7 @@
        id="rect3705"
        width="426.35715"
        height="207.13094"
-       x="-211.28867"
+       x="-179.53897"
        y="77.276749"
        rx="0.56844932"
        ry="0.65396267" />
