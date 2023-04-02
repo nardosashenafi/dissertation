@@ -1,6 +1,11 @@
 
 \section{Background}
 
+In this section, we provide a brief summary to passivity-based control and the
+recent data-driven variant introduced in~\cite{neuralpbc, neuralidapbc}.
+%
+We also motivate the advantages of the Bayesian learning framework in
+uncertainty modeling and robust control.
 \subsection{Passivity-Based Control (PBC)}
 \label{ssec:pbc}
 
@@ -239,8 +244,9 @@ multivariate random variables.
 These parameters are samples drawn from a posterior probability distribution.
 %
 The objective is to find the posterior distribution that minimizes the quadratic
-prediction error $\norm{F(x; \theta) -  Y_x}{}^2$, where $Y_x$ is an observation in
-the training dataset corresponding to the input $x$.
+prediction error $\sum_{(x_j, y_j) \in \mathbb{D}} \norm{F(x_j; \theta) -
+y_j}{}$, where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$ the training
+dataset with inputs $x_j$ and observations $y_j$.
 %
 As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
 \it{expectation maximization} \normalfont (EM) to learn the optimal posterior
@@ -248,9 +254,9 @@ distribution.
 %
 To do so, we define the likelihood in terms of the quadratic prediction error as
 \begin{equation*}
-  P(Y_x | \theta)  = \mathcal{N}(Y_x | F(x; \theta), s),
+  P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{}, s),
 \end{equation*}
-%
+\noindent for independent observations in the dataset $\mathbb{D}$.
 Even though the EM approach finds optimal parameters $\theta$ that
 minimize the prediction error, this technique is prone to overfitting.
 %
@@ -290,14 +296,14 @@ a complex model, minimizing the risk of overfitting~\cite{santos2022avoiding}.
 Similarly, the prior distribution prevents the learned parameters from becoming
 \it{overconfident} \normalfont in their predictions.
 %
-In this construction, the posterior distribution $P(\theta | Y_x)$ is
+In this construction, the posterior distribution $P(\theta | \mathbb{D})$ is
 defined in terms of the likelihood and prior with Bayes' theorem as 
 \begin{align}
-  P(\theta | Y_x) = \frac{P(Y_x | \theta) P(\theta) }{P(Y_x)}
-  = \frac{P(Y_x | \theta) P(\theta) }{\int_\theta P(Y_x | \theta') P(\theta')  d\theta'}, 
+  P(\theta | \mathbb{D}) = \frac{P(\mathbb{D} | \theta) P(\theta) }{P(\mathbb{D})}
+  = \frac{P(\mathbb{D} | \theta) P(\theta) }{\int_\theta P(\mathbb{D} | \theta') P(\theta')  d\theta'}, 
   \label{eq:bayes_posterior}
 \end{align}
-where  $P(\theta)$ is the prior and $P(Y_x)$ is the evidence or the
+where  $P(\theta)$ is the prior and $P(\mathbb{D})$ is the evidence or the
 normalization constant of the posterior.
 %
 The relative weighting between the likelihood and the prior is parameterized by
@@ -336,7 +342,7 @@ discussed as follows.
   We accept or reject each candidate sample according to the following rule~\cite{bishop2006pattern}:
   \begin{align*}
     \nu &\sim \mathcal{U}(0, 1), \\
-    A(\theta^{(\tau)}, \theta^{(\tau-1)}) &= \min \Biggl(1, \frac{P(Y_x | \theta^{(\tau)})P(\theta^{(\tau)})}{P(Y_x | \theta^{(\tau-1)})P(\theta^{(\tau-1)})} \Biggr),
+    A(\theta^{(\tau)}, \theta^{(\tau-1)}) &= \min \Biggl(1, \frac{P(\mathbb{D} | \theta^{(\tau)})P(\theta^{(\tau)})}{P(\mathbb{D} | \theta^{(\tau-1)})P(\theta^{(\tau-1)})} \Biggr),
   \end{align*}
   \noindent where $\mathcal{U}$ is the uniform distribution. If
   $A(\theta^{(\tau)}, \theta^{(\tau-1)}) \geq \nu$, then we accept the sample. 
@@ -364,7 +370,7 @@ lower bound (\textsc{Elbo}). The \textsc{Elbo}, $\mathcal{L}$, is given
 by~\cite{cohen2016bayesian}
 \begin{align}
   \begin{split}
-  \mathcal{L}(Y_x,z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(Y_x \mid \theta;z)P(\theta)) - \log(Q(\theta;z)) \right].
+  \mathcal{L}(\mathbb{D},z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(\mathbb{D} \mid \theta;z)P(\theta)) - \log(Q(\theta;z)) \right].
   \end{split}
   \label{eq:elbo}
 \end{align}
@@ -374,7 +380,7 @@ by~\cite{cohen2016bayesian}
   For continuous posterior distribution, the \textsc{Elbo} given in
   equation~\eqref{eq:elbo} is redefined using differential entropy, which
   expresses the prior and posterior in terms of their probability density
-  functions. In this case, the likelihood $P(\theta \mid Y_x;z)$ is also
+  functions. In this case, the likelihood $P(\theta \mid \mathbb{D};z)$ is also
   a probability density function and the \textsc{Elbo} is not bounded by zero.
 \end{rem}
 
@@ -392,12 +398,12 @@ where $N_Q$ is the number of samples drawn from the posterior.
 The second option only takes one sample from the posterior, and it corresponds
 to the maximum aposteriori (MAP), i.e. 
 \begin{align} 
-  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | Y_x)
+  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | \mathbb{D})
 \end{align}
 Bayesian frameworks can quantify the confidence in the
 predictions through the variance~\cite{jospin2020hands}
 \begin{equation}
-  \Sigma_{F \mid x,Y_x} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
   \label{eqn:predictive_variance}
 \end{equation}
 %
