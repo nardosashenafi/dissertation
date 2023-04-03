@@ -9,11 +9,12 @@ its uses in machine learning.
 
 \subsection{Contact Modeling with Linear Complementarity Problem}
 
-Suppose a hybrid dynamical system consists of $k$ contact events, each
+Suppose a hybrid dynamical system consists of $k$ contact events~\todo{potential
+contacts, not events!}, each
 introducing normal contact forces $\lambda_N \in \mathbb{R}^{k}$ and Coulomb
 friction forces $\lambda_T \in \mathbb{R}^{k}$ to the overall system.
 %
-We can model this hybrid system with the measure equality~\cite{glocker2005formulation}
+We can model this hybrid dynamical system with the measure equality~\cite{glocker2005formulation}
 
 \begin{equation}
   \begin{gathered}
@@ -50,7 +51,8 @@ Most collision simulators work on the kinematic level as opposed to the dynamic
 level.
 %
 For instance, there are event detection methods that simply change the velocity
-of the moving objects at the time of impact.
+of the moving objects at the time of impact.~\todo{these are event-detection,
+give citation}
 %
 One of the drawbacks of these techniques is finding the exact time the contact
 occurs in high speed collision.
@@ -63,7 +65,7 @@ The linear complementarity formulation in~\cite{glocker2005formulation} provides
 a rigorous technique to resolve contact forces, Coulomb friction and impact
 forces in a hybrid system.
 %
-The work presents an optimization problem that searches for \it{contact force
+The work~\todo{which work?} presents an optimization problem that searches for \it{contact force
 and post-impact velocity} \normalfont pairs that obey the geometric and
 kinematic constraints during contacts or impacts.
 %
@@ -71,7 +73,7 @@ kinematic constraints during contacts or impacts.
 %
 The linear complementarity formulation is constructed as follows. We define a
 vector of gap functions $g_N(q) \in \mathbb{R}^{k}$ that measure the
-Euclidean distance between the contact surfaces. 
+Euclidean distance~\todo{rather: signed distance!} between the contact surfaces. 
 %
 Let $\gamma_N = \dot{g}_N(q)$ be the normal relative velocity and
 $\gamma_T$ the tangential relative velocity between contact surfaces.
@@ -107,9 +109,10 @@ contact forces and relative velocities given by:
 
 \noindent where $\epsilon_N$ and $\epsilon_T$ are the normal and tangential
 coefficients of restitution respectively. 
+\todo[inline]{The $\perp$ symbol is not explained at all!}
 % 
 From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N$ and $\xi_T$ can be
-expressed as an affine function over the contact forces $\lambda_N$ and
+expressed as an affine function over~\todo{of} the contact forces $\lambda_N$ and
 $\lambda_T$ as follows~\cite{glocker2005formulation}:
 
 \begin{gather*}
@@ -142,7 +145,7 @@ $\lambda_T$ as follows~\cite{glocker2005formulation}:
       \xi_R - \xi_L \\
       \mu \lambda_N + \lambda_T  \\
       \mu \lambda_N - \lambda_T  
-    \end{pmatrix} \\
+    \end{pmatrix}, \\
 \end{gather*}
  
 \noindent where $\mu$ is the coefficient of friction, $I_k$ is the $k \times k$ identity
@@ -176,9 +179,11 @@ dynamics~\eqref{eq:hybrid_dynamics}. While the complementarity constraint can be
 posed as a feasibility problem, the presence of Coulomb friction makes it a
 non-convex optimization problem. We use a pivoting (basis-exchange) technique
 called Lemke's algorithm~\cite{acary2008numerical} to find the solution to the
-linear complementarity problem~\eqref{eq:feasibility}. This allows us to
-differentiate the solution to the LCP in our efforts to use machine learning
-techniques.
+linear complementarity problem~\eqref{eq:feasibility}. 
+The fact that Lemke's algorithm may be automatically differentiated to provide
+the gradients of the pertinent variables allows us to seamlessly integrate the
+solution to the differential equations into machine learning algorithms.
+
 
 \begin{algorithm}[H]
   \setstretch{1.2}
@@ -200,7 +205,7 @@ techniques.
           \EndFor
         \State \textbf{return} $\phi$
     \end{algorithmic}
-\end{algorithm}
+\end{algorithm}~\todo{explain the algorithm briefly}
 
 
 \subsection{Mixture of Expert Models}
@@ -222,7 +227,7 @@ the right of Figure~\ref{fig:gaussian_moe}.
   \caption{Left: Fit with one Gaussian distribution. Right: Fit with Gaussian
   mixture of 2 experts~\cite{mcgonagle_dobre_pilling}}
   \label{fig:gaussian_moe}
-\end{figure}
+\end{figure}~\todo{why is this caption bolded?}
 %
 This technique uses a gating network to divide the input space $x \in
 \mathcal{X} \subset \mathbb{R}^{2m}$ into state partitions within which a single
@@ -234,11 +239,12 @@ best fit the dataset.
 
 The expert models and the gating networks can take several forms. 
 %
-Gaussian experts and gating networks are commonly used in the MOE framework to
+Gaussian process experts and gating networks are commonly used in the MOE framework to
 find a multi-modal probabilistic model from a small amount of
 data~\cite{bishop2006pattern}.
 %
-However, as the observations from the dataset grow large, the Gaussian experts
+However, as the observations from the dataset grow large, the Gaussian process
+experts~\todo{this is for GP experts, not Gaussian experts}
 impose large computational and memory overhead~\cite{harkonen2022mixtures}.
 %
 Moreover, Gaussian gating networks can only provide a quadratic parameterization
@@ -258,7 +264,7 @@ $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 The gating network $\mathbf{P}(x| \psi) := (P_1(x| \psi), \\ \dots, P_{N_F}(x|
 \psi))$ is a collection of probabilities, where $P_i(x | \psi)$ denotes the
-probability of state $x$ belonging to state partition $i, i \in \{1, \dots, N_F \}$. 
+probability of state $x$ belonging to state partition $i \in \{1, \dots, N_F \}$. 
 %
 We parameterize the gating network with a neural network $\mathbf{P}(x| \psi) :
 \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ with parameters $\psi$, and the output
@@ -293,7 +299,8 @@ combination over the \it{responsibility} \normalfont of each state partition.
 
 
 There are several Bayesian inference techniques to learn the parameters of the
-expert models and the gating network, one of which is \it{expectation
+expert models and the gating network, one of which~\todo{are we using this, what
+are the other techniques, why not use them?} is \it{expectation
 maximization} \normalfont (EM).
 %
 In this technique, we compose the expectation over the log likelihood
