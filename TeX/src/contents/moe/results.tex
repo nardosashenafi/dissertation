@@ -4,7 +4,8 @@ We demonstrate the efficacy of the mixture of expert controllers in simulation
 and real-world experiments.
 %
 In the first case study, we learn a gating network that switches between two
-unstable closed-loop systems to result in a piecewise-stable system.
+unstable closed-loop systems to result in a piecewise-stable system.~\todo{cite
+Liberzon}
 %
 Then, we find switching MOE controllers to swing up the classical cartpole
 mechanism enclosed with wall barriers.
@@ -21,8 +22,8 @@ Suppose we have two linear closed-loop systems of the form
     \label{eq:unstable_closedloop}
 \end{equation}
 %
-Even if the systems are not stable, it is possible to find a state-dependent
-switching rule that makes the resulting switched system
+Even if the individual systems are not stable, it is possible to find a
+state-dependent switching rule that makes the resulting switched system
 stable~\cite{liberzon2003switching}. 
 %
 We aim to learn the parameters $\psi$ of the gating network $\mathbf{P}(x|
@@ -79,7 +80,8 @@ The likelihood is modified to account for the probabilistic control as
   \end{algorithm}
   
 %
-The resulting switching system is shown in Figure~\ref{fig:final_switching}.
+The response of the resulting switching system is shown in
+Figure~\ref{fig:final_switching}.
 %
 The training uses only 3 out of the 4 state partitions available.
 %
@@ -118,6 +120,8 @@ partition at the origin.
     state partitions that can stabilize the system.}
     \label{fig:final_switching}
 \end{figure}
+
+\todo[inline]{there is too much white space here!}
 
 \begin{figure}[H]
     \centering
