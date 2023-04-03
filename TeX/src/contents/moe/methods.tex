@@ -4,8 +4,8 @@
 In this section, we present a data-driven control design framework for hybrid
 dynamical systems. 
 %
-The objective of this framework is to learn a mixture of expert controllers and
-their responsibilities as determined by the gating network.
+The objective of this framework is to learn a mixture of expert controller and
+the responsibilities of the experts as determined by the gating network.
 %
 This technique allows us to observe the effects of contacts from the closed loop
 trajectories  and learn a switching mechanism to best control the hybrid system
@@ -33,7 +33,7 @@ of the expert controllers.
 %
 We use the running cost $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
 \mathbb{R}$ to measure the performance of the sampled experts, which we discuss
-in depth in the next section.
+in depth in the next section~\todo{provide ref}.
 %
 The running cost plays the role of \it{prediction error} \normalfont in the
 construction of the likelihood as shown in~\eqref{eq:log_normal_likelihood}.
@@ -71,11 +71,12 @@ We present two viable choices for the running cost function.
         \end{gathered}
     \label{eq:accumulatedLoss}
     \end{equation}
-    \noindent where $\mathcal{Q} \succ 0$ is positive definite matrix and $\mathcal{R} \succeq 0$ is
+    \noindent where $\mathcal{Q} \succ 0$~\todo{this symbol $\succ$ means p.d.
+    matrix. Introduce and use it.} is positive definite matrix and $\mathcal{R} \succeq 0$ is
     a positive semi-definite matrix.
     %
     This construction encourages trajectories to reach the desired equilibrium
-    with minimum effort and shortest time.
+    with minimum effort and shortest time.~\todo[inline]{there is a tradeoff here.}
     %
 
     We construct the corresponding likelihood as follows.
@@ -89,6 +90,8 @@ We present two viable choices for the running cost function.
         \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} \Bigl[ - \ell \Bigl(x(t), F_i \Bigr) P_i\Bigl(x(t) | \psi \Bigr) \Bigr] \Biggr) \dd t.
         \label{eq:accumulated_likelihood}
     \end{align}
+    \todo[inline]{explain algorithm, motivate how
+    eqn.~\eqref{eq;accumulated_likelihood} is obtained.}
     %
     % Notice that for each state $x(t)$, we need to test the performance of each expert. 
     % %
@@ -117,7 +120,8 @@ We present two viable choices for the running cost function.
   
     \item \textbf{Minimum trajectory loss (MTL)}: While a trivial choice,
     accumulated loss may not reflect the desired behavior of some dynamical
-    systems.
+    systems.~\todo{I didn't understand this sentence -- what is a trivial
+    choice?}
     %
     For instance, suppose we want to swing-up the simple pendulum to the upright
     equilibrium. 
@@ -143,7 +147,7 @@ We present two viable choices for the running cost function.
     %
     Unlike accumulated loss, MTL does not particularly reward low effort or
     short time trajectories, but it equally rewards two trajectories
-    as long as they both reached the desired state within the time horizon $T$. 
+    as long as they both reach the desired state within the time horizon $T$. 
     %
     Moreover, MTL does not need to evaluate the performance of each expert at
     every integration step, as shown in Algorithm~\eqref{algo:mtl}; this greatly
@@ -217,7 +221,7 @@ efficiently train the parameters with adaptive learning rates $\alpha_i$.
 %
 The full training procedure is outlined in Algorithm~\eqref{algo:moe_training}.
 %
-We leverage forward-mode auto-differentiation technique~\cite{revels2016forward}
+We leverage forward-mode auto-differentiation~\todo{discuss why not others?} technique~\cite{revels2016forward}
 to back-propagate on the gradient of the likelihood with respect to the learned
 parameters.
 \begin{algorithm}[tb]
@@ -247,7 +251,7 @@ parameters.
 \subsubsection{Back-propagation through Hybrid Systems}
 
 The training framework outlined~\eqref{eq:moe_opt} allows us to observe the
-effects of contacts in the closed loop trajectories and infer a controller that
+effects of contacts in the closed-loop trajectories and infer a controller that
 either uses the contact to its advantage or minimizes its adverse effects.
 %
 In this section, we look at the relevant parts of the back-propagation to give
@@ -302,8 +306,7 @@ In fact, the derivative can be found from Moreau's integration as
     \frac{\partial x_1}{\partial \lambda} = \bmat{W_N & W_T }, 
 \end{align*}
 %
-demonstrating that the gradient is exists even if a state jump has
-occurred. 
+demonstrating that the gradient exists even if a state jump has occurred. 
 %
 This term is crucial in adjusting the decision parameters in response to how the
 contact force assists or inhibits the system.
@@ -314,7 +317,7 @@ then the gradient $\frac{\partial \ell}{\partial x_1} \frac{\partial
 x_1}{\partial \lambda}\frac{\partial \lambda}{\partial \theta_i}$ adjusts the
 parameter $\theta_i$ to favor states undergoing contact events. 
 %
-We in fact demonstrate this behavior in simulation and real-world experiments in
+Indeed, we demonstrate this behavior in simulation and real-world experiments in
 Section~\ref{ssec:cartpole_with_walls}.
 %
 Conversely, if the contact forces move the states further away from $x^*$, the
