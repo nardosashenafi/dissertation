@@ -1,17 +1,19 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-In this work, we provide several data-driven control design frameworks for
-contact-rich robotic systems.
+We provide several data-driven control design frameworks for contact-rich
+robotic systems.
 %
-These systems exhibit continuous and discrete state transitions, which makes
-them difficult to control with one optimal policy.
+These systems exhibit continuous~\todo{conts transitions don't exist.} and discrete state transitions, which makes
+them difficult to control with one optimal~\todo{doesn't have to be optimal}
+policy.~\todo{because... mention why briefly.}
 %
 Hence, we design a control learning mechanism that provides a mixture of expert
-controllers parameterized by neural networks. 
+controllers parameterized by neural networks.~\todo{neural nets are the
+parametrizations, not the parameters.} 
 %
-This architecture also learns a gating network, which determines the control
-switching scheme based on the observed states.
+This architecture also learns a gating network, which determines the region of
+validity of each expert, based on the observed states.
 %
 Additionally, we address the adverse effects of model uncertainties in the
 control of contact-rich robots.
@@ -23,10 +25,12 @@ Optimal policies designed from such models can lead to poor performance or even
 instability.
 %
 In particular, we demonstrate the effects of system parameter uncertainties and 
-measurement error on the overall performance of the system.
+measurement errors on the overall performance of the system.
 %
 Then, we leverage the stability properties of passivity-based control in
-conjunction with the robustness properties of Bayesian learning to infer
+conjunction with the robustness properties of Bayesian learning to
+infer~\todo[inline]{these are not leveraged to ``learn'' the controllers, they are the
+properties of the learned controllers}
 stochastic controllers.
 %
 
