@@ -407,14 +407,13 @@ The resulting Bayesian \textsc{NeuralPbc} problem is given by
 
 \begin{rem}
     Introducing uncertainties to the deterministic training finds a point
-    estimate of the optimal controller parameter, which may be interpreted
-    as the mean of the optimal posterior distribution that Bayesian learning
-    provides. A point estimate of the learned parameters is prone to be
-    biased (for example, if the uncertainty in system parameters is large,
-    the optimal parameter $\theta$ for the true system parameter may be
-    quite far from the deterministic solution). This bias-variance trade-off
-    problem is alleviated by Bayesian inference which allows one to
-    marginalize over the posterior parameter
+    estimate of the optimal controller parameter, which may be interpreted as
+    the mean of the optimal posterior distribution that Bayesian learning
+    provides. A point estimate of the learned parameters is prone to be biased
+    (for example, if the uncertainty in system parameters is large, the optimal
+    parameter $\theta$ for the true system parameter may be quite far from the
+    deterministic solution). This bias-variance trade-off problem is alleviated
+    by Bayesian inference which allows one to marginalize over the posterior
     distribution~\cite{bishop2006pattern}.
 \end{rem}
 
@@ -980,8 +979,12 @@ auto-differentiation techniques.
 \subsubsection{Bayesian \textsc{NeuralPBC}}
 \label{sssec:bayesian_inference}
 
-Hybrid systems such as walking machines and manipulators perform constant interaction with their environment. In many cases, the exact parameters of the environment are not known. For instance, walking machines operate on uneven terrain, where the exact elevation and friction coefficients of the runway may be unknown.
-Manipulators interact with objects of different textures and friction, which we cannot simply infer from sensors. 
+Hybrid systems such as walking machines and manipulators perform constant
+interaction with their environment. In many cases, the exact parameters of the
+environment are not known. For instance, walking machines operate on uneven
+terrain, where the exact elevation and friction coefficients of the runway may
+be unknown. Manipulators interact with objects of different textures and
+friction, which we cannot simply infer from sensors. 
 % Such hybrid systems need to adjust their control according to their environmental conditions in real-time, they
 % can cause underperformance or even instability.
 %
@@ -994,11 +997,11 @@ training outlined in Algorithm~\ref{algo:deter_neuralpbc_hybrid} is not sufficie
 %
 In the presence of high variance disturbances, the point-estimate parameters
 $\theta$ under domain randomization are prone to be
-biased~\cite{ashenafi2022robustness};
+biased~\cite{ashenafi2022robustness}.
 %
-for instance, if the uncertainty in the terrain elevation is large, the learned
-parameters $\theta$ may be far from the optimal controller corresponding to
-the true elevation.
+Let us take a walking robot as an example; if the uncertainty in the terrain
+elevation is large, the learned parameters $\theta$ may be far from the optimal
+controller corresponding to the true elevation.
 %
 To combat this issue, we propose a probabilistic framework, where we learn a
 posterior probability distribution over the parameters $\theta$ via Bayesian
@@ -1040,8 +1043,9 @@ We solve the optimization problem in~\eqref{eq:bayesian_hybrid_neuralpbc} with t
 %
 We follow the initial state sampling techniques and the performance objectives discussed in detail in Section~\ref{ssec:pbc_smooth_dynamics}.
 In particular, we use variational inference to learn the distribution parameters of the pre-selected posterior $Q(\theta;z)$.
+
 \begin{algorithm}
-  \setstretch{1.2}
+    \setstretch{1.2}
     \caption{Solution to the Optimization Problem~\eqref{eq:bayesian_hybrid_neuralpbc}}
     \label{algo:bayes_neuralpbc}
     \small
@@ -1051,14 +1055,14 @@ In particular, we use variational inference to learn the distribution parameters
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
-        \For{$i=1:N_Q$} \Comment{Samples to compute~\eqref{eq:elbo}}
+        \For{$i=1:N_Q$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
         \State $J \gets 0$ \Comment{Batch loss}
         \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
-          \For{$(x_0) \sim \mathcal {D}_N$}
-            \State $p_s \sim \mathcal{U}(p_{min}, p_{max})$
+            \For{$(x_0) \sim \mathcal {D}_N$}
+            \State $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$\Comment{Sample a system parameter}
             \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
-          \EndFor
+            \EndFor
         \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_Q} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
         \EndFor
         \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
@@ -1068,7 +1072,6 @@ In particular, we use variational inference to learn the distribution parameters
         \State \textbf{return} $z$
     \end{algorithmic}
 \end{algorithm}
-
 
 \subsection{Rimless Wheel}
 \label{sssec:rimless_wheel_model}
@@ -1195,13 +1198,13 @@ move the robot at a constant hip speed.
 %
 The performance objective is given by the accumulated loss
 \begin{align}
-    J_T = \sum_{t=0}^{T} (\dot{x}^* - \dot{x}(t; \theta))
+    J_T = \sum_{t=0}^{T} (\dot{x}_c^* - \dot{x}_c(t; \theta))
     \label{eq:loss}
 \end{align}
-\noindent where $\dot{x}^*$ is a constant 1 \nicefrac{m}{s}.
+\noindent where $\dot{x}_c^*$ is a constant 1 \nicefrac{m}{s}.
 %
 For the Bayesian training, we generate random terrain elevation parameters $p_s$
-from a uniform probability distribution $\mathcal{U} \sim[0, 2]$ centimeters.
+from a uniform probability distribution $p_s \sim \mathcal{U}(0, 2)$ centimeters.
 
 
 \subsubsection{Simulated Experiments}
@@ -1242,13 +1245,13 @@ positive torque is applied if the wheel stumbles backwards.
 We compare the performance of the deterministic and Bayesian controllers as
 follows.
 %
-Similar to the Bayesian training, we sample the terrain elevation from
-$\mathcal{U} \sim[0, p_{max}]$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
+Similar to the Bayesian training, we sample the terrain elevation from $p_s \sim
+\mathcal{U}(0, p_{max})$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
 %
 For each value of $p_{max}$, we generate 10 random initial states $x_0$ and
-integrate 10-second trajectories.
+integrate 10-second-long trajectories.
 %
-The cost of each trajectory is calculated as per~\eqref{eq:loss}.
+The cost $J_T$ of each trajectory is calculated as per~\eqref{eq:loss}.
 %
 The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
 10 trajectories for each $p_{max}$.
