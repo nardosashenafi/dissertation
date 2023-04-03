@@ -5,15 +5,16 @@ continuous and discrete state transitions. Common examples of hybrid systems are
 contact-rich mechanisms such as legged robots and manipulators. These mechanisms
 experience contact forces from their interaction with the environment, causing
 them to undergo mode changes. Controlling contact-rich robots comes with two
-main complications. First, it is difficult to find one optimal controller that
-can achieve the desired performance in all modes of the hybrid system.
+main complications. First, it is difficult to find one optimal
+controller~\todo{why necessarily optimal?} that
+can achieve the desired performance~\todo{is there one?} in all modes of the hybrid system.
 %
 For instance, multiagent manipulation~\cite{ashenafi2021nonholonomic} uses a
 group of robots to cooperatively execute a task, such as maneuvering an object in
 space.
 %
 As we change the number of robots establishing contact with the object, we find
-unique optimal control schemes for each contact mode.
+unique optimal control schemes~\todo{why optimal?} for each contact mode.
 %
 In these scenarios, it may be best to detect event triggers during mode changes and
 manually switch between several optimal controllers.
@@ -21,19 +22,21 @@ manually switch between several optimal controllers.
 % For instance, fuzzy control~\cite{kahraman2020fuzzy, katic2003survey} is
 % commonly used to generate if-then rules for the control of bipedal robots.
 However, such techniques do not scale well to contact-rich systems with numerous
-modes. A dynamical system with $k$ contact events can have up to $2^k$ contact
-combinations. It is quite tedious, and in some cases impossible, to parameterize
+modes. A dynamical system with $k$ contact events~\todo{potential contacts --
+not events} can have up to $2^k$ contact
+combinations. It is quite tedious~\todo[inline]{not just tedious but
+computationally impossible}, and in some cases impossible, to parameterize
 the effects of these contact combinations and find individual controllers for
 each mode. Moreover, it is difficult to parameterize the relationship between
-the states and the conditional that triggers the control switch. 
+the states and the conditions that triggers the control switch. 
 %
 To address this issue, we propose a data-driven framework that
 learns a mixture of expert controllers for contact-rich systems.
 %
-This technique infers the experts and a gating network, which determines the
-control switching scheme based on observed states.
+This technique infers the experts and a gating network, which determine the
+control switching scheme based on observed states.~\todo{in simulation}
 %
-Moreover, we learn optimal expert controllers by injecting a performance
+Moreover, we learn optimal~\todo{why optimal?} expert controllers by injecting a performance
 objective that characterizes the desired behavior of the resulting closed-loop
 system.
 
@@ -41,7 +44,9 @@ system.
 The second complication in the control of hybrid systems is that they operate in
 an environment that is not known completely or modeled accurately.
 %
-For instance, a legged robot needs to perform robustly on uneven terrain.
+For instance, a legged robot needs to perform robustly on uneven
+terrain.~\todo[inline]{be robust enough to be able to perform satisfactorily on uneven
+terrain.}
 Similarly, manipulators need to hold a firm grip on objects of all textures and
 shapes.
 %
@@ -65,20 +70,21 @@ of the system but strongly rely on the dynamical model.
 The use of inaccurate models may lead to poor performance or even instability.
 %
 This raises concerns regarding model uncertainties, especially in hybrid dynamical
-systems.
+systems.~\todo{cite}
 %
 
 Bayesian learning (BL)~\cite{gal2016improving,thakur} offers an alternative
 method to simultaneously combat model uncertainties while preserving the useful
-stability analysis in data-driven frameworks.
+stability analysis~\todo{do we do this?} in data-driven frameworks.
 %
 BL is typically used to characterize uncertainties of a dynamical system with a
 stochastic model.
 %
-For instance, \cite{sadigh2015safe} models uncertainties caused by disturbances,
+For instance, \cite{sadigh2015safe}~\todo{don't use [X] as the subject of a
+sentence} models uncertainties caused by disturbances,
 such as the effect of wind gusts on quadcopters via Bayesian inference.
 %
-Similar approach is shown in~\cite{shen2022online, pmlr-v54-linderman17a}, where
+A similar approach is shown in~\cite{shen2022online, pmlr-v54-linderman17a}, where
 a stochastic dynamical model is constructed via BL techniques, and utilized in
 data-driven control synthesis executed in simulation. 
 %
@@ -100,14 +106,14 @@ Adaptive control framework is provided in~\cite{fan2020bayesian}, where the
 search for the control is given by a quadratic program that imposes
 Lyapunov stability constraint for safety critical systems.
 %
-This technique uses BL to infer a controller through interactions with an
+This technique uses BL to infer a controller through interactions with
 unknown dynamics, while maintaining the algebraic structure of a stable system.
 %
 Inspired by this technique, we merge the structure and stability properties of
 passivity-based control (PBC) with the robustness properties of BL.  
 
 
-In this work, we present a unified framework that simultaneously combines
+In this work~\todo{no need for this phrase ever}, we present a unified framework that simultaneously combines
 data-driven techniques and rigorously addresses model uncertainties using Bayesian
 learning.
 %
@@ -124,4 +130,6 @@ the simple pendulum and the inertia wheel pendulum, in simulation and real-world
 experiment.
 %
 Then we extend the framework to contact-rich systems and evaluate its
-performance on the rimless wheel, a simplified walking machine.
+performance on the rimless wheel, a simplified walking machine that still
+represents the difficulties in controlling such statically open-loop unstable
+systems.
