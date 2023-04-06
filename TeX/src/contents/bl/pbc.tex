@@ -42,54 +42,71 @@ In this framework, the neural net parameterization of $H^\theta_d$ given in
 Section~\ref{ssec:pbc} is replaced by a Bayesian neural
 network whose weights and biases are samples drawn from a posterior distribution.
 %
-The goal is to learn this posterior that achieves the performance objective under system parameter and measurement uncertainties. 
+The goal is to learn this posterior that achieves the performance objective
+under system parameter and measurement uncertainties. 
 %
 
 
-Let $\phi(x_0, u^\theta, T)$ denote a closed loop trajectory integrated from the Hamilton's equation of motion in~\eqref{eq:hamiltonian_dynamics}.
-The trajectory starts from the initial state $x_0$ and spans for the time horizon $T$.
+Let $\phi(x_0, u^\theta, T)$ denote a closed loop trajectory integrated from the
+Hamilton's equation of motion in~\eqref{eq:hamiltonian_dynamics}. The trajectory
+starts from the initial state $x_0$ and spans for the time horizon $T$.
 %
-We sample the initial state $x_0$ through greedy and explorative state sampling techniques discussed in Section~\ref{sssec:state_sampling}.
-The control law $u^\theta$ consists of the energy shaping and damping terms found from the desired Hamiltonian $H^\theta_d$ as shown in equation~\eqref{eq:damping_and_es_control}.
+We sample the initial state $x_0$ through greedy and explorative state sampling
+techniques discussed in Section~\ref{ssec:state_sampling}. The control law
+$u^\theta$ consists of the energy shaping and damping terms found from the
+desired Hamiltonian $H^\theta_d$ as shown in
+equation~\eqref{eq:damping_and_es_control}.
 %
-To generate this trajectory, we first sample the parameters $\theta$ from the prior distribution $P(\theta)$.
+To generate this trajectory, we first sample the parameters $\theta$ from the
+prior distribution $P(\theta)$.
 %
 
-We take two approaches to selecting the prior distribution.
-The simplest approach is to use an uninformed prior given by a uniform distribution;
-this choice encourages
-exploration but has slow convergence properties. The second approach uses an
-informed prior that warm-starts the Bayesian training around the solution of the
-deterministic training. To do so, the prior
-distribution is a Gaussian probability distribution centered around the parameters learned from the deterministic
-\textsc{NeuralPbc} technique discussed in Section~\ref{ssec:pbc}.
+We take two approaches to selecting the prior distribution. The simplest
+approach is to use an uninformed prior given by a uniform distribution; this
+choice encourages exploration but has slow convergence properties. The second
+approach uses an informed prior that warm-starts the Bayesian training around
+the solution of the deterministic training. To do so, the prior distribution is
+a Gaussian probability distribution centered around the parameters learned from
+the deterministic \textsc{NeuralPbc} technique discussed in
+Section~\ref{ssec:pbc}.
 
-With the trajectories generated from the prior distribution samples, we compose a performance objective as follows.
+With the trajectories generated from the prior distribution samples, we compose
+a performance objective as follows.
 \begin{align*}
     J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N} [ \ell( \phi(x_0, u^\theta, T), u^\theta) ], 
 \end{align*}
-\noindent where $\mathcal{D}_N$ is a collection of initial states sampled with explorative and greedy state sampling techniques (Section~\ref{sssec:state_sampling}), and
-$\ell$ is the running cost of the trajectories. We provide three options for the running cost in the next section.
+\noindent where $\mathcal{D}_N$ is a collection of initial states sampled with
+explorative and greedy state sampling techniques
+(Section~\ref{ssec:state_sampling}), and $\ell$ is the running cost of the
+trajectories. We provide three options for the running cost in the next section.
 %
-In order to update the posterior distribution based on the performance of the generated trajectories, we compose the likelihood function as
+In order to update the posterior distribution based on the performance of the
+generated trajectories, we compose the likelihood function as
 \begin{align}
     P(J \mid \theta) = \mathcal{N}\left(J | 0, s \right), 
     \label{eqn:likelihood_neuralpbc}
 \end{align}
-\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and standard deviation $s$.
+\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and
+standard deviation $s$.
 %
-Notice that the likelihood is maximum when the expectation of the running cost $J$ is minimum.
+Notice that the likelihood is maximum when the expectation of the running cost
+$J$ is minimum.
 %
 \begin{rem}
     On top of the neural net parameters $\theta$, we can learn the posterior
-    over the standard deviation $s$ of the likelihood. 
-    This automatically finds the weighting between the likelihood and prior distributions, achieving optimal \textit{bias-variance trade-off}.
-    In this scenario, the posterior distribution is a multivariate probability distribution over the parameters $\theta$ and $s$. 
+    over the standard deviation $s$ of the likelihood. This automatically finds
+    the weighting between the likelihood and prior distributions, achieving
+    optimal \textit{bias-variance trade-off}. In this scenario, the posterior
+    distribution is a multivariate probability distribution over the parameters
+    $\theta$ and $s$. 
 \end{rem}
 
-From here, we can use Hamiltonian Monte Carlo or variational inference (Section~\ref{ssec:bayesianLearning}) to find the posterior distribution from the likelihood and the prior.
+From here, we can use Hamiltonian Monte Carlo or variational inference
+(Section~\ref{ssec:bayesianLearning}) to find the posterior distribution from
+the likelihood and the prior.
 %
-We first pose the search over the posterior as the following optimization problem.
+We first pose the search over the posterior as the following optimization
+problem.
 \begin{equation}
     \begin{aligned}
         \underset{P(\theta | J)}{\textrm{minimize}} 
@@ -102,7 +119,8 @@ We first pose the search over the posterior as the following optimization proble
     \end{aligned}
     \label{eq:smooth_bayesian_pbc}
 \end{equation}
-We expand on the use of HMC and variational inference to solve the optimization problem.
+We expand on the use of HMC and variational inference to solve the optimization
+problem.
 %
 \begin{enumerate}
     \item \textbf{Hamiltonian Monte Carlo (HMC)}: represents the posterior with
@@ -162,7 +180,27 @@ We expand on the use of HMC and variational inference to solve the optimization 
         u(x) = \frac{1}{N_Q} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
     \end{equation*} 
     We repeat this computation for every state in a trajectory.
+    %
 
+    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
+    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
+    %
+    Unlike HMC, we have a closed form probability distribution for the
+    posterior. We draw several samples from the current posterior and evaluate
+    its performance through the joint distribution $P(\theta, J)$. Given the
+    likelihood and the prior distributions, variational inference constructs the
+    \textsc{Elbo} as
+    \begin{align}
+        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
+        \label{eq:neuralpbc_elbo}    
+    \end{align}
+    We use stochastic gradient descent to iteratively update the distribution
+    parameters as follows:
+    \begin{align*}
+      z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
+    \end{align*}
+    The full variational inference training process is shown in
+    Algorithm~\eqref{algo:vi}.
     \begin{algorithm}[H]
         \centering
         \setstretch{1.5}
@@ -205,21 +243,6 @@ We expand on the use of HMC and variational inference to solve the optimization 
         \State \textbf{Return} $\Theta$
         \end{algorithmic}
     \end{algorithm}
-
-    \item \textbf{Variation Inference (VI)}: intends to learn the distribution parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
-    %
-    Unlike HMC, we have a closed form probability distribution for the posterior.
-    We draw several samples from the current posterior and evaluate its performance through the joint distribution $P(\theta, J)$. 
-    Given the likelihood and the prior distributions, variational inference constructs the \textsc{Elbo} as
-    \begin{align}
-        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
-        \label{eq:neuralpbc_elbo}    
-    \end{align}
-    We use stochastic gradient descent to iteratively update the distribution parameters as follows:
-    \begin{align*}
-      z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
-    \end{align*}
-    The full variational inference training process is shown in Algorithm~\eqref{algo:vi}.
     
     The gradient ${\partial \mathcal{L}}/{\partial z}$ holds a rather complex form for two reasons.
     First, the \textsc{Elbo} is evaluated from trajectories integrated from the differential equations in~\eqref{eq:hamiltonian_dynamics}.
@@ -529,17 +552,20 @@ This training framework can be posed as the following optimization problem.
     \label{eq:hybrid_neuralpbc}
 \end{equation}
 %
-The performance objective $\ell$ is evaluated from closed loop trajectories $\phi$ using the current control law.
+The performance objective $\ell$ is evaluated from closed loop trajectories
+$\phi$ using the current control law.
 %
-We follow Moreau's time stepping algorithm~\cite{glocker2005formulation} outlined
-in Algorithm~\eqref{algo:moreau} to resolve the complementarity constraint
-in~\eqref{eq:complementarity} and integrate the closed-loop dynamics.
+We follow Moreau's time stepping algorithm~\cite{glocker2005formulation}
+outlined in Algorithm~\eqref{algo:moreau} to resolve the complementarity
+constraint in~\eqref{eq:complementarity} and integrate the closed-loop dynamics.
 %
-We sample $N_{\mathcal{D}}$ initial states through greedy and explorative state sampling techniques discussed in Section~\ref{sssec:state_sampling}.
-As outlined in Algorithm~\ref{algo:deter_neuralpbc_hybrid}, we compose the cost
-$\ell$ from the $N_{\mathcal{D}}$ closed loop trajectories.
-The performance objective is chosen according to the desired system behavior as discussed in Section~\ref{sssec:cost}.
-We update the parameters $\theta$ through stochastic gradient descent (SGD). 
+We sample $N_{\mathcal{D}}$ initial states through greedy and explorative state
+sampling techniques discussed in Section~\ref{ssec:state_sampling}. As outlined
+in Algorithm~\ref{algo:deter_neuralpbc_hybrid}, we compose the cost $\ell$ from
+the $N_{\mathcal{D}}$ closed loop trajectories. The performance objective is
+chosen according to the desired system behavior as discussed in
+Section~\ref{sssec:cost}. We update the parameters $\theta$ through stochastic
+gradient descent (SGD). 
 %
 We compute the gradient $\nicefrac{\partial \ell}{\partial \theta}$ through
 auto-differentiation techniques.
@@ -627,14 +653,19 @@ This framework can be summarized by the following optimization problem.
 uncorrelated uniform probability distributions $\mathbb{U} \sim [p_{min}, p_{max}]$
 with lower bound $p_{min}$ and upper bound $p_{max}$.
 %
-The magnitude of the samples $p_s$ determine the parameters of the environment with which we are interacting.
-For walking robots, $p_s$ can be the elevation of the terrain; in this case, sampling $p_s$ randomizes the gap $g_N$, which determines the pre-impact velocities
-$\dot{q}^{-}$ and contact forces between the robot and the ground.
+The magnitude of the samples $p_s$ determine the parameters of the environment
+with which we are interacting. For walking robots, $p_s$ can be the elevation of
+the terrain; in this case, sampling $p_s$ randomizes the gap $g_N$, which
+determines the pre-impact velocities $\dot{q}^{-}$ and contact forces between
+the robot and the ground.
 
-We solve the optimization problem in~\eqref{eq:bayesian_hybrid_neuralpbc} with the procedure outlined in Algorithm~\eqref{algo:bayes_neuralpbc}. 
+We solve the optimization problem in~\eqref{eq:bayesian_hybrid_neuralpbc} with
+the procedure outlined in Algorithm~\eqref{algo:bayes_neuralpbc}. 
 %
-We follow the initial state sampling techniques and the performance objectives discussed in detail in Section~\ref{ssec:pbc_smooth_dynamics}.
-In particular, we use variational inference to learn the distribution parameters of the pre-selected posterior $Q(\theta;z)$.
+We follow the initial state sampling techniques and the performance objectives
+discussed in detail in Section~\ref{ssec:pbc_smooth_dynamics}. In particular, we
+use variational inference to learn the distribution parameters of the
+pre-selected posterior $Q(\theta;z)$.
 
 \begin{algorithm}
     \setstretch{1.2}

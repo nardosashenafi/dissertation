@@ -34,7 +34,7 @@ of the expert controllers.
 %
 We use the running cost $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
 \mathbb{R}$ to measure the performance of the sampled experts, which we discuss
-in depth in the next section.
+in depth in Section~\ref{ssec:performance_objective}.
 %
 The running cost plays the role of \it{prediction error} \normalfont in the
 construction of the likelihood as shown in~\eqref{eq:log_normal_likelihood}.
@@ -54,11 +54,11 @@ We pose the search over the parameters of the experts and the gating network as 
     \label{eq:moe_opt}
 \end{equation}
 %
-In the coming sections, we provide a procedure to solve the
+In Section~\ref{ssec:training_moe}, we provide a procedure to solve the
 optimization problem~\eqref{eq:moe_opt} through expectation maximization. 
 
-\subsubsection{Performance Objective}
-\label{sssec:performance_objective}
+\subsection{Performance Objective}
+\label{ssec:performance_objective}
 %
 We present two viable choices for the running cost function. 
 \begin{enumerate}
@@ -208,8 +208,8 @@ We present two viable choices for the running cost function.
     \end{algorithm}
 \end{enumerate}
 
-\subsubsection{State Sampling}
-\label{sssec:state_sampling}
+\subsection{State Sampling}
+\label{ssec:state_sampling}
 
 We intend to find a solution to the optimization problem
 in~\eqref{eq:moe_opt} for all initial states $x_0$ in the
@@ -243,8 +243,8 @@ over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
 \end{align*}
 \noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
 
-\subsubsection{Training MOE}
-\label{sssec:training_moe}
+\subsection{Training Mixture of Expert Controller}
+\label{ssec:training_moe}
 
 %
 We solve the optimization problem in~\eqref{eq:moe_opt} following the procedure
@@ -303,7 +303,8 @@ reverse-mode auto-differentiation techniques.
       \end{algorithmic}
   \end{algorithm}
 
-\subsubsection{Back-propagation through Hybrid Systems}
+\subsection{Back-propagation through Hybrid Systems}
+\label{ssec:backprop_hybrid}
 
 The training framework outlined~\eqref{eq:moe_opt} allows us to observe the
 effects of contacts in the closed-loop trajectories and infer a controller that
@@ -354,7 +355,7 @@ the discontinuity in the states.
 %
 A closer observation reveals that  $\frac{\partial x_1}{\partial \lambda}$
 determines how the \it{post-impact velocity is affected by the
-contact forces} \normalfont.
+contact forces}~\normalfont.
 %
 In fact, the derivative can be found from Moreau's integration as 
 \begin{align*}
