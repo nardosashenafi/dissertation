@@ -4,34 +4,43 @@
 We provide several data-driven control design frameworks for contact-rich
 robotic systems.
 %
-These systems exhibit continuous~\todo{conts transitions don't exist.} and discrete state transitions, which makes
-them difficult to control with one optimal~\todo{doesn't have to be optimal}
-policy.~\todo{because... mention why briefly.}
+These systems exhibit continuous state flows and discrete state transitions,
+which are governed by distinct equations of motion.
 %
-Hence, we design a control learning mechanism that provides a mixture of expert
-controllers parameterized by neural networks.~\todo{neural nets are the
-parametrizations, not the parameters.} 
+Hence, it is difficult to design a single policy that can control the system in
+all modes.
 %
-This architecture also learns a gating network, which determines the region of
-validity of each expert, based on the observed states.
+Typically, hybrid systems are controlled by multi-modal policies, each manually
+triggered based on observed states.
 %
+However, as the number of potential contacts increase, the number of policies
+can grow exponentially and the control-switching scheme becomes too complicated
+to parameterize.
+%
+To address this issue, we design contact-aware data-driven controllers given by
+deep-net mixture of experts.
+%
+This architecture learns switching-control scheme that can achieve the
+desired overall performance of the system, and a gating network, which
+determines the region of validity of each expert, based on the observed states
+%
+
+
 Additionally, we address the adverse effects of model uncertainties in the
 control of contact-rich robots.
 %
 Lack of accurate environmental models can misrepresent the effects of contact
 forces on the system.
 %
-Optimal policies designed from such models can lead to poor performance or even
+Policies designed from such models can lead to poor performance or even
 instability.
 %
 In particular, we demonstrate the effects of system parameter uncertainties and 
 measurement errors on the overall performance of the system.
 %
-Then, we leverage the stability properties of passivity-based control in
-conjunction with the robustness properties of Bayesian learning to
-infer~\todo[inline]{these are not leveraged to ``learn'' the controllers, they are the
-properties of the learned controllers}
-stochastic controllers.
+Then, we design data-driven stochastic controllers that combine the stability
+properties of passivity-based control with the robustness properties of Bayesian
+learning.
 %
 
 

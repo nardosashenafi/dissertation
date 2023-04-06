@@ -108,7 +108,7 @@ optimization scheme:
 \begin{equation}
   \begin{aligned}
       \underset{\theta}{\textrm{minimize}} 
-      & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\%
+      & & & \ell \left(\phi,u^{\theta} \right) , \\%
       \textrm{subject to}
       & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
       & & u^{\theta} &= -\Omega^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} \Omega^\top \nabla_p H_d^{\theta},%
@@ -253,10 +253,9 @@ Let $F(x; \theta)$ denote the stochastic model whose parameters $\theta$ are
 multivariate random variables.
 %
 These parameters are samples drawn from a posterior probability
-distribution.~\todo{why are parameters samples? Aren't they fixed in the true
-distribution?}
+distribution.
 %
-The objective is to find the posterior distribution that minimizes the quadratic
+The objective is to find the posterior distribution that minimizes the
 prediction error $\sum_{(x_j, y_j) \in \mathbb{D}} \norm{F(x_j; \theta) -
 y_j}{}$, where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$ the training
 dataset with inputs $x_j$ and observations $y_j$.
@@ -265,12 +264,11 @@ As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
 \it{expectation maximization} \normalfont (EM) to learn the optimal posterior
 distribution.
 %
-To do so, we define the likelihood in terms of the quadratic prediction
-error~\todo{why is this quadratic, explain.} as
+To do so, we define the likelihood in terms of the prediction error as
 \begin{equation*}
-  P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{}, s),
+  P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{} \; | \; 0, s),
 \end{equation*}
-\noindent for independent observations in the dataset $\mathbb{D}$.
+\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and standard deviation $s$.
 Even though the EM approach finds optimal parameters $\theta$ that
 minimize the prediction error, this technique is prone to overfitting.
 %
@@ -338,10 +336,10 @@ solution, and consequently achieving the bias-variance trade-off.
 \subsubsection{Posterior Distribution}
 
 While the likelihood and prior distributions in~\eqref{eq:bayes_posterior} can
-be expressed explicitly, the evidence is intractable. We leverage Bayesian
-inference techniques to approximate or find the exact posterior distribution
-without the use of the evidence. Two of the most famous techniques are
-discussed as follows.
+be expressed explicitly, the evidence $P(\mathbb{D})$ is typically intractable.
+We leverage Bayesian inference techniques to approximate or find the exact
+posterior distribution without the use of the evidence. Two of the most famous
+techniques are discussed as follows.
 \begin{enumerate}
   \item \textbf{Markov Chain Monte Carlo (MCMC) methods}: find the exact
   posterior distribution from a collection of samples of $\theta$.
@@ -355,10 +353,10 @@ discussed as follows.
   %
   We accept or reject each candidate sample according to the following rule~\cite{bishop2006pattern}:
   \begin{align*}
-    \nu &\sim \mathcal{U}(0, 1), \\
+    \nu &\sim \mathbb{U}(0, 1), \\
     A(\theta^{(\tau)}, \theta^{(\tau-1)}) &= \min \Biggl(1, \frac{P(\mathbb{D} | \theta^{(\tau)})P(\theta^{(\tau)})}{P(\mathbb{D} | \theta^{(\tau-1)})P(\theta^{(\tau-1)})} \Biggr),
   \end{align*}
-  \noindent where $\mathcal{U}$ is the uniform distribution. If
+  \noindent where $\mathbb{U}$ is the uniform distribution. If
   $A(\theta^{(\tau)}, \theta^{(\tau-1)}) \geq \nu$, then we accept the sample. 
   %
   Otherwise, we discard the candidate and resample from $\tilde{Q}(\theta^{(\tau)} |
