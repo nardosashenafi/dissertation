@@ -1,12 +1,12 @@
 \section{Experimental Results}
 \label{sec:moe_results}
-We demonstrate the efficacy of the mixture of expert controllers in simulation
+We demonstrate the efficacy of the mixture of expert controller in simulation
 and real-world experiments.
 %
 In the first case study, we learn a gating network that switches between two
 unstable closed-loop systems to result in a piecewise-stable system.
 %
-Then, we find switching MOE controllers to swing up the classical cartpole
+Then, we find switching MOE controller to swing up the classical cartpole
 mechanism enclosed with wall barriers.
 %
 
@@ -15,19 +15,22 @@ mechanism enclosed with wall barriers.
 Suppose we have two linear closed-loop systems of the form 
 \begin{equation}
     \begin{gathered}
-        \dot{x} = A_1x = \bmat{0 & -1 \\ 2 & 0}x \\
+        \dot{x} = A_1x = \bmat{0 & -1 \\ 2 & 0}x, \\
         \dot{x} = A_2x = \bmat{0 & -2 \\ 1 & 0}x.
     \end{gathered}
     \label{eq:unstable_closedloop}
 \end{equation}
 %
-Even if the systems are not stable, it is possible to find a state-dependent
-switching rule that makes the resulting switched system
+Even if the individual systems are not stable, it is possible to find a
+state-dependent switching rule that makes the resulting switched system
 stable~\cite{liberzon2003switching}. 
 %
+We find the stable switching scheme through the MOE framework discussed in
+Section~\ref{ssec:mixture_of_experts}.
+%
 We aim to learn the parameters $\psi$ of the gating network $\mathbf{P}(x|
-\psi)$ such that the switching system converges to the desired equilibrium $x^*
-= (0, 0)$.
+\psi)$ and the expert parameters $\theta_i$ such that the switching system
+converges to the desired equilibrium $x^* = (0, 0)$.
 %
 The gating network is a fully-connected neural net with one hidden layer (2 input states 
 \rightarrow 6 neurons \rightarrow 4 outputs) and an \textsc{Elu} activation
@@ -44,6 +47,7 @@ The control law is a sample from the Bernoulli probability distribution
        0, & \theta_i > \frac{1}{2}, \\
        1, & \theta_i \leq \frac{1}{2},
     \end{cases}
+    \label{eq:bernoulli}
 \end{align}
 \noindent where $F_i = 0$ corresponds to the first dynamics $\dot{x} = A_1
 x$ and $F_i=1$ corresponds to $\dot{x} = A_2x$.
@@ -51,13 +55,23 @@ x$ and $F_i=1$ corresponds to $\dot{x} = A_2x$.
 We use the \textsc{Sigmoid} activation function to limit $\theta_i$ between 0
 and 1.
 %
+The likelihood is modified to account for the probabilistic control as
+\begin{align*}
+    \mathbb{L}(\phi) = \sum_{t=0}^{T}  \sum_{i=1}^{N_F} -\theta_i \ell \Bigl(x(t + \Delta t), F_i(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t + \Delta t), F_i(1-\theta_i) \Bigr) P_i\Bigl(x(t)| \psi \Bigr)  .
+\end{align*}
+
 We generate a trajectory following the procedure in
 Algorithm~\eqref{algo:switching_A1A2}.
 %
-The likelihood is modified to account for the probabilistic control as
-\begin{align*}
-    \mathbb{L}(\phi) = \int_{0}^{T} \Biggl( \sum_{i=1}^{N_F} - \Bigl[ \theta_i \ell \Bigl(x(t), u(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t), u(1-\theta_i) \Bigr) \Bigr] P_i\Bigl(x(t)| \psi \Bigr)  \Biggr) \dd t.
-\end{align*}
+For the initial state $x_0$, we sample a state partition $i$ from the
+categorical distribution~\eqref{eq:gating_categorical}.
+%
+Then, we sample from the Bernoulli distribution $F_i$ in~\eqref{eq:bernoulli} using the
+parameter $\theta_i$ corresponding to the sampled state partition $i$.
+%
+The expert $F_i$ executes one of the two closed loop systems.
+%
+We repeat this process for time horizon $T$.
 
 \begin{algorithm}
     \setstretch{1.2}
@@ -79,7 +93,8 @@ The likelihood is modified to account for the probabilistic control as
   \end{algorithm}
   
 %
-The resulting switching system is shown in Figure~\ref{fig:final_switching}.
+The response of the learned switching system is shown in
+Figure~\ref{fig:final_switching}.
 %
 The training uses only 3 out of the 4 state partitions available.
 %
@@ -123,12 +138,21 @@ partition at the origin.
 \label{ssec:cartpole_with_walls}
 
 In this section, we take the classical cartpole swing-up problem and introduce
-contact events from two barriers as shown Figure~\ref{fig:cartpole_contact}. 
+potential contacts from two barriers as shown Figure~\ref{fig:cartpole_contact}. 
 %
-We demonstrate the performance of the mixture of expert controllers in
+The potential contacts serve as a way to convert the standard cartpole system
+into a multi-modal dynamics.
+%
+The objective is to swing-up the pendulum on the cart in the presence of
+contacts and impacts.
+%
+We apply the MOE framework to train switching expert controllers and a gating
+network that governs the switching scheme.
+%
+We demonstrate the performance of the mixture of expert controller in
 simulation and real-world experiments.
 %
-Lastly, we compare the performance of the MOE controllers against
+Lastly, we compare the performance of the MOE controller against
 a single swing-up controller. 
 
 \begin{figure}[H]
@@ -155,45 +179,43 @@ cart.
 The objective is to use the control authority on the cart in order to swing-up
 the passive pendulum to the upright.
 %
-The pendulum spans length of $l=0.2$m and its mass $m_c = 0.75$kg is
+The pendulum spans length of $l=0.2$m and its mass $m_p = 0.75$kg is
 concentrated at the distance $l_{cm}=\nicefrac{l}{2}$ from the hinge.
 %
-The cart alone has a mass of $m_p=0.165$ kg. The viscous friction in the cart
+The cart alone has a mass of $m_c=0.165$ kg. The viscous friction in the cart
 wheels is characterized by the coefficient $b=1.2$ \nicefrac{N $\cdot$ sec}{m}.
 %
-The dynamics of the system
-is given by~\eqref{eq:hybrid_dynamics} where 
+The dynamics of the system is given by~\eqref{eq:hybrid_dynamics} where 
+\begin{equation*}
+    M(q) = \bmat{m_c + m_p & -m_p+l_{cm} \cos(\theta_p) \\
+        -m_pl_{cm}\cos(\theta_p) & m_p l_{cm}^2+I_p}, 
+\end{equation*}
 \begin{equation}
     \begin{gathered}
-        M(q) = \bmat{m_c + m_p & -m_p+l_{cm} \cos(\theta_p) \\
-        -m_pl_{cm}\cos(\theta_p) & m_p l_{cm}^2+I_1} \\
         C(q, \dot{q}) = \bmat{b  & m_pl_{cm}\sin(\theta_p) \\
-                -m_p\sin(\theta_p)/2 & 0} \\
-        G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta_p)}^\top \\
-        B = [1 \; 0]^\top
+                -m_p\sin(\theta_p)/2 & 0}, \\
+        G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta_p)}^\top, \\
+        B = [1 \; 0]^\top,
     \end{gathered}
 \end{equation}
-\noindent where $q = [x_c; \theta_p]$, $x_c$ is the location of the cart, $\theta_p$
-is the angle of the pendulum from the vertical and $g$ is the acceleration due
-to gravity. 
+\noindent where $q = (x_c, \theta_p)$, $x_c$ is the location of the cart,
+$\theta_p$ is the angle of the pendulum from the vertical. The moment of inertia
+of the pendulum is given by $I_p$ and $g$ is the acceleration due to gravity. 
 %
-There are a total of $k=10$ contact events between the pendulum and the sides of
+There are a total of $k=10$ potential contacts between the pendulum and the sides of
 the walls.
 %
 We integrate closed-loop trajectories with Moreau time stepping algorithm
 outlined in Algorithm~\eqref{algo:moreau} with an integration time step $\Delta
 t=0.001$.
 %
-
-
 % \begin{figure}[tb]
 %     \centering
 %     \includegraphics[width=0.6\linewidth]{MOEfirstImpact.png}
 %     \caption{Cartpole with wall contacts}
 %     \label{fig:cartpole_contact}
 % \end{figure}
-
-\begin{figure}[tb]
+\begin{figure}[H]
     \centering
     \begin{tikzpicture}
     
@@ -215,11 +237,25 @@ t=0.001$.
 \subsubsection{Training}
 \label{sssec:cartpole_training}
 
-The goal is to learn mixture of expert controllers that stabilize the system at
-$x^* = (q^*, \dot{q})^* = (0, 0)$.
+We aim to learn the parameters of the experts $\theta_i$ and the gating network
+$\psi$ that swing up the cartpole to the desired state $x^* = (q^*, \dot{q})^* =
+(0, 0)$ under contacts and impacts.
 %
 Once the system reaches within a small neighborhood of $x^*$, we employ Linear
 Quadratic Regulator (LQR) to stabilize at the desired equilibrium.
+%
+The gating network is a fully-connected neural net with two hidden layers (state
+input \rightarrow 4 neurons \rightarrow 3 neurons \rightarrow  3 output).
+% 
+We constrain the maximum number of state partitions to 3.
+%
+There are a total of 3 experts $F_i$, each corresponding to a state
+partition.
+%
+The experts are fully-connected neural nets with two hidden layers (state input
+\rightarrow 10 neurons \rightarrow 4 neurons \rightarrow  1 output).
+%
+The output of the experts correspond to the force applied on the cart.
 %
 We use minimum trajectory loss (MTL) discussed in
 Section~\ref{sssec:performance_objective} with time horizon $T=1.5$s.
@@ -227,19 +263,6 @@ Section~\ref{sssec:performance_objective} with time horizon $T=1.5$s.
 In each parameter update, we sample $N_{\mathcal{D}}=4$ initial states through
 greedy and explorative techniques.
 %
-The gating network is a fully-connected neural net with two hidden layers (state input
-\rightarrow 4 neurons \rightarrow 3 neurons \rightarrow  1 output).
-% 
-We constrain the maximum number of state partitions to 3.
-%
-There are a total of 3 neural net experts, each corresponding to a state
-partition.
-%
-The experts are fully-connected neural net with two hidden layers (state input
-\rightarrow 10 neurons \rightarrow 4 neurons \rightarrow  1 output).
-%
-The output of the experts correspond to the force applied on the cart.
-
 
 \subsubsection{Results}
 \begin{figure}[tb]
@@ -249,11 +272,12 @@ The output of the experts correspond to the force applied on the cart.
     \label{fig:cartpole_hardware}
 \end{figure}
 
-We demonstrate the performance of the MOE controllers in simulation and hardware. 
+We demonstrate the performance of the MOE controller in simulation and hardware. 
 %
 The hardware is set up as shown in the Figure~\ref{fig:cartpole_hardware}.
 % 
-The cart uses a rack and pinion mechanism to translate on the track with zero-slip.
+The cart uses a rack and pinion mechanism to translate on the track with
+zero-slip.
 %
 One of the wheels of the cart is attached to an optical encoder, from which we
 can estimate the position and velocity of the cart.
@@ -267,7 +291,7 @@ reporting its orientation.
 We use MATLAB/Simulink to evaluate the neural nets and pass voltage commands to
 the DC-motor.
 %
-We convert the force commands output by the MOE controllers into voltage
+We convert the force commands output by the MOE controller into voltage
 commands $V(t)$ as follows.
 \begin{align*}
     V(t) = \frac{u(x(t); \psi, \theta) + A_m \dot{x}_c}{B_m}
@@ -293,24 +317,39 @@ pendulum from pumping energy from the downward equilibrium.
 By the time the pendulum approaches the upright equilibrium, it is moving at
 such high speed that LQR cannot stabilize it.
 %
-But from several trajectories, we have observed that the system leverages the
-impact from the wall to lower the speed of the pendulum.
+However, we have observed from several trajectories that the system leverages
+the impact from the wall to lower the speed of the pendulum.
 %
 Then, the control law switches between experts as the velocity jumps due to impact.
 %
-The magnitude of the control is such that the MOE controllers apply rapid
+The magnitude of the control is such that the MOE controller applies rapid
 braking during contact, allowing LQR to catch the pendulum post-impact.
 %
-The MOE controllers achieve successful swing-up in simulation and real-world,
+The MOE controller achieves successful swing-up in simulation and real-world,
 proving the accuracy in the contact modelling and the robustness of the
 controllers.
 
 
 Figure~\ref{fig:gapContour} shows the relationship between the gap function and
 the state partitions.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{moe_traj_control.eps}
+    \caption{A sample trajectory starting from downward equilibrium at rest.
+    The contours correspond to the outputs of the MOE controller during impact
+    ($x_c=0.36m, \dot{x}_c = 0\nicefrac{m}{s}$). The solid line
+    splitting the state space horizontally in half shows the boundary between
+    the two state partitions. The state partition shows that the controller must
+    switch from one expert to another in order to catch the pendulum
+    post-impact.}
+    \label{fig:cartpole_trajectory}
+\end{figure}
+
+Figure~\ref{fig:gapContour} shows the relationship between the selected expert
+and the occurrence of potential contacts.
 %
 The red lines represent the boundaries of the state partitions and the contour
-depicts the level sets of the gap function.
+depicts the level sets of the smallest gap function.
 %
 Notice that the states within the boundaries of the red lines have large gap
 values, hence contact events do not occur in this region.
@@ -323,12 +362,13 @@ activated to prevent contact during swing-up and to catch the pendulum just
 after impact, as shown in the trajectory of
 Figure~\ref{fig:cartpole_trajectory}.
 %
-This demonstrates that the state partition depends on the occurrence of contact
-events.
+This demonstrates that the state partition depends on the occurrence of
+potential contacts.
 %
-Moreover, the multi-modal nature of MOE controllers allow us to leverage the
-advantages or prevent the adverse effects of contacts and impacts.
-%
+Moreover, the multi-modal nature of MOE controller allows us to leverage the
+advantages or prevent the adverse effects of contacts and impacts.~\todo{not
+clear, explain why.}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{moe_traj_control.eps}
@@ -344,7 +384,7 @@ advantages or prevent the adverse effects of contacts and impacts.
 %
 
 
-Lastly, we compare the performance of the MOE controllers against a single controller.
+Lastly, we compare the performance of the MOE controller against a single controller.
 %
 This controller is parameterized by a neural net (state input \rightarrow 10
 neurons \rightarrow 4 neurons \rightarrow  1 output) similar to one of the
@@ -359,9 +399,10 @@ to stabilize it to the upright.
 As shown in Figure~\ref{fig:continuous_control}, the single controller
 successfully swings up the pendulum closer to the upright.
 %
-But the controller is not able to catch the pendulum post-impact.
+However, the controller is not able to catch the pendulum post-impact.~\todo{explain
+why this is the case, support MoE approach.}
 %
-Figure~\ref{fig:contandmoe} shows the performance of the MOE controllers in the
+Figure~\ref{fig:contandmoe} shows the performance of the MOE controller in the
 same scenario as Figure~\ref{fig:continuous_control}.
 %
 The MOE solution leverages the switching controllers to successfully catch the
@@ -385,7 +426,7 @@ pendulum post-impact.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{contANDMOE.eps}
-    \caption{The performance of the MOE controllers compared to the single
+    \caption{The performance of the MOE controller compared to the single
     controller in Figure~\ref{fig:continuous_control}}.
     \label{fig:contandmoe}
 \end{figure}

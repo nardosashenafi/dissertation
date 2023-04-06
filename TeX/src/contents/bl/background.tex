@@ -1,15 +1,16 @@
-
 \section{Background}
 
 In this section, we provide a brief summary to passivity-based control and the
-recent data-driven variant introduced in~\cite{ashenafi2022robust, acc, sirichotiyakul2022data}.
+recent data-driven variant our group has introduced in~\cite{ashenafi2022robust,
+acc, sirichotiyakul2022data}.
 %
 We also motivate the advantages of the Bayesian learning framework in
 uncertainty modeling and robust control.
 \subsection{Passivity-Based Control (PBC)}
 \label{ssec:pbc}
 
-Suppose we have a robotic system whose Hamiltonian $H$ can be expressed as
+Suppose we have a robotic system whose Hamiltonian $H$ can be expressed
+as~\todo{needs citation}
 %
 \begin{equation}
     H(q,p) = \frac{1}{2} p^\top M^{-1}(q) p + V(q),
@@ -32,8 +33,8 @@ the input matrix, and $u \in \mathbb{R}^{n}$ is the control input.
 % The system~\eqref{eq:hamiltonian_dynamics} is \textit{underactuated} if rank $\Omega
 % = n < m$.
 %
-Passivity-based control leverages the stability properties of passive systems to
-design a stable closed-loop system.
+Passivity-based control leverages the robust stability properties of passive
+systems to design a stable closed-loop system.~\todo{cite}
 %
 A mechanical system is considered passive if it is dissipative, i.e.
 \begin{align}
@@ -42,8 +43,10 @@ A mechanical system is considered passive if it is dissipative, i.e.
 \noindent for all initial state $x(t_0$) and all input $u$ under the
 supply rate $s = u^\top y$.
 %
-From Lyapunov stability theory, the system~\eqref{eq:hamiltonian_dynamics} is
-passive and therefore the origin $x = (0, 0)$ is stable because 
+From Lyapunov stability theory~\todo{Lyapunov theory does not talk about
+passivity at all!}, the system~\eqref{eq:hamiltonian_dynamics} is
+passive and therefore the origin $x = (0, 0)$ is stable because~\todo{this is
+not quite true... $\dot{H}$ is only negative semidefinite.}
 \begin{equation*}
   \begin{gathered}
     \dot{H} = \frac{\partial H}{\partial x} f(x, u) \leq u^\top y, \\
@@ -55,7 +58,7 @@ The objective of passivity-based control (PBC) is to design a control law $u$
 that imposes the desired storage function $H_d$ on the closed-loop system,
 rendering it passive and therefore stable~\cite{van2000l2}.
 %
-The dynamics of the resulting closed-loop system is 
+The dynamics of the resulting closed-loop system is~\todo{3.2 was also $f$}
 \begin{align}
   \begin{split}  
     f(x, u) &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
@@ -74,7 +77,8 @@ that creates a passive closed-loop system as
 \end{equation}
 \noindent where $\Omega^\dagger = \left( \Omega^\top \Omega  \right)^{-1}
 \Omega^\top$. We also introduce a damping term $u_{di}$ that results in an
-asymptotically stable system. The resulting controller is
+asymptotically stable system.~\todo[inline]{how is $u_{di}$ an asymptotically stable
+system? rephrase.} The resulting controller is
 \begin{align}
   \begin{split} 
     u &= u_{es}(x) + u_{di}(x), \\
@@ -84,7 +88,7 @@ asymptotically stable system. The resulting controller is
 \end{align}
 \noindent where $K_v \succ 0$ is the damping gain matrix.
 From~\eqref{eq:damping_and_es_control}, we can construct a constraint on the
-form of $H_d$ as 
+form of $H_d$ as~\todo{we don't contruct it, it is inherent.}
 \begin{align}
   \Omega^\bot \left( \nabla_q H_d - \nabla_q H \right) = 0,
     \label{eq:pdes}
@@ -103,7 +107,7 @@ optimization scheme:
 \begin{equation}
   \begin{aligned}
       \underset{\theta}{\textrm{minimize}} 
-      & & &\int_{0}^{T} \ell \left(\phi,u^{\theta}(\phi) \right) \, \dd t , \\%
+      & & & \ell \left(\phi,u^{\theta} \right) , \\%
       \textrm{subject to}
       & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
       & & u^{\theta} &= -\Omega^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} \Omega^\top \nabla_p H_d^{\theta},%
@@ -122,7 +126,8 @@ PBC framework.
   \item The optimization problem finds an approximate solution to the PDEs
   in~\eqref{eq:pdes} using stochastic gradient descent.
   \item Desired system behavior is explicitly introduced into the optimization
-  via the performance objective $\ell$.
+      via the performance objective $\ell$.~\todo{therefore we may find a
+      preferred solution to the PDEs}
   \item The framework leverages the universal approximation capabilities of
   neural networks to parameterize the desired Hamiltonian $H^\theta_d$.
 \end{enumerate}
@@ -136,7 +141,7 @@ $H_d$
   \label{eq:idapbc_desired_hamiltonian}
 \end{equation}
 \noindent where the minimum of the closed-loop potential energy $V_d(q)$ is at
-the desired equilibrium coordinate $q^*$.
+the desired equilibrium position $q^*$.
 %
 The resulting passive closed loop system is given by~\cite{ortega2002stabilization}
 \begin{equation}
@@ -158,7 +163,8 @@ and~\eqref{eq:pch} equal to each other to find the energy-shaping and the dampin
 \end{align}
 %
 We build a constraint from~\eqref{eq:idapbc_ues} to extract $V_d$ and the
-matrices $M_d$ and $J_2$. The resulting PDEs are given by 
+matrices $M_d$ and $J_2$.~\todo{again this constraint is not our invention. It
+is inherent.} The resulting PDEs are given by 
 \begin{equation}
   \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} = 0.
   \label{eq:pde_idapbc}
@@ -168,20 +174,20 @@ Similar to \textsc{NeuralPbc}, the closed-form solution to the PDEs
 in~\eqref{eq:pde_idapbc} may be intractable. 
 
 The deterministic \textsc{Neural-IdaPbc} framework introduced
-in~\cite{neuralidapbc} finds an approximate solution to the PDEs from the
+in~\cite{neuralidapbc}~\todo{citation error} finds an approximate solution to the PDEs from the
 following optimization problem.
 \begin{equation}
   \begin{aligned}
       \underset{\theta }{\textrm{minimize}} 
       &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
-      \textrm{subject to} 
+      \textrm{subject to}
       &&\quad M_d^\theta &= \big( M_d^\theta \big)^\top \succ 0, \\
       &&\quad J_2^\theta &= -\big( J_2^\theta \big)^\top, \\
       % &&\quad q^\star &= \underset{q}{\textrm{argmin}} \; V_d^\theta.  \\
       &&\quad q^\star &= \underset{q}{\textrm{argmin}}\; V_d^\theta,
   \end{aligned}    
   \label{eq:idapbc_finite_optim}%
-\end{equation}
+\end{equation}~\todo{fix alignment of constraints in the optim.}
 where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
 %
@@ -189,7 +195,8 @@ To enforce the constraints shown in~\eqref{eq:idapbc_finite_optim}, we redefine
 $M^\theta_d, J^\theta_2$ and $V^\theta_d$ as follows.
 %
 We constrain the positive-definiteness of $M^\theta_d$ with the Cholesky
-decomposition 
+decomposition~\todo[inline]{By itself, Cholesky decomposition does not constrain anything. We train
+$L$ in the Cholesky decomposition to get positive definiteness. Rephrase.} 
 \begin{align*}
   M^\theta_d = L_{\theta}(q)L_{\theta}^\top(q) + \delta_M I_n,
 \end{align*}
@@ -217,7 +224,7 @@ zero. We denote this with
 \noindent where $W_i$ holds the weights of layer $i$ and $\sigma$ is the activation function.
 %
 The activation function is chosen such that $\sigma(0) = 0$, ensuring that
-$\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.
+$\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.~\todo{why? explain.}
 %
 Several choices for the activation function include \textsc{Elu}, \textsc{Tanh} and \textsc{Relu}.
 %
@@ -227,8 +234,11 @@ Several choices for the activation function include \textsc{Elu}, \textsc{Tanh} 
 \subsection{Bayesian Learning}
 \label{ssec:bayesianLearning}
 
-Suppose we are given a finite dataset from an unknown noise process, for which
-we are trying to fit a regression model.
+Suppose we are given a finite dataset from an unknown noise process~\todo{this
+is not a noise process. This is a dynamical system.}, for which
+we are trying to fit a regression model.~\todo[inline]{I didn't understand this.
+There is a process which has noise in it. If it was just noise, you cannot
+predict anything!}
 %
 The goal is not only to predict the average outputs of the source, but also
 the uncertainty of the noise process.
@@ -241,9 +251,10 @@ predictions~\cite{bishop2006pattern}.
 Let $F(x; \theta)$ denote the stochastic model whose parameters $\theta$ are
 multivariate random variables.
 %
-These parameters are samples drawn from a posterior probability distribution.
+These parameters are samples drawn from a posterior probability
+distribution.
 %
-The objective is to find the posterior distribution that minimizes the quadratic
+The objective is to find the posterior distribution that minimizes the
 prediction error $\sum_{(x_j, y_j) \in \mathbb{D}} \norm{F(x_j; \theta) -
 y_j}{}$, where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$ the training
 dataset with inputs $x_j$ and observations $y_j$.
@@ -252,11 +263,11 @@ As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
 \it{expectation maximization} \normalfont (EM) to learn the optimal posterior
 distribution.
 %
-To do so, we define the likelihood in terms of the quadratic prediction error as
+To do so, we define the likelihood in terms of the prediction error as
 \begin{equation*}
-  P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{}, s),
+  P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{} \; | \; 0, s),
 \end{equation*}
-\noindent for independent observations in the dataset $\mathbb{D}$.
+\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and standard deviation $s$.
 Even though the EM approach finds optimal parameters $\theta$ that
 minimize the prediction error, this technique is prone to overfitting.
 %
@@ -265,7 +276,7 @@ distribution \it{biased to the training
 data}\normalfont~\cite{bishop2006pattern}. 
 %
 The risk of overfitting is especially an issue when we are modelling the noise
-in the data source, which requires some amount of variance.
+in the data source, which requires some amount of variance.~\todo{why? explain.}
 %
 The solution to this problem involves finding a \it{bias-variance
 trade-off}\normalfont, where the training adjusts the parameters based on the
@@ -324,10 +335,10 @@ solution, and consequently achieving the bias-variance trade-off.
 \subsubsection{Posterior Distribution}
 
 While the likelihood and prior distributions in~\eqref{eq:bayes_posterior} can
-be expressed explicitly, the evidence is intractable. We leverage Bayesian
-inference techniques to approximate or find the exact posterior distribution
-without the use of the evidence. Two of the most famous techniques are
-discussed as follows.
+be expressed explicitly, the evidence $P(\mathbb{D})$ is typically intractable.
+We leverage Bayesian inference techniques to approximate or find the exact
+posterior distribution without the use of the evidence. Two of the most famous
+techniques are discussed as follows.
 \begin{enumerate}
   \item \textbf{Markov Chain Monte Carlo (MCMC) methods}: find the exact
   posterior distribution from a collection of samples of $\theta$.
@@ -341,10 +352,10 @@ discussed as follows.
   %
   We accept or reject each candidate sample according to the following rule~\cite{bishop2006pattern}:
   \begin{align*}
-    \nu &\sim \mathcal{U}(0, 1), \\
+    \nu &\sim \mathbb{U}(0, 1), \\
     A(\theta^{(\tau)}, \theta^{(\tau-1)}) &= \min \Biggl(1, \frac{P(\mathbb{D} | \theta^{(\tau)})P(\theta^{(\tau)})}{P(\mathbb{D} | \theta^{(\tau-1)})P(\theta^{(\tau-1)})} \Biggr),
   \end{align*}
-  \noindent where $\mathcal{U}$ is the uniform distribution. If
+  \noindent where $\mathbb{U}$ is the uniform distribution. If
   $A(\theta^{(\tau)}, \theta^{(\tau-1)}) \geq \nu$, then we accept the sample. 
   %
   Otherwise, we discard the candidate and resample from $\tilde{Q}(\theta^{(\tau)} |

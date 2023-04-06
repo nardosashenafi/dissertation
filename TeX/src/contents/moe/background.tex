@@ -9,12 +9,12 @@ its uses in machine learning.
 
 \subsection{Contact Modeling with Linear Complementarity Problem}
 
-Suppose a hybrid dynamical system consists of $k$ contact events, each
+Suppose a hybrid dynamical system consists of $k$ potential contacts, each
 introducing normal contact forces $\lambda_N \in \mathbb{R}^{k}$ and Coulomb
 friction forces $\lambda_T \in \mathbb{R}^{k}$ to the overall system.
 %
-We can model this hybrid system with the measure equality~\cite{glocker2005formulation}
-
+We can model this hybrid dynamical system with the measure
+equality~\cite{glocker2005formulation}
 \begin{equation}
   \begin{gathered}
     M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0, \\
@@ -22,19 +22,15 @@ We can model this hybrid system with the measure equality~\cite{glocker2005formu
   \end{gathered}
   \label{eq:hybrid_dynamics}
 \end{equation}
-
+%
 \noindent where $x \in \mathcal{X} \subset \mathbb{R}^{2m}$ consists of robot
 position $q \in \mathbb{R}^m$ and velocities $\dot{q}$, $M \in \mathbb{R}^{m
 \times m}$ denotes the positive-definite mass matrix, $C \in \mathbb{R}^{m
 \times m}$ holds the Coriolis and centripetal terms, and $G \in \mathbb{R}^{m}$
 is the gravitational term. The matrix $B \in \mathbb{R}^{m \times n}$ maps the
-input $u \in \mathbb{R}^{n}$ to the generalized coordinates and $\dd R \in
-\mathbb{R}^m$ represents the force measure of contact forces and Coulomb
-friction exerted on the system. 
-%
-% The vector $\lambda \in \mathbb{R}^{2k}$ consists of the normal and
-% tangential contact forces and the matrix $W \in \mathbb{R}^{m \times 2k}$ maps
-% these contact forces to the generalized coordinates.
+input $u \in \mathcal{U} \subset \mathbb{R}^{n}$ to the generalized coordinates
+and $\dd R \in \mathbb{R}^m$ represents the force measure of contact forces and
+Coulomb friction exerted on the system. 
 %
 In contrast to smooth dynamical systems, the hybrid
 system~\eqref{eq:hybrid_dynamics} exhibits contact forces that enforce
@@ -49,29 +45,40 @@ expensive.
 Most collision simulators work on the kinematic level as opposed to the dynamic
 level.
 %
-For instance, there are event detection methods that simply change the velocity
-of the moving objects at the time of impact.
+For instance, there are event detection methods~\cite{cellier1986combined} that
+simply change the velocity of the moving objects at the time of impact.
 %
 One of the drawbacks of these techniques is finding the exact time the contact
 occurs in high speed collision.
 %
-There is the additional difficulty of identifying the Coulomb friction, which is
-especially prone to Painlev{{\'e}} Paradox~\cite{genot1999new} in high friction
-scenarios.
+There is the additional difficulty of identifying the Coulomb friction.
+% , which is
+% especially prone to Painlev{{\'e}} Paradox~\cite{genot1999new} in high friction
+% scenarios.
 %
 The linear complementarity formulation in~\cite{glocker2005formulation} provides
 a rigorous technique to resolve contact forces, Coulomb friction and impact
 forces in a hybrid system.
 %
-The work presents an optimization problem that searches for \it{contact force
+This formulation presents an optimization problem that searches for \it{contact force
 and post-impact velocity} \normalfont pairs that obey the geometric and
 kinematic constraints during contacts or impacts.
 %
 
+\begin{rem}
+  Unlike the classical second order equations of motion $M(q) \ddot{q} + h(q,
+  \dot{q}) = 0$, the measure differential inclusion
+  in~\eqref{eq:hybrid_dynamics} can characterize the behavior of the system
+  under impact forces. Notice that in the presence of impacts, the velocity
+  $\dot{q}$ is not continuous for all time, thus the acceleration $\ddot{q}$
+  does not exist everywhere. For further understanding of how the measure
+  equality can accurately represent the impact dynamics, we refer the reader
+  to~\cite{moreau1988unilateral}.
+\end{rem}
 %
 The linear complementarity formulation is constructed as follows. We define a
-vector of gap functions $g_N(q) \in \mathbb{R}^{k}$ that measure the
-Euclidean distance between the contact surfaces. 
+vector of gap functions $g_N(q) \in \mathbb{R}^{k}$ that measure the distance
+between the contact surfaces. 
 %
 Let $\gamma_N = \dot{g}_N(q)$ be the normal relative velocity and
 $\gamma_T$ the tangential relative velocity between contact surfaces.
@@ -98,18 +105,19 @@ contact forces and relative velocities given by:
       \xi_T(q, \dot{q})
     \end{pmatrix} =
       \begin{pmatrix}
-        (1+\epsilon_N) \gamma_N(q, \dot{q})  \\
-        (1+\epsilon_T) \gamma_T(q, \dot{q})
+        (I_k+\epsilon_N) \gamma_N(q, \dot{q})  \\
+        (I_k+\epsilon_T) \gamma_T(q, \dot{q})
       \end{pmatrix},
   \end{gathered}
   \label{eq:complementarity} 
 \end{equation}
-
-\noindent where $\epsilon_N$ and $\epsilon_T$ are the normal and tangential
-coefficients of restitution respectively. 
+\noindent where $\epsilon_N \in \mathbb{R}^k$ and $\epsilon_T \in \mathbb{R}^k$
+are diagonal matrices consisting of the normal and tangential coefficients of
+restitution, respectively. The operator $\perp$ signifies the orthogonality
+between two vectors, and $I_k$ is the $k \times k$ identity matrix.
 % 
 From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N$ and $\xi_T$ can be
-expressed as an affine function over the contact forces $\lambda_N$ and
+expressed as an affine function of the contact forces $\lambda_N$ and
 $\lambda_T$ as follows~\cite{glocker2005formulation}:
 
 \begin{gather*}
@@ -142,12 +150,12 @@ $\lambda_T$ as follows~\cite{glocker2005formulation}:
       \xi_R - \xi_L \\
       \mu \lambda_N + \lambda_T  \\
       \mu \lambda_N - \lambda_T  
-    \end{pmatrix} \\
+    \end{pmatrix}, \\
 \end{gather*}
  
-\noindent where $\mu$ is the coefficient of friction, $I_k$ is the $k \times k$ identity
-matrix, $W_N$ and $W_T$ map the velocity vector $\dot{q}$ to $\gamma_N$ and
-$\gamma_T$, respectively, and $\Delta t$ is the integration time step.
+\noindent where $\mu$ is the coefficient of friction, $W_N$ and $W_T$ map the
+velocity vector $\dot{q}$ to $\gamma_N$ and $\gamma_T$, respectively, and
+$\Delta t$ is the integration time step.
 %
 The linear complementarity problem (LCP)~\eqref{eq:complementarity} can be posed as
 the following feasibility problem:
@@ -169,17 +177,28 @@ the following feasibility problem:
 \end{equation}
 \noindent which can be solved with various optimization techniques. 
 
+
 We follow Moreau's time stepping algorithm~\cite{glocker2005formulation}
 outlined in Algorithm~\eqref{algo:moreau} to resolve the complementarity
 constraint in~\eqref{eq:feasibility} and numerically integrate the
-dynamics~\eqref{eq:hybrid_dynamics}. While the complementarity constraint can be
-posed as a feasibility problem, the presence of Coulomb friction makes it a
-non-convex optimization problem. We use a pivoting (basis-exchange) technique
-called Lemke's algorithm~\cite{acary2008numerical} to find the solution to the
-linear complementarity problem~\eqref{eq:feasibility}. This allows us to
-differentiate the solution to the LCP in our efforts to use machine learning
-techniques.
-
+dynamics~\eqref{eq:hybrid_dynamics}. 
+%
+We first use the kinematics of the system to evaluate the position vector $q$
+after half-time step.
+%
+This allows us to check the gap functions for possible penetration between
+contact surfaces.
+%
+If all the gap functions are positive, we safely assume that there are no
+contact forces applied.
+%
+On the other hand, if any of the gap functions are non-positive, we compose a
+complementarity constraint for the active contacts as given
+in~\eqref{eq:feasibility}.
+%
+While the complementarity constraint can be posed as a feasibility problem, the
+presence of Coulomb friction makes it a non-convex optimization problem. 
+%
 \begin{algorithm}[H]
   \setstretch{1.2}
     \caption{Moreau's Time Stepping Algorithm}
@@ -201,6 +220,19 @@ techniques.
         \State \textbf{return} $\phi$
     \end{algorithmic}
 \end{algorithm}
+%
+We use a pivoting (basis-exchange) technique called Lemke's
+algorithm~\cite{acary2008numerical} to find the solution to the linear
+complementarity problem~\eqref{eq:feasibility}. The fact that Lemke's algorithm
+may be automatically differentiated to provide the gradients of the pertinent
+variables allows us to seamlessly integrate the solution to the differential
+equations into machine learning algorithms.
+%
+We use the contact forces provided by Lemke's algorithm in conjunction with the
+equations of motion to compute the post-impact velocities.
+%
+This procedure is repeated for time horizon $T$.
+
 
 
 \subsection{Mixture of Expert Models}
@@ -216,13 +248,6 @@ A single Gaussian distribution provides a poor fit to the multi-modal data.
 %
 MOE framework allows us to fit multiple uni-modal distributions as shown on
 the right of Figure~\ref{fig:gaussian_moe}.
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=\linewidth]{gaussian_moe.png}
-  \caption{Left: Fit with one Gaussian distribution. Right: Fit with Gaussian
-  mixture of 2 experts~\cite{mcgonagle_dobre_pilling}}
-  \label{fig:gaussian_moe}
-\end{figure}
 %
 This technique uses a gating network to divide the input space $x \in
 \mathcal{X} \subset \mathbb{R}^{2m}$ into state partitions within which a single
@@ -234,12 +259,13 @@ best fit the dataset.
 
 The expert models and the gating networks can take several forms. 
 %
-Gaussian experts and gating networks are commonly used in the MOE framework to
-find a multi-modal probabilistic model from a small amount of
+Gaussian process experts and gating networks are commonly used in the MOE
+framework to find a multi-modal probabilistic model from a small amount of
 data~\cite{bishop2006pattern}.
 %
-However, as the observations from the dataset grow large, the Gaussian experts
-impose large computational and memory overhead~\cite{harkonen2022mixtures}.
+However, as the observations from the dataset grow large, the Gaussian process
+experts impose large computational and memory
+overhead~\cite{harkonen2022mixtures}.
 %
 Moreover, Gaussian gating networks can only provide a quadratic parameterization
 of the boundaries of the state partitions.
@@ -248,6 +274,13 @@ Hence, we leverage the universal approximation capabilities of neural networks
 for both the experts and the gating network.
 %
 
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{gaussian_moe.png}
+  \caption{Left: Fit with one Gaussian distribution. Right: Fit with Gaussian
+  mixture of 2 experts~\cite{mcgonagle_dobre_pilling}}
+  \label{fig:gaussian_moe}
+\end{figure}
 
 Let $F(x)$ denote a collection of $N_F$ expert models $F(x) = \{F_1(x),
 \dots, F_{N_{F}}(x)\}$, whose parameters are given by the set
@@ -258,7 +291,7 @@ $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 The gating network $\mathbf{P}(x| \psi) := (P_1(x| \psi), \\ \dots, P_{N_F}(x|
 \psi))$ is a collection of probabilities, where $P_i(x | \psi)$ denotes the
-probability of state $x$ belonging to state partition $i, i \in \{1, \dots, N_F \}$. 
+probability of state $x$ belonging to state partition $i \in \{1, \dots, N_F \}$. 
 %
 We parameterize the gating network with a neural network $\mathbf{P}(x| \psi) :
 \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ with parameters $\psi$, and the output
@@ -277,57 +310,63 @@ on the outputs of the gating network as follows~\cite{harkonen2022mixtures}
   \label{eq:gating_categorical}
 \end{align}
 %
-The prediction from the mixture of experts $F(x; \theta)$ is given by the linear
-combination over the \it{responsibility} \normalfont of each state partition.
+% The prediction from the mixture of experts $F(x; \theta)$ is given by the linear
+% combination over the \it{responsibility} \normalfont of each state partition.
 %
-\begin{align*}
-  I &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \}\\
-  F(x; \theta) &= F_I(x; \theta_I)
-\end{align*}
-% A single controller is active in each state partition hence the prediction $F_o(x)$ is equivalent to 
 % \begin{align*}
-%   j &= \underset{i}{\textrm{argmax}} \{ P(c_i=i | x, \psi) \}\\
-%   F_o(x) &= F_j(x)
+%   F(x; \theta) &= \sum_{i=1}^{N_F}F_i(x; \theta_i)P_i(x | \psi).
 % \end{align*}
+A single expert is active in each state partition hence the prediction $u(x;
+\theta)$ at input state $x$ is given by 
+\begin{align*}
+  a &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \}\\
+  u(x; \theta) &= F_a(x; \theta_a)
+\end{align*}
 
 
-
-There are several Bayesian inference techniques to learn the parameters of the
-expert models and the gating network, one of which is \it{expectation
+There are several techniques to learn the parameters of the
+expert models and the gating network. A common approach is \it{expectation
 maximization} \normalfont (EM).
 %
-In this technique, we compose the expectation over the log likelihood
+In this technique, we first compose the expectation over the log likelihood
 as~\cite{bishop2006pattern}   
-\begin{equation}
-  \mathbb{L}(\mathbb{D} | \theta, \psi) := \frac{1}{N} \sum_{j=1}^{N} \sum_{i=1}^{N_F} -\norm{F_i(x_j; \theta_i) - y_j}{}^2 P_i(x_j | \psi) 
-  \label{eq:log_normal_likelihood}
-\end{equation}
-\noindent where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N)\}$ is a collection
-of $N$ training datasets, and $\norm{F_i(x_j; \theta_i) - y_j}{}^2$ is the error in the
-prediction made by the expert $i$.
-%
-% We can expand this expression to 
-% \begin{align}
-%   \ln \{P(Y_x | \theta, \psi) \} = \sum_{j=1}^{N} \ln  \Biggl\{ \sum_{i=1}^{N_F} \mathcal{N}( \norm{F_i(x_j) - y_j}{}, s) P_i(x_j, \psi) \Biggr\}.
-%   \label{eq:log_normal_likelihood}
-% \end{align}
-% %
-% We can extract the relevant parts of~\eqref{eq:log_normal_likelihood} and define the
-% final form of the likelihood function as
-% \begin{align}
-%   \mathbb{L}(Y_x | \theta, \psi) := \sum_{i=1}^{N_F} - \norm{F_i(x) - Y_x}{}^2 + \ln \Bigl\{ P(c_i=i | x, \psi) \Bigr\}.
-%   \label{eq:likelihood_def}
-% \end{align}
+\begin{align}
+  \ln \{P(\mathbb{D} | \theta, \psi)\} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N}( \norm{F_i(x_j; \theta_i) - y_j}{} \; | \; 0,s) P_i(x_j, \psi) ,
+  \label{eq:original_normal_likelihood}
+\end{align}
+where $\mathcal{N}$ is the Gaussian distribution with mean zero and standard
+deviation $s$. The dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N)\}$ is a
+collection of $N$ training observations, and $\norm{F_i(x_j; \theta_i) - y_j}{}$
+is the error in the prediction made by the expert $i$. 
+% 
 Notice that the likelihood measures how likely the current parameters $(\psi,
 \theta)$ are to generate the sampled data $\mathbb{D}$. 
 %
 The goal is to maximize the likelihood and consequently minimize prediction
 error.
 %
-The likelihood~\eqref{eq:log_normal_likelihood} is maximum when the parameter $\theta_i$
-has the lowest prediction error and the highest probability of getting selected
-by the gating network.
+The likelihood~\eqref{eq:original_normal_likelihood} is maximum when the
+parameter $\theta_i$ has the lowest prediction error and the highest probability
+of getting selected by the gating network.
 %
-The standard EM approach evaluates~\eqref{eq:log_normal_likelihood} and uses
+The standard EM approach evaluates~\eqref{eq:original_normal_likelihood} and uses
 gradient-based techniques to iteratively update the parameters $(\psi, \theta)$.
 %
+To do so, we can expand the likelihood as 
+\begin{align*}
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \Biggl( -\frac{1}{2}\frac{\norm{F_i(x_j; \theta_i) - y_j}{}^2}{s^2} \Biggr) P_i(x_j, \psi),
+\end{align*}
+\noindent and extract the relevant parts of the likelihood in order to
+define a simplified form given by
+\begin{equation}
+  \ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) :=  \sum_{j=1}^{N} \sum_{i=1}^{N_F} -\norm{F_i(x_j; \theta_i) - y_j}{}^2 P_i(x_j | \psi). 
+  \label{eq:log_normal_likelihood}
+\end{equation}
+%
+Depending on the complexity of the experts and the gating network, we can take
+analytical gradients of $\mathbb{L}$ with respect to the decision parameters
+($\psi, \theta$) or leverage auto-differentiation
+techniques~\cite{revels2016forward}. 
+%
+The EM framework uses stochastic-gradient descent to iteratively update the
+decision parameters.
