@@ -1227,21 +1227,6 @@ The torque plot on Figure~\ref{fig:deter_control} shows that a large
 positive torque is applied if the wheel stumbles backwards.
 %
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory2.eps}
-    \caption{Top: Torso orientation and velocity for 10-second trajectory. The
-            solid black lines show the continuous phases and the dashed red
-            lines show discrete transitions. Bottom: Horizontal hip speed}
-    \label{fig:deter_rw_trajectory}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{RW_deterministic_control2.eps}
-    \caption{Torque command to torso as a function of torso angle and horizontal hip speed}
-    \label{fig:deter_control}
-\end{figure}
 We compare the performance of the deterministic and Bayesian controllers as
 follows.
 %
@@ -1258,7 +1243,23 @@ The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{simulationComparison.eps}
+    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory2.eps}
+    \caption{Top: Torso orientation and velocity for 10-second-long trajectory. The
+            solid black lines show the continuous phases and the dashed red
+            lines show discrete transitions. Bottom: Horizontal hip speed}
+    \label{fig:deter_rw_trajectory}
+\end{figure}
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{RW_deterministic_control2.eps}
+    \caption{Torque command to torso as a function of torso angle and horizontal hip speed}
+    \label{fig:deter_control}
+\end{figure}
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{simulationComparison.eps}
     \caption{Comparison of deterministic and Bayesian control for the rimless wheel.}
     \label{fig:comparison}
 \end{figure}
@@ -1294,4 +1295,18 @@ torque commands with the Raspberry Pi via ROS wireless communication protocols.
     \includegraphics[width=0.7\columnwidth]{rendering.JPG}
     \caption{Rimless Wheel Assembly}
     \label{fig:hardware}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{deter_even.eps}
+    \caption{Deterministic controller on even terrain}
+    \label{fig:deter_even}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{deter_uneven.eps}
+    \caption{Deterministic controller on uneven terrain}
+    \label{fig:deter_uneven}
 \end{figure}
