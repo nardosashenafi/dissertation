@@ -78,7 +78,8 @@ a performance objective as follows.
 \noindent where $\mathcal{D}_N$ is a collection of initial states sampled with
 explorative and greedy state sampling techniques
 (Section~\ref{ssec:state_sampling}), and $\ell$ is the running cost of the
-trajectories. We provide three options for the running cost in the next section.
+trajectories. We provide three options for the running cost in the upcoming
+section titled \textit{Performance Objective}.
 %
 In order to update the posterior distribution based on the performance of the
 generated trajectories, we compose the likelihood function as
@@ -169,7 +170,7 @@ problem.
     Once we obtain the collection samples, we use them to evaluate the
     controller as follows.
     %
-    From the collection $\Theta$, we sample $N_Q$ parameters in a uniform
+    From the collection $\Theta$, we sample $N_{\theta}$ parameters in a uniform
     fashion.
     %
     We evaluate the neural net $H^\theta_d$ and the corresponding energy shaping
@@ -177,30 +178,10 @@ problem.
     %
     Then, we marginalize over the control law as 
     \begin{equation*}
-        u(x) = \frac{1}{N_Q} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
+        u(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
     \end{equation*} 
     We repeat this computation for every state in a trajectory.
     %
-
-    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
-    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
-    %
-    Unlike HMC, we have a closed form probability distribution for the
-    posterior. We draw several samples from the current posterior and evaluate
-    its performance through the joint distribution $P(\theta, J)$. Given the
-    likelihood and the prior distributions, variational inference constructs the
-    \textsc{Elbo} as
-    \begin{align}
-        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
-        \label{eq:neuralpbc_elbo}    
-    \end{align}
-    We use stochastic gradient descent to iteratively update the distribution
-    parameters as follows:
-    \begin{align*}
-      z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
-    \end{align*}
-    The full variational inference training process is shown in
-    Algorithm~\eqref{algo:vi}.
     \begin{algorithm}[H]
         \centering
         \setstretch{1.5}
@@ -243,6 +224,26 @@ problem.
         \State \textbf{Return} $\Theta$
         \end{algorithmic}
     \end{algorithm}
+
+    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
+    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
+    %
+    Unlike HMC, we have a closed form probability distribution for the
+    posterior. We draw several samples from the current posterior and evaluate
+    its performance through the joint distribution $P(\theta, J)$. Given the
+    likelihood and the prior distributions, variational inference constructs the
+    \textsc{Elbo} as
+    \begin{align}
+        \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
+        \label{eq:neuralpbc_elbo}    
+    \end{align}
+    We use stochastic gradient descent to iteratively update the distribution
+    parameters as follows:
+    \begin{align*}
+      z \leftarrow z + \frac{ \partial \mathcal{L}(J,z)}{\partial z}
+    \end{align*}
+    The full variational inference training process is shown in
+    Algorithm~\eqref{algo:vi}.
     
     The gradient ${\partial \mathcal{L}}/{\partial z}$ holds a rather complex form for two reasons.
     First, the \textsc{Elbo} is evaluated from trajectories integrated from the differential equations in~\eqref{eq:hamiltonian_dynamics}.
@@ -266,7 +267,7 @@ problem.
             \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
             \While{$i < $ \texttt{maximum iteration}}
             \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
-            \For{$i=1:N_Q$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
+            \For{$i=1:N_{\theta}$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
             \State $J \gets 0$ \Comment{Batch loss}
             \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
                 \For{$x_0 \in \mathcal {D}_N$}
@@ -274,7 +275,7 @@ problem.
                 \State $\phi \leftarrow \phi(x_0, u^\theta, T) $\Comment{Generate trajectory}
                 \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
                 \EndFor
-            \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_Q} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
+            \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_{\theta}} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
             \EndFor
             \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
             \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
@@ -356,12 +357,12 @@ corresponding likelihood functions and the desired behavior they impose.
     \end{equation}
     % 
     For instance, the set $\mathcal{S}$ may be chosen as a ball of radius
-    $r$ around $x^\star$ in the standard norm topology. 
+    $r$ around $x^\star$. 
     %
     Here, $r$ becomes a hyperparameter of the training algorithm. With a
     particular choice of $\mathcal{S}$, if at any point along the prediction
     $\phi$, a state $x$ is closer than $r$ to $x^\star$, no penalty is
-    incurred by $J_{\textrm{set}}$. This construction has the same advantages as the Minimum Trajectory Loss (MTL) discussed in Section~\ref{sssec:performance_objective}. The corresponding likelihood function is
+    incurred by $J_{\textrm{set}}$. This construction has the same advantages as the Minimum Trajectory Loss (MTL) discussed in Section~\ref{ssec:performance_objective}. The corresponding likelihood function is
     given by 
     \begin{align}
         P(J_{\textrm{set}} | \theta) = \mathcal{N}(J_{\textrm{set}} \; | \; 0, s).
@@ -489,7 +490,7 @@ as~\cite{van2007introduction}
 Hence, the discrete transitions undergoing elastic or inelastic collisions are
 jump-passive.
 %
-For instance, in the case of well-defined contact events, the post-impact
+For instance, in the case of well-defined contact, the post-impact
 Hamiltonian is given by
 \begin{align*}
     H(x^+) = \epsilon^2 H(x^-),
@@ -522,7 +523,7 @@ In this section, we extend the techniques of deterministic and Bayesian
 %
 We introduce a contact model of the hybrid dynamics into the deterministic
 \textsc{NeuralPbc} framework and infer a controller that leverages the
-advantages of contact events and/or minimizes its adverse effects.
+advantages of potential contacts and/or minimizes its adverse effects.
 %
 Moreover, we inject uncertainties in contact forces and post-impact velocities
 to \textsc{NeuralPbc} in order to design a robust controller through Bayesian
@@ -678,7 +679,7 @@ pre-selected posterior $Q(\theta;z)$.
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $\mathcal{L} \gets 0$ \Comment{\textsc{Elbo} Loss}
-        \For{$i=1:N_Q$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
+        \For{$i=1:N_{\theta}$} \Comment{Samples to compute~\eqref{eq:neuralpbc_elbo}}
         \State $J \gets 0$ \Comment{Batch loss}
         \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
             \For{$(x_0) \sim \mathcal {D}_N$}
@@ -686,7 +687,7 @@ pre-selected posterior $Q(\theta;z)$.
             \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
             \EndFor
-        \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_Q} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
+        \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_{\theta}} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
         \EndFor
         \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
         \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}

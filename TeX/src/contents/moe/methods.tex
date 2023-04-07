@@ -87,8 +87,9 @@ We present two viable choices for the running cost function.
     error in the likelihood function.
     %
     Similar to the regression problem provided in
-    Section~\ref{ssec:mixture_of_experts}, the likelihood is maximum when the running cost 
-    incurred by expert $i$ is low and the responsibility of the expert is high.
+    Section~\ref{ssec:mixture_of_experts}, we want the likelihood to be maximum
+    when the running cost incurred by expert $i$ is low and the responsibility
+    of the expert is high.
     %
     We can obtain this characteristics by designing the likelihood as
     \begin{align}
@@ -215,26 +216,62 @@ We intend to find a solution to the optimization problem
 in~\eqref{eq:moe_opt} for all initial states $x_0$ in the
 state space.
 %
+To do so, we generate the running cost $\ell$ from \textit{a batch of initial
+states} and update the parameters $(\psi, \theta)$ \textit{iteratively} via
+stochastic gradient descent.
+%
+We need to collect the batch of initial states in an efficient manner.
+%
+It is computationally expensive to merely discretize the vast state
+space into batches of initial states. 
+%
 To efficiently sample the initial states, we use a combination of greedy and
 explorative state sampling techniques.
 %
 Greedy state sampling, commonly known as \textsc{DAgger}, is a technique
 adapted from imitation learning~\cite{ross2011no}.
 %
-This technique refines the controller on the states most visited under the
-current parameters $(\psi, \theta)$.
+This method collects states most visited under the current parameters $(\psi,
+\theta)$ and concentrates on refining the performance of the controller on these
+states.
 %
-We first sample several initial states randomly and generate trajectories using
-the current parameters.
+For instance, suppose we are solving the optimization in~\eqref{eq:moe_opt} to
+obtain a controller that swings up an underactuated simple pendulum to the
+upright.
+% %
+Initially, the parameters $(\psi, \theta)$ may result in a controller that swings the
+pendulum to the downward equilibrium irrespective of where it started.
 %
-Then, we randomly select $N_d$ samples from the visited states. 
+Thus, it is most efficient to first expose the training to the cost incurred by
+visiting the downward equilibrium.
 %
+In this technique, we first sample several initial states randomly and generate
+trajectories using the current parameters.
+%
+Then, we randomly select $N_d$ samples from the states visited in the trajectory. 
+%
+At first, the $N_d$ samples mostly consist of states near the downward equilibrium.
+%
+As the parameter update continues, \textsc{DAgger} starts sampling states that
+are closer to the upright equilibrium.
+%
+This efficient state exposition is pivotal for the convergence to the optimal
+parameters.
 
-The explorative state sampling technique helps recover from locally optimal
-solutions. 
+
+
+The explorative state sampling technique exposes the training to the rewards of approaching and 
+remaining close to $x^*$.
 %
-This is achieved by sampling $N_r$ initial states around the neighborhood of the
-desired state $x^*$.
+It also uses random sampling to explore new control strategies and recover from locally optimal
+solutions.  
+%
+This method collects $N_r$ initial states around the neighborhood of the desired
+equilibrium by drawing samples from the normal distribution $x_0 \sim \mathcal{N}(x^*, \delta)$,
+whose mean is $x^*$ and the standard deviation is a small constant $\delta$.
+%
+The combination of greedy and explorative state sampling techniques helps to
+quickly refine the performance of the current controller and converge to the desired behavior.
 %
 In a single batch training, we compute the running cost as an expectation
 over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:

@@ -2,15 +2,15 @@
 
 In this section, we provide a brief summary to passivity-based control and the
 recent data-driven variant our group has introduced in~\cite{ashenafi2022robust,
-acc, sirichotiyakul2022data}.
+sirichotiyakul2022data, acc}.
 %
 We also motivate the advantages of the Bayesian learning framework in
 uncertainty modeling and robust control.
 \subsection{Passivity-Based Control (PBC)}
 \label{ssec:pbc}
 
-Suppose we have a robotic system whose Hamiltonian $H$ can be expressed
-as~\todo{needs citation}
+Suppose we have a robotic system whose Hamiltonian $H : \mathcal{X} \rightarrow
+\mathbb{R}$ can be expressed as
 %
 \begin{equation}
     H(q,p) = \frac{1}{2} p^\top M^{-1}(q) p + V(q),
@@ -19,7 +19,6 @@ as~\todo{needs citation}
 %
 where $p \in \mathbb{R}^m$ is the generalized momenta, and $V(q)$ represents the
 potential energy. Hamilton's equations of motion are given by
-
 \begin{align}
     \begin{split}  
       f(x, u) &= \bmat{\nabla_pH \\ -\nabla_qH}\ + \bmat{0 \\ \Omega(q)}u, \\
@@ -27,77 +26,98 @@ potential energy. Hamilton's equations of motion are given by
     \end{split}
     \label{eq:hamiltonian_dynamics}
 \end{align}
-\noindent where $x = (q, \dot{q})$, $\Omega(q) \in \mathbb{R}^{m \times n}$ is
+\noindent where $x = (q, p)$, $\Omega(q) \in \mathbb{R}^{m \times n}$ is
 the input matrix, and $u \in \mathbb{R}^{n}$ is the control input.
 %
 % The system~\eqref{eq:hamiltonian_dynamics} is \textit{underactuated} if rank $\Omega
 % = n < m$.
 %
-Passivity-based control leverages the robust stability properties of passive
-systems to design a stable closed-loop system.~\todo{cite}
 %
-A mechanical system is considered passive if it is dissipative, i.e.
+A mechanical system is considered passive if it is dissipative with respect to a
+\textit{storage function} $H$, i.e.
 \begin{align}
   H(x(t_1)) \leq H(x(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) dt,
 \end{align}
-\noindent for all initial state $x(t_0$) and all input $u$ under the
-supply rate $s = u^\top y$.
+\noindent for all initial states $x(t_0$) and all input $u$ under the
+supply rate $s = u^\top y$~\cite{van2000l2}.
+% %
+There exists a strong connection between the passivity and stability properties
+of a dynamical system.
 %
-From Lyapunov stability theory~\todo{Lyapunov theory does not talk about
-passivity at all!}, the system~\eqref{eq:hamiltonian_dynamics} is
-passive and therefore the origin $x = (0, 0)$ is stable because~\todo{this is
-not quite true... $\dot{H}$ is only negative semidefinite.}
+The system~\eqref{eq:hamiltonian_dynamics} has a stable equilibrium at the origin, i.e. 
+\begin{align*}
+  y \equiv 0 \Rightarrow x \equiv 0,
+\end{align*}
+if it holds the following passivity properties
 \begin{equation*}
   \begin{gathered}
-    \dot{H} = \frac{\partial H}{\partial x} f(x, u) \leq u^\top y, \\
+    \dot{H} = \frac{\partial H}{\partial x} f(x,u) \leq u^\top y, \\
     H \geq 0.
   \end{gathered}
 \end{equation*}
+%
+We refer the reader to~\cite{khalil2015nonlinear} for a detailed proof on the
+connection between passivity and stability.
+% Passivity-based control leverages the robust stability properties of passive
+% systems to design a stable closed-loop system~\cite{van2000l2}.
 
 The objective of passivity-based control (PBC) is to design a control law $u$
 that imposes the desired storage function $H_d$ on the closed-loop system,
 rendering it passive and therefore stable~\cite{van2000l2}.
 %
-The dynamics of the resulting closed-loop system is~\todo{3.2 was also $f$}
+The dynamics of the closed-loop system with the desired storage function $H_d$ can be given as
 \begin{align}
   \begin{split}  
-    f(x, u) &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
+    \bmat{\dot{q} \\ \dot{p}} &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
   \end{split}
   \label{eq:desired_hamiltonian_dynamics}
 \end{align}
 \noindent and it has a new desired stable equilibrium at $x^*$.
-
+%
 From~\eqref{eq:hamiltonian_dynamics}
-and~\eqref{eq:desired_hamiltonian_dynamics}, we can find the energy shaping term
-that creates a passive closed-loop system as
+and~\eqref{eq:desired_hamiltonian_dynamics}, we can find the energy shaping
+control that results in a passive closed-loop system as
 %
 \begin{equation}
   u_{es}(x) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right).
   \label{eq:esc}
 \end{equation}
 \noindent where $\Omega^\dagger = \left( \Omega^\top \Omega  \right)^{-1}
-\Omega^\top$. We also introduce a damping term $u_{di}$ that results in an
-asymptotically stable system.~\todo[inline]{how is $u_{di}$ an asymptotically stable
-system? rephrase.} The resulting controller is
+\Omega^\top$. To obtain an asymptotically stable system, we can add a
+damping term $u_{di}$ to the control as follows.
 \begin{align}
   \begin{split} 
     u &= u_{es}(x) + u_{di}(x), \\
-    &u_{di}(x) = - K_{v} \, y
+    &u_{di}(x) = - K_{v} \, y,
   \end{split}
   \label{eq:damping_and_es_control}
 \end{align}
 \noindent where $K_v \succ 0$ is the damping gain matrix.
-From~\eqref{eq:damping_and_es_control}, we can construct a constraint on the
-form of $H_d$ as~\todo{we don't contruct it, it is inherent.}
+%
+The goal is to characterize the storage function $H_d$ of the closed-loop
+system, whose desired equilibrium is at $x^*$, and to extract the energy-shaping
+control that morphs the open-loop system~\eqref{eq:hamiltonian_dynamics}
+to~\eqref{eq:desired_hamiltonian_dynamics}.
+%
+To do so, we expose an inherent constraint on the form of $H_d$ from~\eqref{eq:esc} as
 \begin{align}
   \Omega^\bot \left( \nabla_q H_d - \nabla_q H \right) = 0,
     \label{eq:pdes}
 \end{align}
-where $\Omega^\perp \Omega = 0$ and $H_d$ has a minimum at the desired
-equilibrium $x^* = (q^\star, p^*)$. 
+where $\Omega^\perp \Omega = 0$. 
 %
-However, for high-dimensional systems, the closed-form solution to the partial
-differential equations (PDEs) in~\eqref{eq:pdes} may be intractable. 
+Hence we can obtain $H_d$ from the solution to the partial differential
+equations (PDEs) in~\eqref{eq:pdes}.
+%
+In many cases, it is tedious and computationally expensive to extract $H_d$ from
+the PDEs. Morevoer, the closed-form solution to the PDEs may be intractable,
+especially in high-dimensional systems.
+%
+A novel data-driven framework is presented in~\cite{ashenafi2022robust,
+sirichotiyakul2022data, acc}, where we find a solution to the PDEs in an
+iterative manner via stochastic gradient descent.
+%
+We present a brief summary of this technique as follows.
 
 \subsubsection{Neural PBC}
 
@@ -126,8 +146,8 @@ PBC framework.
   \item The optimization problem finds an approximate solution to the PDEs
   in~\eqref{eq:pdes} using stochastic gradient descent.
   \item Desired system behavior is explicitly introduced into the optimization
-      via the performance objective $\ell$.~\todo{therefore we may find a
-      preferred solution to the PDEs}
+      via the performance objective $\ell$, which allows us to find a
+      preferred solution to the PDEs.
   \item The framework leverages the universal approximation capabilities of
   neural networks to parameterize the desired Hamiltonian $H^\theta_d$.
 \end{enumerate}
@@ -162,9 +182,11 @@ and~\eqref{eq:pch} equal to each other to find the energy-shaping and the dampin
   \label{eq:idapbc_ues}
 \end{align}
 %
-We build a constraint from~\eqref{eq:idapbc_ues} to extract $V_d$ and the
-matrices $M_d$ and $J_2$.~\todo{again this constraint is not our invention. It
-is inherent.} The resulting PDEs are given by 
+The goal is to select $V_d$ and the matrices $M_d, J_2$ that result in a passive
+closed-loop system.
+%
+There are a set of PDEs constructed from~\eqref{eq:idapbc_ues} that constrain
+the forms of $V_d, M_d, J_2$, and they are given by 
 \begin{equation}
   \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} = 0.
   \label{eq:pde_idapbc}
@@ -172,9 +194,13 @@ is inherent.} The resulting PDEs are given by
 %
 Similar to \textsc{NeuralPbc}, the closed-form solution to the PDEs
 in~\eqref{eq:pde_idapbc} may be intractable. 
+%
+The framework presented in~\cite{sirichotiyakul2022data} addresses this issue
+through the \textsc{Neural-IdaPbc} architecture, which we summarize as follows.
+
 
 The deterministic \textsc{Neural-IdaPbc} framework introduced
-in~\cite{neuralidapbc}~\todo{citation error} finds an approximate solution to the PDEs from the
+in~\cite{sirichotiyakul2022data} finds an approximate solution to the PDEs from the
 following optimization problem.
 \begin{equation}
   \begin{aligned}
@@ -187,24 +213,26 @@ following optimization problem.
       &&\quad q^\star &= \underset{q}{\textrm{argmin}}\; V_d^\theta,
   \end{aligned}    
   \label{eq:idapbc_finite_optim}%
-\end{equation}~\todo{fix alignment of constraints in the optim.}
+\end{equation}
 where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
 %
 To enforce the constraints shown in~\eqref{eq:idapbc_finite_optim}, we redefine
 $M^\theta_d, J^\theta_2$ and $V^\theta_d$ as follows.
 %
-We constrain the positive-definiteness of $M^\theta_d$ with the Cholesky
-decomposition~\todo[inline]{By itself, Cholesky decomposition does not constrain anything. We train
-$L$ in the Cholesky decomposition to get positive definiteness. Rephrase.} 
-\begin{align*}
+We rewrite the desired mass matrix $M^\theta_d$ using the Cholesky decomposition as
+\begin{align}
   M^\theta_d = L_{\theta}(q)L_{\theta}^\top(q) + \delta_M I_n,
-\end{align*}
+  \label{eq:md_idapbc}
+\end{align}
 \noindent where $\delta_M > 0$ is a small constant and $I_n$ is the $n \times n$
 identity matrix.
 %
 The matrix $L_{\theta} \in \mathbb{R}^{n \times n}$ is a lower-triangular matrix
 whose $\nicefrac{n(n+1)}{2}$ entries are outputs of a neural network. 
+%
+The form of $M_d^\theta$ in~\eqref{eq:md_idapbc} preserves the
+postive-definiteness of the mass matrix.
 %
 The skew-symmetrix matrix $J_2$ is constructed as 
 \begin{align*}
@@ -224,9 +252,10 @@ zero. We denote this with
 \noindent where $W_i$ holds the weights of layer $i$ and $\sigma$ is the activation function.
 %
 The activation function is chosen such that $\sigma(0) = 0$, ensuring that
-$\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.~\todo{why? explain.}
+$\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.
 %
-Several choices for the activation function include \textsc{Elu}, \textsc{Tanh} and \textsc{Relu}.
+Several choices of activation functions that satisfy these properties include
+\textsc{Elu}, \textsc{Tanh} and \textsc{Relu}.
 %
 
 
@@ -234,14 +263,11 @@ Several choices for the activation function include \textsc{Elu}, \textsc{Tanh} 
 \subsection{Bayesian Learning}
 \label{ssec:bayesianLearning}
 
-Suppose we are given a finite dataset from an unknown noise process~\todo{this
-is not a noise process. This is a dynamical system.}, for which
-we are trying to fit a regression model.~\todo[inline]{I didn't understand this.
-There is a process which has noise in it. If it was just noise, you cannot
-predict anything!}
+Suppose we are given a finite dataset with inherent noise, for which
+we are trying to fit a regression model.
 %
 The goal is not only to predict the average outputs of the source, but also
-the uncertainty of the noise process.
+the uncertainty of each predicition.
 %
 Bayesian learning uses the expressive power of stochastic models to best
 represent the data source and report the uncertainty in
@@ -267,18 +293,68 @@ To do so, we define the likelihood in terms of the prediction error as
 \begin{equation*}
   P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{} \; | \; 0, s),
 \end{equation*}
-\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and standard deviation $s$.
-Even though the EM approach finds optimal parameters $\theta$ that
-minimize the prediction error, this technique is prone to overfitting.
+\noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and
+standard deviation $s$. Even though the EM approach finds optimal parameters
+$\theta$ that minimize the prediction error, this technique is prone to
+overfitting.
 %
 Given finite number of observations, EM finds low variance posterior
 distribution \it{biased to the training
 data}\normalfont~\cite{bishop2006pattern}. 
 %
-The risk of overfitting is especially an issue when we are modelling the noise
-in the data source, which requires some amount of variance.~\todo{why? explain.}
+There are two side effects to such biased trainings.
 %
-The solution to this problem involves finding a \it{bias-variance
+First, in an attempt to absolutely minimize the prediction error $\norm{F(x_j;
+\theta) - y_j}{}$ on the training dataset, the stochastic model can take a complex form.
+%
+However, overfitting to the training data reduces the accuracy of the
+predictions made by the model.
+%
+This is best shown in Figure~\ref{fig:overfit}, where the blue circles
+correspond to the training data and the red line depicts the average prediction made by
+the regression model $F(x; \theta)$.
+%
+The right figure represents a complex model $F(x;\theta)$ that gives minimum
+prediction error on the training data but does not accurately represent the data
+source, which is given by the green curve.
+%
+On the other hand, the left figure shows a regression model that has not overfit
+to the training dataset.
+%
+By maintaining some minimal prediction error, the model manages to make better
+predicitions on new datasets.
+%
+Secondly, stochastic models are most useful to quantify the uncertainty in each
+prediction. This is given by~\cite{jospin2020hands}
+\begin{equation}
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta | \mathbb{D})} \vectornorm{F(x; \theta) - \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta | \mathbb{D})} F(x; \theta)}^2,
+  \label{eqn:predictive_variance}
+\end{equation}
+% 
+\noindent where $N_\theta$ is the number of samples drawn from the posterior
+$P(\theta | \mathbb{D})$.
+%
+When the model overfits to the training data, it collapses the
+posterior to a near-zero-variance distribution.
+%
+In such cases, the prediction uncertainty in~\eqref{eqn:predictive_variance}
+collapses to zero.
+%
+Hence, the model makes predictions with absolute certainty, overlooking to report that 
+the overfit model makes inaccurate predictions.
+%
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{overfitting.eps}
+  \caption{Comparison between model biased to the training data (right) and model
+  that achieves bias-variance trade-off (left)~\cite{bishop2006pattern}. Blue
+  circles represent training data, the green curve is the original data source
+  for which we are learning a regression model, the red line is the learned
+  model $F(x;\theta)$}
+  \label{fig:overfit}
+\end{figure}
+
+The solution to the overfitting problem involves finding a \it{bias-variance
 trade-off}\normalfont, where the training adjusts the parameters based on the
 likelihood, but also enforces the posterior to hold some variance to prevent
 overfitting.
@@ -401,20 +477,14 @@ Once we find the exact or approximate posterior, the prediction for state $x$
 can be found in one of two ways. The first option is to marginalize the model
 over the posterior as follows~\cite{jospin2020hands}
 \begin{equation}
-  \hat{F}(x) = \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta),
+  \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim Q} F(x; \theta),
   \label{eqn:marginalization}
 \end{equation} 
-where $N_Q$ is the number of samples drawn from the posterior. 
+where $N_{\theta}$ is the number of samples drawn from the posterior. 
 %
 The second option only takes one sample from the posterior, and it corresponds
 to the maximum aposteriori (MAP), i.e. 
 \begin{align} 
   \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | \mathbb{D})
 \end{align}
-Bayesian frameworks can quantify the confidence in the
-predictions through the variance~\cite{jospin2020hands}
-\begin{equation}
-  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_Q-1} \sum_{\theta \sim Q} \vectornorm{F(x; \theta) - \frac{1}{N_Q} \sum_{\theta \sim Q} F(x; \theta)}^2.
-  \label{eqn:predictive_variance}
-\end{equation}
-%
+

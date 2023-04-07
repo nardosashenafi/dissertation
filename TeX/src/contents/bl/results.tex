@@ -1,3 +1,24 @@
+In this chapter, we provide simulated and real-world experiments that
+demonstrate the robustness properties of the Bayesian framework presented in
+Chapter 3.
+%
+We present three sets of experiments for the Bayesian \textsc{NeuralPbc}
+approach.
+%
+First, we learn a swing-up controller for the simple pendulum and evaluate its
+performance under system parameter and measurement uncertainties in simulation.
+%
+In the second set of experiments, we tackle the swing-up task for the inertia
+wheel pendulum and demonstrate the efficacy of the Bayesian controller in
+simulation and real-world experiments.
+%
+Lastly, we demonstrate the performance of the deterministic and Bayesian
+\textsc{NeuralPbc} frameworks for hybrid dynamical systems on the rimless wheel,
+in simulation and real-world experiments.
+%
+For the Bayesian \textsc{Neural-IdaPbc} framework, we provide simulated and
+hardware experiments for the swing-up task of the IWP.
+
 
 \section{Bayesian Neural PBC}
 \subsection{Simple Pendulum}
@@ -158,6 +179,8 @@ efficacy and robustness claims of Bayesian inference.
 %
 We use the deterministic solution for \textsc{NeuralPbc} as the baseline on
 which we compare the performance of the Bayesian solution. 
+
+\subsubsection{System Model}
 
 The IWP mechanism consists of a pendulum with an actuated wheel instead of a
 static mass.
@@ -523,7 +546,7 @@ $u(q, \dot{q})$ is the torque applied to the torso and $\dd R$ represents the
 force measure of contact forces and Coulomb friction exerted on the spokes by
 the ground. We use the linear complementarity
 formulation~\cite{glocker2005formulation} to resolve the contact forces and
-Coulomb friction contributing to the discrete transitions.
+Coulomb friction.
 
 
 \subsubsection{Training}
@@ -656,6 +679,13 @@ torque commands with the Raspberry Pi via ROS wireless communication protocols.
 
 \section{Bayesian Neural Interconnection and Damping Assignment PBC}
 \subsection{Inertia Wheel Pendulum}
+In this section, we validate the Bayesian \textsc{Neural-IdaPbc} framework on the
+problem of swinging-up and stabilizing the inverted position of an inertia wheel
+pendulum (IWP). 
+%
+We provide experimental results from simulation and real-world hardware in order
+to thoroughly demonstrate the efficacy and robustness claims of Bayesian
+inference.
 
 \subsubsection{Training}
 The optimization problem~\eqref{eq:idapbc_finite_optim} is constructed as

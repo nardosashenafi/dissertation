@@ -1,0 +1,33 @@
+We tackle two main difficulties in the control of contact-rich robotic systems.
+%
+First, we address the computational complexities in designing multi-modal
+controllers for hybrid dynamical systems.
+%
+In our framework, we use data-driven techniques to infer a mixture of expert
+controller that switches between several policies.
+%
+The learning architecture also provides a gating network, which governs the
+control switching scheme based on the observed states.
+%
+We use the linear complementarity formulation to accurately model
+contact-rich systems and to train contact-aware MOE controller in simulaion.
+%
+This data-driven technique finds controllers that react to the positive or negative
+effects of contacts and impacts.
+%
+We demonstrate this behavior on the swing-up problem of the cartpole system.
+%
+We modify the standard cartpole problem to a multi-modal contact-rich mechanism
+by introducing wall barriers on each sides of the system.
+%
+Using the MOE architecture, we successfully swing up the cartpole in simulation
+and hardware.
+%
+The case study shows that the contact-aware controller finds a way to leverage the impact
+from the wall barriers to catch the pendulum post-impact.
+%
+
+Secondly, we characterize and tackle the effects of model uncertainties in the
+control of dynamical system.
+%
+In particular, 
