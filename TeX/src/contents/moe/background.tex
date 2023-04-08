@@ -203,6 +203,17 @@ in~\eqref{eq:feasibility}.
 While the complementarity constraint can be posed as a feasibility problem, the
 presence of Coulomb friction makes it a non-convex optimization problem. 
 %
+We use a pivoting (basis-exchange) technique called Lemke's
+algorithm~\cite{acary2008numerical} to find the solution to the linear
+complementarity problem~\eqref{eq:feasibility}. The fact that Lemke's algorithm
+may be automatically differentiated to provide the gradients of the pertinent
+variables allows us to seamlessly integrate the solution to the differential
+equations into machine learning algorithms.
+%
+We use the contact forces provided by Lemke's algorithm in conjunction with the
+equations of motion to compute the post-impact velocities.
+%
+This procedure is repeated for time horizon $T$.
 \begin{algorithm}[H]
   \setstretch{1.2}
     \caption{Moreau's Time Stepping Algorithm}
@@ -225,19 +236,6 @@ presence of Coulomb friction makes it a non-convex optimization problem.
     \end{algorithmic}
 \end{algorithm}
 %
-We use a pivoting (basis-exchange) technique called Lemke's
-algorithm~\cite{acary2008numerical} to find the solution to the linear
-complementarity problem~\eqref{eq:feasibility}. The fact that Lemke's algorithm
-may be automatically differentiated to provide the gradients of the pertinent
-variables allows us to seamlessly integrate the solution to the differential
-equations into machine learning algorithms.
-%
-We use the contact forces provided by Lemke's algorithm in conjunction with the
-equations of motion to compute the post-impact velocities.
-%
-This procedure is repeated for time horizon $T$.
-
-
 
 \subsection{Mixture of Expert Models}
 \label{ssec:mixture_of_experts}

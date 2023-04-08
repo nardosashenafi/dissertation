@@ -13,9 +13,36 @@ parameters $\theta$. The goal is to learn the distribution parameters $z$ of the
 posterior multivariate probability distribution $Q(\theta;z)$ that maximize the
 \textsc{Elbo} given in~\eqref{eq:elbo}.
 %
+We pose the search over the parameters $z$ as the following optimization problem.
+\begin{equation}
+    \begin{aligned}
+        \underset{z }{\textrm{minimize}} 
+        &&\quad \left\| l_{\textrm{IDA}} (x) \right\|^2 &= \left\| \Omega^\perp \left\{ \nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p \right\} \right\|^2, \\
+        \textrm{subject to}
+        &&\quad M^\theta_d &= L_{\theta}(q)L_{\theta}^\top(q) + \delta_M I_n, \\
+        &&\quad J_2^\theta(q, p) &= A_\theta(q, p) - A^\top_\theta(q, p), \\
+        % &&\quad q^\star &= \underset{q}{\textrm{argmin}} \; V_d^\theta.  \\
+        &&\quad q^\star &= \underset{q}{\textrm{argmin}}\; V_d^\theta, \\
+        &&p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p), \\
+        &&\theta &\sim Q(\theta; z).
+    \end{aligned}    
+    \label{eq:bayesian_idapbc}%
+  \end{equation}
 
-The computation of the \textsc{Elbo} requires the likelihood function and the
-prior distribution.
+% Similar to the deterministic \textsc{NeuralIdaPbc} framework discussed in
+% Section~\ref{ssec:pbc}, we enforce the constraints on $V_d, M_d$ and $J_2$ with the
+% following redefinitions.
+% \begin{equation*}
+%     \begin{gathered}
+%         M^\theta_d = L_{\theta}(q)L_{\theta}^\top(q) + \delta_M I_n, \\
+%         J_2^\theta(q, p) = A_\theta(q, p) - A^\top_\theta(q, p) \\
+%         V_d^\theta(x) = \Phi \Bigl( W_j\sigma(W_{j-1}\sigma(\ldots W_2\sigma(W_1x))) \Bigr),
+%     \end{gathered}
+% \end{equation*}
+% \noindent where $\sigma(0) = 0$, $\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.
+%
+The computation of the \textsc{Elbo} requires the likelihood function and
+the prior distribution.
 %
 In order to compute the likelihood, we first draw samples of $\theta$ from the
 posterior $Q(\theta;z)$, and evaluate the PDEs given in~\eqref{eq:pde_idapbc}.

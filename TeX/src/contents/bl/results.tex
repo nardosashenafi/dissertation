@@ -171,7 +171,7 @@ robustness against model uncertainty and measurement noise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Inertia Wheel Pendulum}
 \label{subsec:iwp}
-In this section, we validate the proposed control design framework on the
+In this section, we validate the Bayesian \textsc{NeuralPbc} framework on the
 problem of swinging-up and stabilizing the inverted position of an inertia wheel
 pendulum (IWP), shown in Fig.~\ref{fig:iwp}. We provide experimental results
 from simulation and real-world hardware in order to thoroughly demonstrate the
@@ -453,7 +453,7 @@ $l_1$.
 The torso has its mass $m_2$ concentrated at a distance of $l_2$ from the hip. 
 %
 We actuate the torso angle with the motor mounted at the hip, which in turn
-propels the entire wheel. 
+propels the entire wheel forward or back. 
 %
 The angle of the torso is characterized by $\varphi$ measured from the outward
 normal of the runway shown as $\hat{n}$ in Figure~\ref{fig:rimless_wheel_w_torso}.  
@@ -544,23 +544,15 @@ The Euler-Lagrange equations corresponding to the Lagrangian $\mathcal{L} =
 \noindent where $q = (x, y, \varphi, \beta)$, $B = \bmat{0 & 0 & 1 & -1}^\top$,
 $u(q, \dot{q})$ is the torque applied to the torso and $\dd R$ represents the
 force measure of contact forces and Coulomb friction exerted on the spokes by
-the ground. We use the linear complementarity
-formulation~\cite{glocker2005formulation} to resolve the contact forces and
-Coulomb friction.
+the ground. We use Moreau's time stepping algorithm
+(Algorithm~\eqref{algo:moreau}) to resolve the contact forces and Coulomb
+friction.
 
 
 \subsubsection{Training}
 \label{sssec:training}
 
-Both the deterministic and Bayesian frameworks learn $H_d$ given by a
-fully-connected neural network with a total of 113 weights and biases.   
-%
-A single parameter update consists of a batch of 4 initial states sampled
-through greedy or explorative techniques.
-%
-Each initial state is integrated forward for time horizon of 5 seconds.
-%
-The objective of the trainings is to use the control authority on the torso to
+The objective of this case study is to use the control authority on the torso to
 move the robot at a constant hip speed.
 %
 The performance objective is given by the accumulated loss
@@ -570,8 +562,39 @@ The performance objective is given by the accumulated loss
 \end{align}
 \noindent where $\dot{x}_c^*$ is a constant 1 \nicefrac{m}{s}.
 %
-For the Bayesian training, we generate random terrain elevation parameters $p_s$
-from a uniform probability distribution $p_s \sim \mathbb{U}(0, 2)$ centimeters.
+The deterministic \textsc{NeuralPbc} framework learns the parameters of $H_d$,
+which is given by a fully-connected neural network with a total of 113 weights
+and biases.   
+%
+We observe the cost~\eqref{eq:loss} incurred by trajectories generated under the
+current controller parameters $\theta$ and update the decision parameters
+iteratively via stochastic gradient descent.
+%
+A single parameter update consists of 4 initial states sampled
+through greedy or explorative techniques (Section~\ref{ssec:state_sampling}).
+%
+Each initial state is integrated forward for time horizon of 5 seconds.
+%
+
+In the Bayesian framework, we use variational inference to learn a Gaussian
+posterior distribution over the parameters of $H_d$.
+%
+The decision parameters $z$ are the distribution parameters of the Gaussian
+posterior.
+%
+For the Bayesian training, we generate random terrain elevation parameters $p_s
+\in \mathbb{R}^N$ from a uniform probability distribution $p_s \sim
+\mathbb{U}(0 \textrm{cm}, 2\textrm{cm})$.
+%
+The components of the vector $p_s$ represent the elevation of the terrain under
+each spoke.
+%
+We sample a new set of $p_s$ for every trajectory, which exposes the training to
+the effects of various environmental conditions.
+%
+The controller learned from the Bayesian training is marginalized according
+to~\eqref{eqn:marginalization} over $N_\theta = 15$ samples drawn from the
+posterior. 
 
 
 \subsubsection{Simulated Experiments}
@@ -615,6 +638,16 @@ follows.
 Similar to the Bayesian training, we sample the terrain elevation from $p_s \sim
 \mathbb{U}(0, p_{max})$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
 %
+As the value of $p_{max}$ increases, the difference in elevation between two consecutive 
+spokes increases.
+%
+For instance, for $p_{max} = 0.5$, one spoke can be on a level ground and the adjacent spoke can be 
+up to $0.5$ cm higher.
+%
+As $p_{max}$ increases to 2cm, the neighboring spokes can have up to 2cm
+elevation difference, which requires a large torque to overcome the steep rise
+in elevation.
+% 
 For each value of $p_{max}$, we generate 10 random initial states $x_0$ and
 integrate 10-second-long trajectories.
 %
@@ -622,8 +655,18 @@ The cost $J_T$ of each trajectory is calculated as per~\eqref{eq:loss}.
 %
 The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
 10 trajectories for each $p_{max}$.
+%
+Notice that the Bayesian training consistently incurs less cost in all
+elevation differences compared to its deterministic counterpart.
+%
+The deterministic training accumulates more cost with each increment in the
+value of $p_{max}$, while the Bayesian training incurs a relatively consistent
+cost across all values of $p_{max}$. 
+%
+This demonstrates the improved robustness properties of Bayesian
+\textsc{NeuralPbc} under uneven terrain.
 
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.6\linewidth]{simulationComparison.eps}
     \caption{Comparison of deterministic and Bayesian control for the rimless wheel.}
@@ -633,7 +676,7 @@ The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
 \subsubsection{Real-World Experiments}
 
 We test the performance of both the deterministic and Bayesian controllers on
-the hardware shown in Figure~\ref{fig:hardware}.
+the hardware shown in Figures~\ref{fig:hardware} and~\ref{fig:rw_picture}.
 %
 The robot consists of two set of $10$ spokes for stability.
 %
@@ -655,30 +698,56 @@ the motors, a Raspberry Pi 3B and a Teensy microcontroller.
 We evaluate the neural networks on a laptop and exchange sensor readings and
 torque commands with the Raspberry Pi via ROS wireless communication protocols.
 
+Figures~\ref{fig:deter_even} and~\ref{fig:bayes_even} show the horizontal hip
+speed achieved by the deterministic and Bayesian controllers, respectively, on
+the hardware,
+%
+The real-world experiment exhibits very similar behavior to the simulation
+results shown in Figure~\ref{fig:deter_rw_trajectory}.
+%
+Both controllers are able to reach and maintain the desired hip speed of the
+walking machine.
+%
+Akin to the simulation results, both controllers periodically apply large torque
+to react to the reduced hip speed caused by the impacts.
+%
+Compared to the deterministic controller, the Bayesian controller exhibits spikes
+in hip speed.
+%
+This is due to the marginalizing scheme, which occasionally samples parameters
+that result in a high torque in order to overcome large increments in elevation.
+%
+This behavior is very beneficial in preventing the mechanism from stumbling due
+to impacts on uneven terrain. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\columnwidth]{rendering.JPG}
+    \includegraphics[width=0.5\columnwidth]{rendering.JPG}
     \caption{Rimless Wheel Assembly}
     \label{fig:hardware}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\columnwidth]{deter_even.eps}
-    \caption{Deterministic controller on even terrain}
-    \label{fig:deter_even}
+    \includegraphics[width=0.5\columnwidth]{rimlesswheel_hardware.jpg}
+    \caption{Rimless Wheel Hardware}
+    \label{fig:rw_picture}
 \end{figure}
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\columnwidth]{deter_uneven.eps}
-    \caption{Deterministic controller on uneven terrain}
-    \label{fig:deter_uneven}
+    \includegraphics[width=0.7\columnwidth]{deter_even.eps}
+    \caption{Trajectory generated by deterministic controller}
+    \label{fig:deter_even}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{bayes_even.eps}
+    \caption{Trajectory generated by Bayesian controller}
+    \label{fig:bayes_even}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Bayesian Neural Interconnection and Damping Assignment PBC}
-\subsection{Inertia Wheel Pendulum}
+
 In this section, we validate the Bayesian \textsc{Neural-IdaPbc} framework on the
 problem of swinging-up and stabilizing the inverted position of an inertia wheel
 pendulum (IWP). 
@@ -686,10 +755,21 @@ pendulum (IWP).
 We provide experimental results from simulation and real-world hardware in order
 to thoroughly demonstrate the efficacy and robustness claims of Bayesian
 inference.
+\subsection{Inertia Wheel Pendulum}
+
+The objective of this case study is to learn the parameters of $V_d, M_d, J_2$
+that render the closed-loop passive and thus stable at the desired equilibrium
+$x^*$, which corresponds to the upward position.
+%
+We utilize the system model provided in Section~\ref{subsec:iwp} to learn the decision
+parameter $\theta$ from trajectories.
+%
+The optimization problem~\eqref{eq:idapbc_finite_optim} is constructed as
+follows. 
 
 \subsubsection{Training}
-The optimization problem~\eqref{eq:idapbc_finite_optim} is constructed as
-follows. The potential energy function $V_d^\theta$ is a fully-connected neural
+
+The potential energy function $V_d^\theta$ is a fully-connected neural
 network with two hidden layers, each of which has the activation function
 \textsc{Elu}.
 %

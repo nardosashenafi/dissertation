@@ -9,11 +9,11 @@ controller that switches between several policies.
 The learning architecture also provides a gating network, which governs the
 control switching scheme based on the observed states.
 %
-We use the linear complementarity formulation to accurately model
-contact-rich systems and to train contact-aware MOE controller in simulaion.
+We use the linear complementarity formulation to accurately model contact-rich
+systems and to train contact-aware MOE controller in simulaion.
 %
-This data-driven technique finds controllers that react to the positive or negative
-effects of contacts and impacts.
+This data-driven technique finds controllers that react to the positive or
+negative effects of contacts and impacts.
 %
 We demonstrate this behavior on the swing-up problem of the cartpole system.
 %
@@ -23,11 +23,52 @@ by introducing wall barriers on each sides of the system.
 Using the MOE architecture, we successfully swing up the cartpole in simulation
 and hardware.
 %
-The case study shows that the contact-aware controller finds a way to leverage the impact
-from the wall barriers to catch the pendulum post-impact.
+The case study shows that the contact-aware controller finds a way to leverage
+the impact from the wall barriers to catch the pendulum post-impact.
 %
 
-Secondly, we characterize and tackle the effects of model uncertainties in the
-control of dynamical system.
+The second complication in the control of contact-rich systems involves
+designing robust controllers under uncertain environmental conditions.
 %
-In particular, 
+In particular, we raise the issue of operating a walking machine on uneven
+terrain, where the exact elevation of the runway is unknown.
+%
+We characterize and tackle the effects of model uncertainties in the control of
+dynamical system.
+%
+We leverage the robustness properties of Bayesian learning to infer stochastic
+controllers that can achieve the desired performance under system parameter and
+measurement uncertainties.
+%
+This technique is first demonstrated on smooth dynamical systems, such as the
+simple pendulum and the inertia wheel pendulum, in simulation and hardware.
+%
+Then, we extend the Bayesian framework to contact-rich systems, such as the
+rimless wheel walking machine, and demonstrate the robustness properties of the
+Bayesian technique against a deterministic framework.
+
+The control design techniques presented in this work have laid the foundation
+for numerous future research directions.
+%
+The MOE architecture can be applied to address many interesting challenges in
+the control of contact-rich robots.
+%
+For instance, we can utilize the MOE framework to select an optimal way to
+manipulate and maneuver an object in space.
+%
+This framework can be used to select one of many object manipulation techniques,
+such as pushing, lifting or sliding an object, based on the obstacles present in
+the environment.
+%
+We also intend to combine the multi-modal nature of the MOE framework with the
+robustness properties of Bayesian inference. 
+%
+This is best useful when the robotic system interacts with a dynamic
+environment.
+%
+An example of such scenario can be found in the cartpole system with wall
+barriers.
+%
+If these wall barriers are not static, the controller needs to reason about the
+uncertainty in the walls' positions, and learn a controller robust against the
+unexpected impacts from these barriers.
