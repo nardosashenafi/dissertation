@@ -44,14 +44,11 @@ supply rate $s = u^\top y$~\cite{van2000l2}.
 There exists a strong connection between the passivity and stability properties
 of a dynamical system.
 %
-The system~\eqref{eq:hamiltonian_dynamics} has a stable equilibrium at the origin, i.e. 
-\begin{align*}
-  y \equiv 0 \Rightarrow x \equiv 0,
-\end{align*}
-if it holds the following passivity properties
+The system~\eqref{eq:hamiltonian_dynamics} has an asymptotically stable equilibrium at the
+origin if it is \textit{strictly} passive, i.e.,
 \begin{equation*}
   \begin{gathered}
-    \dot{H} = \frac{\partial H}{\partial x} f(x,u) \leq u^\top y, \\
+    \dot{H} = \frac{\partial H}{\partial x} f(x,u) < u^\top y, \\
     H \geq 0.
   \end{gathered}
 \end{equation*}
