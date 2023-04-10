@@ -499,15 +499,13 @@ Rimless wheel is a system that undergoes phases of continuous flows and discrete
 transitions, resulting in a hybrid dynamical system with two modes. We construct
 a dynamical model for such system with the Lagrangian approach. The kinetic and
 potential energies of the system are given by
-
 \begin{equation*}
   \begin{gathered}
     \mathcal{K} = \frac{1}{2} m_t(\dot{x} + \dot{y})^2  +  \frac{1}{2} I_1 \dot{\beta}^2  + 
-                    \frac{1}{2} (m_2 l_2^2 + I_2) \dot{\varphi}^2 + m_2 l_2(c_{\varphi} \dot{x} + s_{\varphi} \dot{y}) \dot{\varphi} \\
-    \mathcal{P} = m_tg(-x s_{\gamma} + y c_\gamma) - m_2 g l_2 c_{\varphi \gamma}
+                    \frac{1}{2} (m_2 l_2^2 + I_2) \dot{\varphi}^2 + m_2 l_2(c_{\varphi} \dot{x} + s_{\varphi} \dot{y}) \dot{\varphi}, \\
+    \mathcal{P} = m_tg(-x s_{\gamma} + y c_\gamma) - m_2 g l_2 c_{\varphi \gamma},
   \end{gathered}
 \end{equation*}
-
 \noindent where $c_a := \cos{(a)}, s_a := \sin{(a)}, c_{ab} := \cos{(a - b)},
 s_{ab} := \sin{(a - b)}$. The total mass of the mechanism is given by $m_t$;
 $I_1$ and $I_2$ are moments of inertia of the wheel and torso respectively. The
@@ -518,7 +516,6 @@ gravity.
 %
 The Euler-Lagrange equations corresponding to the Lagrangian $\mathcal{L} =
 \mathcal{K} - \mathcal{P}$ are
-
 \begin{equation}
   M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0,
   \label{eq:dynamics}
@@ -540,7 +537,6 @@ The Euler-Lagrange equations corresponding to the Lagrangian $\mathcal{L} =
                   0}^\top \\
   \end{gathered}
 \end{equation*}
-
 \noindent where $q = (x, y, \varphi, \beta)$, $B = \bmat{0 & 0 & 1 & -1}^\top$,
 $u(q, \dot{q})$ is the torque applied to the torso and $\dd R$ represents the
 force measure of contact forces and Coulomb friction exerted on the spokes by
