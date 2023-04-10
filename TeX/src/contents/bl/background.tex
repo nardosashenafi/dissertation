@@ -103,11 +103,11 @@ To do so, we expose an inherent constraint on the form of $H_d$ from~\eqref{eq:e
 \end{align}
 where $\Omega^\perp \Omega = 0$. 
 %
-Hence we can obtain $H_d$ from the solution to the partial differential
+Hence, we can obtain $H_d$ from the solution to the partial differential
 equations (PDEs) in~\eqref{eq:pdes}.
 %
 In many cases, it is tedious and computationally expensive to extract $H_d$ from
-the PDEs. Morevoer, the closed-form solution to the PDEs may be intractable,
+the PDEs. Moreover, the closed-form solution to the PDEs may be intractable,
 especially in high-dimensional systems.
 %
 A novel data-driven framework is presented in~\cite{ashenafi2022robust,
@@ -229,7 +229,7 @@ The matrix $L_{\theta} \in \mathbb{R}^{n \times n}$ is a lower-triangular matrix
 whose $\nicefrac{n(n+1)}{2}$ entries are outputs of a neural network. 
 %
 The form of $M_d^\theta$ in~\eqref{eq:md_idapbc} preserves the
-postive-definiteness of the mass matrix.
+positive-definiteness of the mass matrix.
 %
 The skew-symmetrix matrix $J_2$ is constructed as 
 \begin{align*}
@@ -260,49 +260,86 @@ Several choices of activation functions that satisfy these properties include
 \subsection{Bayesian Learning}
 \label{ssec:bayesianLearning}
 
-Suppose we are given a finite dataset with inherent noise, for which
-we are trying to fit a regression model.
+Suppose we are given a finite dataset with inherent noise, for which we are
+trying to fit a regression model.
 %
-The goal is not only to predict the average outputs of the source, but also
-the uncertainty of each predicition.
+Consider an example of recognizing handwritten digits from images.
 %
-Bayesian learning uses the expressive power of stochastic models to best
-represent the data source and report the uncertainty in
-predictions~\cite{bishop2006pattern}.
+The task is to build a model that takes in input images and identifies the
+digits written on those images.
+%
+We train the model on finite labelled dataset, which consists of inherent noise
+due to the differences in individual handwriting.
+%
+In practical applications such as this one, the training data comprises only a
+fraction of all possible ways to write digits.
+%
+However, we can still use machine learning techniques to recognize patterns in
+the strokes and make generalized predictions on new dataset.
+%
+It is also most beneficial to report the uncertainty associated with each
+prediction in order to inform the user of outlier images present in the testing
+dataset.
+%
+This can all be achieved by probabilistic learning, which uses the expressive power
+of \textit{stochastic models} to generate generalized predictions from finite
+dataset and report the uncertainty in these predictions~\cite{bishop2006pattern}.
 
 
+In the probabilistic learning framework, the stochastic models are constructed
+as follows.
+%
 Let $F(x; \theta)$ denote the stochastic model whose parameters $\theta$ are
 multivariate random variables.
 %
-These parameters are samples drawn from a posterior probability
-distribution.
+A common approach is to pre-select the posterior probability distribution
+$P(\theta;z)$ over the parameters $\theta$ and learn the distribution parameters
+$z$ that minimize the prediction error $\sum_{(x_j, y_j) \in \mathbb{D}}
+\norm{F(x_j; \theta) - y_j}{}$, where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N,
+y_N) \}$ is the training dataset with inputs $x_j$ and observations $y_j$.
 %
-The objective is to find the posterior distribution that minimizes the
-prediction error $\sum_{(x_j, y_j) \in \mathbb{D}} \norm{F(x_j; \theta) -
-y_j}{}$, where $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$ the training
-dataset with inputs $x_j$ and observations $y_j$.
-%
-As discussed in Section~\ref{ssec:mixture_of_experts}, we can use
-\it{expectation maximization} \normalfont (EM) to learn the optimal posterior
-distribution.
+\it{Expectation maximization} \normalfont (EM) is a gradient-based technique
+commonly used to learn $z$ that maximizes the likelihood function, and
+consequently minimizes the prediction error~\cite{bishop2006pattern}.
 %
 To do so, we define the likelihood in terms of the prediction error as
 \begin{equation*}
   P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\norm{F(x_j; \theta) -  y_j}{} \; | \; 0, s),
 \end{equation*}
 \noindent where $\mathcal{N}$ is a Gaussian distribution with mean zero and
-standard deviation $s$. Even though the EM approach finds optimal parameters
-$\theta$ that minimize the prediction error, this technique is prone to
-overfitting.
+standard deviation $s$. 
 %
-Given finite number of observations, EM finds low variance posterior
-distribution \it{biased to the training
+Depending on the complexity of the stochastic model, we can take analytical
+gradients of $P(\theta;z)$ with respect to $z$ or leverage
+auto-differentiation techniques~\cite{revels2016forward}. 
+%
+Once we find the optimal $z$ values that maximize the likelihood, we can make
+predictions for new data inputs by drawing samples from the distribution
+$P(\theta;z)$ and marginalizing over the model as follows:
+\begin{equation*}
+  \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta;z)} F(x; \theta),
+\end{equation*} 
+\noindent where $N_{\theta}$ is the number of samples drawn from $P(\theta;z)$.
+The uncertainty associated with each prediction is given by~\cite{jospin2020hands}
+\begin{equation}
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta;z)} \vectornorm{F(x; \theta) - \hat{F}(x)}^2.
+  \label{eqn:predictive_variance}
+\end{equation}
+%
+
+\subsubsection{Bias-variance trade-off}
+Even though the EM approach finds optimal parameters that minimize the
+prediction error, this technique is prone to overfitting.
+%
+Given finite number of observations, EM finds low variance
+distribution $P(\theta;z)$ \it{biased to the training
 data}\normalfont~\cite{bishop2006pattern}. 
 %
 There are two side effects to such biased trainings.
 %
 First, in an attempt to absolutely minimize the prediction error $\norm{F(x_j;
-\theta) - y_j}{}$ on the training dataset, the stochastic model can take a complex form.
+\theta) - y_j}{}$, the stochastic model can take a complex form and overfit to
+the training dataset.
 %
 However, overfitting to the training data reduces the accuracy of the
 predictions made by the model.
@@ -319,18 +356,10 @@ On the other hand, the left figure shows a regression model that has not overfit
 to the training dataset.
 %
 By maintaining some minimal prediction error, the model manages to make better
-predicitions on new datasets.
+predictions on new datasets.
 %
 Secondly, stochastic models are most useful to quantify the uncertainty in each
-prediction. This is given by~\cite{jospin2020hands}
-\begin{equation}
-  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta | \mathbb{D})} \vectornorm{F(x; \theta) - \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta | \mathbb{D})} F(x; \theta)}^2,
-  \label{eqn:predictive_variance}
-\end{equation}
-% 
-\noindent where $N_\theta$ is the number of samples drawn from the posterior
-$P(\theta | \mathbb{D})$.
-%
+prediction. 
 When the model overfits to the training data, it collapses the
 posterior to a near-zero-variance distribution.
 %
@@ -340,21 +369,13 @@ collapses to zero.
 Hence, the model makes predictions with absolute certainty, overlooking to report that 
 the overfit model makes inaccurate predictions.
 %
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{overfitting.eps}
-  \caption{Comparison between model biased to the training data (right) and model
-  that achieves bias-variance trade-off (left)~\cite{bishop2006pattern}. Blue
-  circles represent training data, the green curve is the original data source
-  for which we are learning a regression model, the red line is the learned
-  model $F(x;\theta)$}
-  \label{fig:overfit}
-\end{figure}
+We call such overfit models with near-zero prediction uncertainty as
+\textit{overconfident} models.
 
 The solution to the overfitting problem involves finding a \it{bias-variance
 trade-off}\normalfont, where the training adjusts the parameters based on the
-likelihood, but also enforces the posterior to hold some variance to prevent
-overfitting.
+likelihood, but also enforces the posterior to hold some variance in order to
+prevent overfitting.
 %
 % We can observe the importance of bias-variance tradeoff directly from the
 % prediction error as follows.
@@ -404,6 +425,17 @@ initial distribution of the decision parameters.
 %
 This tug of war prevents the posterior from finding a near zero-variance
 solution, and consequently achieving the bias-variance trade-off.
+%
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{overfitting.eps}
+  \caption{Comparison between model biased to the training data (right) and model
+  that achieves bias-variance trade-off (left)~\cite{bishop2006pattern}. Blue
+  circles represent training data, the green curve is the original data source
+  for which we are learning a regression model, the red line is the learned
+  model $F(x;\theta)$}.
+  \label{fig:overfit}
+\end{figure}
 
 \subsubsection{Posterior Distribution}
 
@@ -447,11 +479,12 @@ techniques are discussed as follows.
 \item \textbf{Variational Inference (VI)}: is a gradient-based technique that approximates the posterior with the pre-selected
 distribution $Q(\theta;z)$.
 %
-The approximate posterior is selected from the conjugate families of the likelihood and
-prior distributions. The goal is to learn the distribution parameters $z$ of the approximate posterior that
-minimize the Kullback-Leibler divergence or equivalently maximize the evidence
-lower bound (\textsc{Elbo}). The \textsc{Elbo}, $\mathcal{L}$, is given
-by~\cite{cohen2016bayesian}
+The approximate posterior is selected from the conjugate families of the
+likelihood and prior distributions. The goal is to learn the distribution
+parameters $z$ of the approximate posterior that minimize the Kullback-Leibler
+divergence or equivalently maximize the evidence lower bound
+(\textsc{Elbo})~\cite{cohen2016bayesian}. The \textsc{Elbo}, $\mathcal{L}$, is
+given by
 \begin{align}
   \begin{split}
   \mathcal{L}(\mathbb{D},z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(\mathbb{D} \mid \theta;z)P(\theta)) - \log(Q(\theta;z)) \right].
