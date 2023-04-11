@@ -47,7 +47,7 @@ Let us consider the first-order scalar control system, whose system parameter
 $p_s$ is uncertain: 
 %
 \begin{equation} \begin{cases} \dot{x} = p_sx + u, \; x(0) =
-  x_0 \\ u(x) = \theta x.  \end{cases} \label{eq:first-order} \end{equation}
+  x_0, \\ u(x) = \theta x.  \end{cases} \label{eq:first-order} \end{equation}
 %
 We assume that $p_s \sim \mc{N}\left(\hat{p}_s, \sigma_{p}\right)$ where
 $\hat{p}_s$ designates our best prior point estimate of the system parameter $p_s$
@@ -95,7 +95,7 @@ control parameter has the probability density function
 %
 \begin{align*} 
     f_{\theta^\star}(\theta^\star) &= f_p\left(g^{-1}(\theta^\star)\right)
-        \abs{\frac{d}{d\theta}g^{-1}(\theta^\star)} \\ 
+        \abs{\frac{d}{d\theta}g^{-1}(\theta^\star)}, \\ 
         &= \frac{1}{\sigma_p
         \sqrt{2\pi}}\left(\frac{1}{2}\left(1+\frac{c}{r{\theta^\star}^2}\right)\right)
         \exp{\left\{-\frac{1}{2\sigma_p^2}\left(
@@ -123,7 +123,7 @@ $p$ is
 %
 \begin{align*} 
     f_{\mc{J}^\star}(\mc{J}^\star) &=f_p\left(h^{-1}(\mc{J}^\star)\right)
-        \abs{\frac{d}{d\theta}h^{-1}(\mc{J}^\star)} \\
+        \abs{\frac{d}{d\theta}h^{-1}(\mc{J}^\star)}, \\
         &= \frac{1}{\sigma_p
         \sqrt{2\pi}}\left(\frac{1}{r} + \frac{c}{4{\mc{J}^\star}^2}\right)
         \exp{\left\{ -\frac{1}{2\sigma_p^2} \left(

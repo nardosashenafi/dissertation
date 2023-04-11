@@ -65,7 +65,7 @@ rendering it passive and therefore stable~\cite{van2000l2}.
 The dynamics of the closed-loop system with the desired storage function $H_d$ can be given as
 \begin{align}
   \begin{split}  
-    \bmat{\dot{q} \\ \dot{p}} &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}\, \\
+    \bmat{\dot{q} \\ \dot{p}} &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}, \\
   \end{split}
   \label{eq:desired_hamiltonian_dynamics}
 \end{align}
@@ -233,7 +233,7 @@ positive-definiteness of the mass matrix.
 %
 The skew-symmetric matrix $J_2$ is constructed as 
 \begin{align*}
-  J_2^\theta(q, p) = A_\theta(q, p) - A^\top_\theta(q, p)
+  J_2^\theta(q, p) = A_\theta(q, p) - A^\top_\theta(q, p),
 \end{align*}
 \noindent where the entries of $A_{\theta}(q, p)$ are given by neural nets.
 %
@@ -521,6 +521,6 @@ where $N_{\theta}$ is the number of samples drawn from the posterior.
 The second option only takes one sample from the posterior, and it corresponds
 to the maximum aposteriori (MAP), i.e. 
 \begin{align} 
-  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | \mathbb{D})
+  \theta_{MAP}=\underset{\theta}{\textrm{argmax}}\; P(\theta | \mathbb{D}).
 \end{align}
 

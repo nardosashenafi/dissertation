@@ -87,9 +87,28 @@ between the contact surfaces.
 Let $\gamma_N = \dot{g}_N(q)$ be the normal relative velocity and
 $\gamma_T$ the tangential relative velocity between contact surfaces.
 %
+{\color{red} We can write the relative normal and tangential velocities in terms
+of the generalized velocities as 
+%
+\begin{align*}
+  \gamma_N = W_N \dot{q}, \; \gamma_T = W_T \dot{q},
+\end{align*}  
+\noindent where $W_N$ and $W_T$ are the linear mappings from the generalized
+coordinates to the local contact coordinates.
+%
+We deal with pre- and post-impact velocities throughout this formulation, thus we
+introduce the following notations.
+%
+The pre- and post-impact generalized velocities are denoted by $\dot{q}^-$ and
+$\dot{q}^+$, respectively, and their corresponding relative velocities are given
+by
+\begin{align*}
+  \gamma_N^+ = W_N\dot{q}^+, \; \gamma_T^+ = W_T\dot{q}^-, \\
+  \gamma_N^- = W_N\dot{q}^-, \; \gamma_T^- = W_T\dot{q}^-.
+\end{align*}
+
 The linear complementarity formulation imposes a unilateral constraint between
 contact forces and relative velocities given by:
-
 \begin{equation}
   \begin{gathered}
     0 \leq 
@@ -107,24 +126,82 @@ contact forces and relative velocities given by:
     \begin{pmatrix}
       \xi_N(q, \dot{q}) \\
       \xi_T(q, \dot{q})
-    \end{pmatrix} =
+    \end{pmatrix} :=
       \begin{pmatrix}
-        (I_k+\epsilon_N) \gamma_N(q, \dot{q})  \\
-        (I_k+\epsilon_T) \gamma_T(q, \dot{q})
+        \gamma_N^+ + \epsilon_N \gamma_N^-  \\
+        \gamma_T^+ + \epsilon_T \gamma_T^-
       \end{pmatrix},
   \end{gathered}
   \label{eq:complementarity} 
 \end{equation}
 \noindent where $\epsilon_N \in \mathbb{R}^k$ and $\epsilon_T \in \mathbb{R}^k$
 are diagonal matrices consisting of the normal and tangential coefficients of
-restitution, respectively. The operator $\perp$ signifies the orthogonality
-between two vectors, and $I_k$ is the $k \times k$ identity matrix.
+restitution, respectively. We use the notation $0 \leq a \perp b \geq 0$ to
+denote $a \geq 0, b \geq 0$ and $a^\top b=0$.
 % 
+The physical interpretation of~\eqref{eq:complementarity} can be given as
+follows.
+%
+% We first look at the properties of normal contact forces and relative velocities
+% during contacts, and we translate the same concept to the tangential direction.
+%
+In the presence of contacts and impacts, the post-impact velocities can be found
+from pre-impact velocities by $\gamma_N^+ = -\epsilon_N \gamma_N^-$.
+%
+In this scenario, the quantity $\xi_N$ evaluates to zero, because
+\begin{align*}
+  \xi_N &:= \gamma_N^+ + \epsilon_N \gamma_N^-, \\
+  \xi_N &= -\epsilon_N \gamma_N^- + \epsilon_N \gamma_N^- = 0.
+\end{align*}
+%
+The complementarity constraint in~\eqref{eq:complementarity} states that when
+two surfaces come into contact, the resultant between pre- and post-impact
+velocities, given by $\xi_N$ must be zero, and in the meantime, the contact
+forces can take positive values.
+%
+Conversely, if there are no potential contacts, the relative velocities are
+continuous, i.e. $\gamma_N^+ = \gamma_N^- = \gamma_N$.
+%
+In this case, the complementarity constraint states that $\xi_N$ can be
+non-zero, which is analogues to contact surfaces approaching each other or
+moving away from each other, but the normal contact forces $\lambda_N$ must be
+zero. 
+%
+There exists no scenario when both the contact force $\lambda_N$ and the
+difference in pre- and post-impact velocities $\xi_N$ are both positive.
+%
+
 From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N$ and $\xi_T$ can be
 expressed as an affine function of the contact forces $\lambda_N$ and
-$\lambda_T$ as follows~\cite{glocker2005formulation}:
-
-\begin{gather*}
+$\lambda_T$. This allows us to express the
+complementarity~\eqref{eq:complementarity} as a quadratic function of only the
+contact forces. To do so, we need to separate the tangential contact force
+$\lambda_T$ into two parts as follows~\cite{glocker2005formulation}
+\begin{align*}
+  \lambda_R = \mu \lambda_N + \lambda_T, \\
+  \lambda_L = \mu \lambda_N - \lambda_T, 
+\end{align*}
+\noindent and the corresponding complementarity condition becomes
+%
+\begin{equation*}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_R(q, \dot{q}) \\
+      \xi_L(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_R  \\
+        \lambda_L
+      \end{pmatrix} \geq 0,
+    \end{gathered}
+\end{equation*}
+Notice that $\lambda_R, \lambda_L, \xi_R, \xi_L$ have no physical interpretation.
+%
+These quantities merely help us express the resultant pre- and post-impact
+velocities $\xi_N, \xi_R, \xi_L$ as the following affine function: 
+\begin{align*}
   \begin{pmatrix}
     \xi_N \\
     \xi_R \\
@@ -135,7 +212,12 @@ $\lambda_T$ as follows~\cite{glocker2005formulation}:
       \lambda_N \\
       \lambda_R \\
       \xi_L
-    \end{pmatrix} + b, \\
+    \end{pmatrix} + b, 
+\end{align*}
+\noindent where the values of $A$ and $b$ are extracted from the dynamics. We
+refer the reader to~\cite{glocker2005formulation} for detailed derivation of the
+forms of $A$ and $b$, and present the results as
+\begin{gather*}
     A = \begin{bmatrix}
       W_N M^{-1} (W_N - W_T \mu) & W_N M^{-1} W_N & 0  \\
       W_T M^{-1} (W_N - W_T \mu) & W_T M^{-1} W_T & I_k  \\
@@ -144,22 +226,10 @@ $\lambda_T$ as follows~\cite{glocker2005formulation}:
       W_N M^{-1} h \Delta t + (I_k+\epsilon_N) \gamma_N\\
       W_T M^{-1} h \Delta t + (I_k+\epsilon_T) \gamma_T\\
       0
-    \end{bmatrix} \\
-    \begin{pmatrix}
-      \xi_T   \\
-      \lambda_R \\
-      \lambda_L 
-    \end{pmatrix} = 
-    \begin{pmatrix}
-      \xi_R - \xi_L \\
-      \mu \lambda_N + \lambda_T  \\
-      \mu \lambda_N - \lambda_T  
-    \end{pmatrix}, \\
+    \end{bmatrix}, 
 \end{gather*}
- 
-\noindent where $\mu$ is the coefficient of friction, $W_N$ and $W_T$ map the
-velocity vector $\dot{q}$ to $\gamma_N$ and $\gamma_T$, respectively, and
-$\Delta t$ is the integration time step.
+\noindent where $\mu$ is the coefficient of friction, $I_k$ is the $k \times k$
+identity matrix, and $\Delta t$ is the integration time step.
 %
 The linear complementarity problem (LCP)~\eqref{eq:complementarity} can be posed as
 the following feasibility problem:
@@ -179,8 +249,8 @@ the following feasibility problem:
     \end{pmatrix} \geq 0, \\
   \label{eq:feasibility} 
 \end{equation}
-\noindent which can be solved with various optimization techniques. 
-
+\noindent which we can solve for $\lambda_N, \lambda_R, \xi_L$ with various
+optimization techniques. }
 
 We follow Moreau's time stepping algorithm~\cite{glocker2005formulation}
 outlined in Algorithm~\eqref{algo:moreau} to resolve the complementarity
@@ -275,7 +345,6 @@ of the boundaries of the state partitions.
 Hence, we leverage the universal approximation capabilities of neural networks
 for both the experts and the gating network.
 %
-
 \begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{gaussian_moe.png}
@@ -321,8 +390,8 @@ on the outputs of the gating network as follows~\cite{harkonen2022mixtures}
 A single expert is active in each state partition hence the prediction $u(x;
 \theta)$ at input state $x$ is given by 
 \begin{align*}
-  a &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \}\\
-  u(x; \theta) &= F_a(x; \theta_a)
+  a &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \},\\
+  u(x; \theta) &= F_a(x; \theta_a).
 \end{align*}
 
 
