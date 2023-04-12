@@ -1,0 +1,65 @@
+
+# Conclusions
+
+## Closing Thoughts and Future Directions
+
+###### PBC + machine learning techniques :sparkles: 
+
+::: {style="font-size: 32px;"}
+* We uncovered the engineering foundations for combining them
+* Transparent connection to stability analysis (<span style="font-variant:small-caps;">NeuralIdaPbc</span>)
+* Extensive experimental results in simulation and on hardware
+:::
+
+###### Future directions---applications in:
+
+::: {style="font-size: 32px;"}
+* Dynamical models with uncertainity
+* Hybrid dynamical systems (walking machines)
+:::
+
+
+## Data-Driven Control Through Contact {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+&nbsp;
+
+::: {.callout}
+$$
+\begin{aligned}
+\underset{q(\theta) }{\text{min}} 
+&&\quad J(&\phi(t; x_0, u), u) \\
+\text{subject to} 
+&&\quad M(x) dx &- h(x, \dot{x}, u) dt - d\Lambda= 0, \\
+&&\quad u(x; \theta) &= \mathcal{D}\{F(x; \theta)\}, \\
+&&\quad \zeta &\sim \mathcal{N}(\zeta_0, \Sigma_{\zeta}), \\
+&&\quad \theta &\sim q(\theta),
+\end{aligned} 
+$$
+:::
+:::
+
+::: {.column width="48%"}
+
+![](contents/assets/rimless_wheel.svg){width=90%}
+
+:::
+
+::::
+
+::: {.incremental}
+* Impacts and friction modelled through measure differential inclusions.
+* Usually solved through linear complementarity problems (convex optimization).
+* Data-driven PBC designed to be robust against uncertainties (e.g. surface friction).
+:::
+
+## Acknowledgements
+
+![](contents/assets/acknowledgement.jpg){fig-align="center"}
+
+## {background-image="contents/contents/assets/qa_background.png" visibility="uncounted"}
+<!--  -->

@@ -1,0 +1,6 @@
+name: RevealAnimate,
+script: [plugin.js, svg.min.js]
+config:
+  animate: {
+		autoplay: false
+	}

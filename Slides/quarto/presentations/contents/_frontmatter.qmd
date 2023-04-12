@@ -1,0 +1,56 @@
+---
+pagetitle: "Robust Control of Contact-Rich Robots via Neural Bayesian Inference"
+author-meta: "Nardos Ashenafi"
+institute: "Boise State University"
+---
+
+## Robust Control of Contact-Rich Robots via Neural Bayesian Inference {.center .smaller}
+<!-- ###################################################################### -->
+
+<hr/>
+
+*Doctoral Dissertation Defense*
+
+<br/>
+
+::: {layout="[100,60]"}
+__Candidate__: <br/>
+Nardos Ashenafi:mortar_board: <br/>
+Electrical and Computer Engineering Department <br/>
+Boise State University, Boise, Idaho, USA 
+
+__Supervisory Committee__: <br/>
+Aykut Satici, Ph.D. <br/>
+John Chiasson, Ph.D. <br/>
+Kurtis Cantley, Ph.D. <br/>
+Hao Chen, Ph.D. <br/>
+Arash Komaee, Ph.D. 
+:::
+
+
+## Publications and Contributions 
+
+<br>
+
+:::: {.columns}
+::: {.column width="65%"}
+
+::: {.fragment .fade-in-then-semi-out fragment-index=0}
+### <span style="font-variant:small-caps;">Published</span>
+* ***CCTA 2021***: Cooperative Manipulation
+* ***ACC 2022***: Bayesian NeuralPBC
+* ***L-CSS 2022***: Bayesian NeuralPBC
+    + ***CDC 2022***
+* ***Arxiv 2022***: Theoretical Justification of Robustness
+:::
+
+:::
+
+::: {.column width="35%"} 
+::: {.fragment .fade-in fragment-index=1}
+### <span style="font-variant:small-caps;">Upcoming Submissions</span>
+* Mixture of Experts
+* Bayesian NeuralPBC on Rimless Wheel
+:::
+:::
+:::: 

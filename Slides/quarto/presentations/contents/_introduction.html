@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>introduction</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="_introduction_files/libs/clipboard/clipboard.min.js"></script>
+<script src="_introduction_files/libs/quarto-html/quarto.js"></script>
+<script src="_introduction_files/libs/quarto-html/popper.min.js"></script>
+<script src="_introduction_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="_introduction_files/libs/quarto-html/anchor.min.js"></script>
+<link href="_introduction_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="_introduction_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="_introduction_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="_introduction_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="_introduction_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<!-- ###################################################################### -->
+<!-- ## {background-iframe="https://www.youtube-nocookie.com/embed/CJyCcXob0c8?controls=0&amp;start=19&amp;autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"} -->
+<section id="robot-control-laboratory" class="level2">
+<h2 class="anchored" data-anchor-id="robot-control-laboratory">Robot Control Laboratory</h2>
+<div class="fragment fade-in-then-semi-out" data-fragment-index="0">
+<p><img src="contents/assets/airhockey.jpg" class="absolute" data-top="50" data-left="50" width="700" height="600"></p>
+</div>
+<div class="fragment fade-in-then-semi-out" data-fragment-index="1">
+<p><img src="contents/assets/pantograph.jpg" class="absolute" data-top="200" data-left="0" width="350" height="300"></p>
+</div>
+<div class="fragment fade-in-then-semi-out" data-fragment-index="2">
+<p><img src="contents/assets/nexcobot.jpg" class="absolute" data-top="50" data-right="-50" width="350" height="300"></p>
+</div>
+<div class="fragment fade-in-then-semi-out" data-fragment-index="3">
+<p><img src="contents/assets/furuta.jpg" class="absolute" data-top="350" data-right="-20" width="220" height="300"></p>
+</div>
+</section>
+<section id="section" class="level2" data-background-video="contents/assets/furuta.mp4" data-background-size="contain" data-background-video-muted="true">
+<h2 data-background-video="contents/assets/furuta.mp4" data-background-size="contain" data-background-video-muted="true" class="anchored" data-anchor-id="section"></h2>
+</section>
+<section id="section-1" class="level2" data-background-video="contents/assets/nhcm_total.mp4" data-background-size="contain" data-background-video-muted="true">
+<h2 data-background-video="contents/assets/nhcm_total.mp4" data-background-size="contain" data-background-video-muted="true" class="anchored" data-anchor-id="section-1"></h2>
+</section>
+<section id="what-is-underactuation" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-underactuation">What is Underactuation?</h2>
+<div class="r-vstack">
+<div class="fragment fade-up" data-fragment-index="0">
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Underactuation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>No control input can generate acceleration in arbitrary direction</li>
+<li>Control problem becomes much more complicated</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="fragment fade-up" data-fragment-index="1">
+<div class="columns">
+<div class="column" data-align="top" style="width:39%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="contents/assets/acrobot.gif" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div><div class="column" style="width:20%;">
+
+</div><div class="column" style="width:40%;">
+<div class="quarto-figure quarto-figure-right">
+<figure class="figure">
+<p><img src="contents/assets/quadrotor2d.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption"><a href="http://underactuated.mit.edu/acrobot.html#section3"></a></figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="underactuated-robots" class="level2">
+<h2 class="anchored" data-anchor-id="underactuated-robots">Underactuated Robots</h2>
+<!-- ###################################################################### -->
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="contents/assets/walking_model.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Walking machines</figcaption><p></p>
+</figure>
+</div>
+</div><div class="column" style="width:0%;">
+
+</div><div class="column" style="width:40%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="contents/assets/manipulator.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Torque-limited manipulators</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="classical-control-vs-data-driven" class="level2">
+<h2 class="anchored" data-anchor-id="classical-control-vs-data-driven">Classical Control vs Data-Driven</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>&nbsp;</p>
+<p>Classical Control</p>
+<ul>
+<li>Derived from nominal model</li>
+<li>System specific</li>
+<li>Allows for stability analysis</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p>&nbsp;</p>
+<p>Data-Driven</p>
+<ul>
+<li>Finds controllers from repeated interactions</li>
+<li>Flexible across systems</li>
+<li>Lacks stability certificates</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="section-2" class="level2" data-background-video="contents/assets/walking_RL.mp4" data-background-video-muted="true">
+<h2 data-background-video="contents/assets/walking_RL.mp4" data-background-video-muted="true" class="anchored" data-anchor-id="section-2"></h2>
+<div class="fragment fade-in" data-fragment-index="0">
+<div class="semi-transparent-overlay">
+
+</div>
+</div>
+<p><img src="contents/assets/data-driven.jpg" class="fragment fade-in absolute" data-fragment-index="0" data-top="50" data-right="150" width="700" height="600"></p>
+</section>
+<section id="motivation" class="level2">
+<h2 class="anchored" data-anchor-id="motivation">Motivation</h2>
+<p>&nbsp;</p>
+<p>There are advantages to merging machine learning with classical control theory</p>
+<ul>
+<li>Use the insight from classical control theory to create robust data-driven controllers
+<ul>
+<li>Insights about stability and convergence</li>
+</ul></li>
+<li>Solve difficulties in classical control via machine learning</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

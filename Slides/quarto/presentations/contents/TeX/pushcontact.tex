@@ -1,0 +1,45 @@
+\documentclass[tikz]{standalone}
+\input{standalonepreamble}
+%\tikzstyle{name}=[options]
+\def\nodespx{6cm}\def\nodespy{1.7cm}
+\tikzstyle{mynode}=[thick,rounded corners = 0.1cm,draw,minimum size=0.375cm,align=center]
+\tikzstyle{myedge} = [thick,->,>=stealth',outer sep=0pt,inner sep=0pt]
+\tikzstyle{nodraw}=[draw=none]
+\tikzstyle{alignc}=[align=center]
+\newcommand{\tw}{text width}
+\newcommand{\mw}{minimum width}
+\newcommand{\mh}{minimum height}
+\begin{document}
+\begin{tikzpicture}[>=stealth']
+\coordinate (j1) at (0,0);
+\def\qa{80}\def\qb{150}\def\qc{210}
+\def\la{2.0}\def\lb{1.5}\def\lc{1.0}
+\coordinate (j2) at ($(j1)+(\qa:\la)$) ;
+\coordinate (j3) at ($(j2)+(\qb:\lb)$) ;
+\coordinate (ee) at ($(j3)+(\qc:\lc)$) ;
+\coordinate (j4) at (4,0);
+%%% Third moving link:
+\draw[shift=(j3),rotate=\qc,fill=white,thick] (0,-0.15*\lc) rectangle (\lc,0.15*\lc);
+\draw[shift=(ee),rotate=\qc-90,fill=white,thick] (-0.1,0) rectangle (0.1,0.6) coordinate (task);
+\draw[shift=(j3),rotate=\qc,fill=white,thick] (\lc,-0.2*\lc) rectangle ++(0.1*\lc,0.4*\lc);
+%% Second moving links
+\draw[shift=(j2),rotate=\qb,fill=white,thick] (0,0) ++(90:0.2*\lb) -- ++(0:\lb) arc (90:-90:0.2*\lb) -- ++(-180:\lb);
+%% first moving links
+\draw[shift=(j1),rotate=\qa,fill=white,thick] (0,0) ++(90:0.2*\la) -- ++(0:\la) arc (90:-90:0.2*\la) -- ++(-180:\la);
+%% base
+\draw[fill=white,thick,xscale=0.75,yscale=0.75] (j1) +(1,-1) -- ++(-1,-1) -- ++(0,1) arc (180:0:1) -- ++(0,-1);
+%%% Task:
+\draw[thick] (task) ++(0,0.3) rectangle ++(-2,-2) coordinate (boxcorner) ++ (-0.25,-0.05) coordinate (stepcorner);
+\draw[pattern=north west lines,draw=none, thick] (stepcorner) rectangle ++(2.5,-0.2);
+\draw[pattern=north west lines,draw=none, thick] (stepcorner) rectangle ++(-0.5,-0.2);
+\draw[ultra thick] (stepcorner) ++(2.5,0) -- ++(-3,0); 
+\draw (boxcorner) ++(1,1) node {Object};
+\end{tikzpicture}
+ \end{document}
+ 
+ 
+% Rewards Node
+%\draw (rewardloc) node(rew)[mynode,draw=none,text width=3cm,align =center]{Reward Model \\ (Section~\ref{sssec:rewardmodels})};
+%%% green SOTA as a node
+%\draw (cmgmploc) node(sotanode)[mynode,\mw=4cm,\mh = 6cm,fill = green!10,dashed]{};
+%\draw (sotanode.north west) node[above right,green!70!black]{State-of-the-Art Planner};

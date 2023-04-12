@@ -1,0 +1,283 @@
+# Theoretical Justification {visibility="uncounted"}
+<!-- ###################################################################### -->
+
+Why does Bayesian Learning result in more robust controllers?
+
+
+
+## System Parameter Uncertainty {auto-animate="true"}
+<!-- ###################################################################### -->
+
+::: {.fragment data-fragment-index=0}
+* Scalar control system 
+* Uncertain drift vector field: $p \sim
+\mathcal{N}(\hat{p}, \sigma_p^2)$.
+* No measurement uncertainty
+:::
+
+::: {data-id="system" .fragment data-fragment-index=1}
+
+::: {layout="[100,-5,60]" layout-valign="center"}
+$$
+\Sigma: \quad
+\begin{cases}
+  \dot{x} &= px + u, \\
+  u(x) &= \theta x, \\
+  x(0) &= 1.
+\end{cases}
+$$
+$$
+  x(t) = e^{(p+\theta)t}.
+$$
+:::
+:::
+
+
+
+## Performance Index {auto-animate="true"}
+<!-- ###################################################################### -->
+
+
+::: {data-id="system"}
+
+::: {layout="[100,-5,60]" layout-valign="center"}
+$$
+\Sigma: \quad
+\begin{cases}
+  \dot{x} &= px + u, \\
+  u(x) &= \theta x, \\
+  x(0) &= 1.
+\end{cases}
+$$
+$$
+  x(t) = e^{(p+\theta)t}.
+$$
+:::
+:::
+
+::: {.fragment data-fragment-index=0}
+
+Quadratic performance index
+
+- $q \geq 0$, $r > 0$  
+- $T$: control horizon
+:::
+
+::: {.fragment data-fragment-index=0, data-id="perf"}
+$$
+\mathcal{J} = \int_0^T \left( \frac{1}{2}qx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt.
+$$
+:::
+
+
+## Infinite-Horizon Best Performance {auto-animate="true"}
+<!-- ###################################################################### -->
+
+::: {layout="[100,-5,60]" layout-valign="center" .fragment data-fragment-index=0 data-id="perf"}
+$$
+\mathcal{J} = \int_0^T \left( \frac{1}{2}qx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt.
+$$
+$$
+\mathcal{J}_{T \to \infty} = -\frac{1}{4}\frac{q+r \theta^2}{p+\theta}.
+$$
+:::
+
+::: {.fragment data-fragment-index=1}
+
+Solve for $\theta$ that minimizes $\mathcal{J}_\infty$: $\theta^\star = g(p) :=
+-p -\sqrt{p^2+\frac{q}{r}}$.
+
+:::
+
+::: {layout="[100,-5,60]" layout-valign="center" .fragment data-fragment-index=2 data-id="opt-sol"}
+
+::: {.callout-note icon=false}
+## Deterministic
+
+$\theta^\star = g(\hat{p}) := -\hat{p} -\sqrt{\hat{p}^2+\frac{q}{r}}$
+
+:::
+
+::: {.callout-note icon=false}
+## Probabilistic
+
+$$
+\begin{aligned}
+f_{\theta^\star}(\theta^\star) &= \frac{1}{\sigma_p \sqrt{2\pi}}\left( \
+\frac{1}{2}\left(1+\frac{q}{r{\theta^\star}^2}\right) \right) \\
+&\exp{\left\{ -\frac{1}{2\sigma_p^2}\left( \frac{q}{2r\theta^\star} -
+\frac{\theta^\star}{2} - \hat{p}  \right)^2  \right\} }
+\end{aligned}
+$$
+
+:::
+
+:::
+
+
+## Infinite-Horizon Best Performance {auto-animate="true"}
+<!-- ###################################################################### -->
+
+
+:::: {layout="[100,-5,60]" layout-valign="center" .fragment data-fragment-index=0 data-id="opt-sol"}
+
+::: {.callout-note icon=false}
+## Deterministic
+$\theta^\star = g(\hat{p}) := -\hat{p} -\sqrt{\hat{p}^2+\frac{q}{r}}$
+:::
+
+::: {.callout-note icon=false}
+## Probabilistic
+$$
+\begin{aligned}
+f_{\theta^\star}(\theta^\star) &= \frac{1}{\sigma_p \sqrt{2\pi}}\left( \
+\frac{1}{2}\left(1+\frac{q}{r{\theta^\star}^2}\right) \right) \\
+&\exp{\left\{ -\frac{1}{2\sigma_p^2}\left( \frac{q}{2r\theta^\star} -
+\frac{\theta^\star}{2} - \hat{p}  \right)^2  \right\} }
+\end{aligned}
+$$
+:::
+::::
+
+::: {.r-stack}
+![](contents/assets/optimal-dist_1.svg){.fragment data-fragment-index=1}
+
+![](contents/assets/optimal-dist_2.svg){.fragment data-fragment-index=2}
+
+![](contents/assets/optimal-dist_3.svg){.fragment data-fragment-index=3}
+:::
+
+---
+
+### Parameter Uncertainty and Measurement Noise {auto-animate="true"}
+<!-- ###################################################################### -->
+
+::: {.fragment data-fragment-index=0}
+Same control system with measurement noise: $x \sim \mathcal{N}(x, \sigma^2)$.
+:::
+
+::: {data-id="stoc-system" .fragment data-fragment-index=1}
+
+::: {layout-valign="center"}
+$$
+\Sigma: \quad
+\begin{cases}
+  dx(t) &= (p+\theta)x(t) dt + \theta \sigma dW_t, \\
+  x(0) &= 1.
+\end{cases}
+$$
+:::
+::: {layout-valign="center"}
+$$
+x(t) = e^{(p+\theta)t} + \theta \sigma \int_0^t e^{(p+\theta)(t-s)}dW_s.
+$$
+:::
+:::
+
+::: {.fragment data-fragment-index=2 data-id="lemma"}
+::: {.callout-tip icon=false}
+## Lemma
+
+The conditional expectation $\mathbb{E}[\mathcal{J} \mid p]$ of the performance
+index given the system parameter $p$ is
+
+$$
+\mathbb{E}[\mathcal{J} \mid p] =
+-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left[ \theta^2 \sigma^2 T +
+\left(1-e^{2 T (p+\theta)}\right) \left(1+\frac{1}{2}\frac{\theta^2
+\sigma^2}{p+\theta}\right) \right]
+$$
+:::
+:::
+
+
+## Conditional Expectation {auto-animate="true" .smaller}
+<!-- ###################################################################### -->
+
+::: {.fragment data-fragment-index=2 data-id="lemma"}
+$$
+\mathbb{E}[\mathcal{J} \mid p] =
+-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left[ \theta^2 \sigma^2 T +
+\left(1-e^{2 T (p+\theta)}\right) \left(1+\frac{1}{2}\frac{\theta^2
+\sigma^2}{p+\theta}\right) \right]
+$$
+:::
+
+::: {.fragment data-fragment-index=3 data-id="proof"}
+::: {.callout-warning icon=false}
+## Proof
+
+Substituting the solution of the SDE into the performance measure yields
+
+$$
+\begin{aligned} \mathcal{J} =
+        & -\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 +
+        e^{2T(p+\theta)}\right) + 
+        (q+r\theta^2)\theta\sigma \int_0^T
+        e^{(p+\theta)t} \int_0^t e^{(p+\theta)(t-s)}dW_s
+        dt \; + \\ &\frac{1}{2}(q+r\theta^2)\theta^2
+        \sigma^2 \int_0^T \left( \int_0^t
+        e^{(p+\theta)(t-s)} dW_s  \right)^2 dt 
+\end{aligned}
+$$
+
+The conditional expectation of this quantity given the system parameter $p$
+under the distribution induced by the Wiener process may be computed in
+closed-form using Ito calculus.
+
+$$
+\begin{aligned} 
+\mathbb{E}_W\left[\mathcal{J} \mid p \right] &= -\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 - e^{2T(p+\theta)}\right) +
+        (q+r\theta^2)\theta\sigma\int_0^Te^{(p+\theta)t}\mathbb{E}_W\left[\int_0^t
+        e^{(p+\theta)(t-s)} dW_s~\Big\rvert p\right] dt + \\
+        &\frac{1}{2}(q+r\theta)^2\theta^2\sigma^2\int_0^T\mathbb{E}_W\left[\left(\int_0^t
+        e^{(p+\theta)(t-s)} dW_s \right)^2~\bigg\rvert p\right] dt \\
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 -
+        e^{2T(p+\theta)}\right) + 
+        \frac{1}{2}(q+r\theta^2)\theta^2\sigma^2\int_0^T\left(\int_0^t
+        e^{2(p+\theta)(t-s)} ds \right) dt \\ 
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta}\left(1 - e^{2T(p+\theta)}\right) + 
+        \frac{1}{2}(q+r\theta^2)\theta^2\sigma^2\int_0^T
+        -\frac{1}{2(p+\theta)}\left(1 - e^{2T(p+\theta)}\right) dt \\ 
+        &=-\frac{1}{4}\frac{q+r\theta^2}{p+\theta} \left[ \theta^2 \sigma^2 T +
+        \left(1 - e^{2T(p+\theta)}\right) \left(1 +
+        \frac{1}{2}\frac{\theta^2\sigma^2}{p+\theta}\right)\right]. 
+\end{aligned}
+$$
+
+<div style="text-align: right"> :orange_square: </div>
+
+:::
+:::
+
+
+## Optimal Controller {auto-animate="true" auto-animate-easing="ease-in-out"}
+<!-- ###################################################################### -->
+
+
+::: {.r-stack layout-valign="center"}
+![](contents/assets/optimal_ctrl.svg){width="80%" .fragment data-fragment-index=0 data-id="opt-ctrl"}
+
+<div style="vertical-align: bottom" class="fragment" data-fragment-index="0">Optimal controller $|\theta^\star|$ minimizing $\mathbb{E}\mathcal{J}$</div>
+
+![](contents/assets/optimal_cost.svg){width="80%" .fragment data-fragment-index=1 data-id="opt-cost"}
+
+<div style="vertical-align: bottom" class="fragment" data-fragment-index="1">Minimal expected cost $\mathbb{E}\mathcal{J}$</div>
+
+:::
+
+
+## Optimal Controller {auto-animate="true" auto-animate-easing="ease-in-out"}
+<!-- ###################################################################### -->
+
+
+::: r-hstack
+![Optimal controller $|\theta^\star|$ minimizing $\mathbb{E}\mathcal{J}$](contents/assets/optimal_ctrl.svg){.fragment data-fragment-index=0 data-id="opt-ctrl"}
+
+![Minimal expected cost $\mathbb{E}\mathcal{J}$](contents/assets/optimal_cost.svg){.fragment data-fragment-index=0 data-id="opt-cost"}
+:::
+
+::: {.incremental .fragment data-fragment-index=1}
+* Optimal control parameter a nontrivial function of $\sigma$ and $\sigma_p$.
+* Bayesian learning strikes the right trade-off.
+:::

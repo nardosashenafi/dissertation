@@ -1,0 +1,127 @@
+
+<!-- ###################################################################### -->
+
+
+## Hybrid Systems
+
+:::{.fragment .fade-in fragment-index=0}
+* exhibit both continuous state flow and discrete state transitions
+:::
+:::{.fragment .fade-in fragment-index=1}
+* E.g. Room temperature control, contact-rich robots
+:::
+:::{.fragment .fade-in fragment-index=3}
+* We tackle two main challenges in the control of contact-rich robots.
+:::
+:::{.fragment .fade-in fragment-index=2}
+:::: {.columns}
+:::{.column  width="60%"}
+![Walking machines](contents/assets/walking_model.png){fig-align="center" width="400" height="200"}
+:::
+:::{.column  width="0%"}
+:::
+:::{.column  width="40%"}
+![Manipulators](contents/assets/manipulator.jpg){fig-align="center" width="200" height="200"}
+:::
+::::
+:::
+
+
+## 1. Mode Changes in Contact-Rich Robots 
+<!-- ###################################################################### -->
+:::: {.columns}
+:::{.column  width="50%"}
+![](contents/assets/walkingmodes.jpg){.absolute top=200 left=0 width="400" height="300"}
+:::
+
+:::{.column  width="50%"}
+
+<br/>
+<br/>
+
+* Contacts cause mode changes
+* Each mode has distinct dynamics
+* Controlled by switching amongst several policies
+:::
+::::
+
+## Motivation
+
+<!-- ## {background-video="contents/assets/nhcm_total.mp4" background-video-muted="true"}
+::: {.fragment .fade-in fragment-index=0}
+<div class="semi-transparent-overlay"></div> -->
+<!-- ::: -->
+
+:::: {.columns}
+:::{.column  width="50%"}
+
+<br/>
+<br/>
+
+* Switching control does not scale well
+    + E.g. Cooperative manipulation
+    + $k$ contacts can have upto $2^k$ contact combinations
+* It is difficult to parameterize the switching condition 
+:::
+
+:::{.column  width="50%"}
+<br/>
+
+
+![](contents/assets/nhcm.png){fig-align="right" width="400" height="300"}
+:::
+::::
+
+
+## 1. Proposed Method
+<br/>
+<br/>
+
+* Our method uses data-driven technique to *automatically* learn the mixture of expert controller and the switching conditionals
+* We design contact-aware controllers by training on trajectories generated from accurate contact models
+
+## 2. Operating in uncertain environment 
+
+
+## Existing Methods {.smaller transition="fade"}
+
+:::: {.fragment .semi-fade-out fragment-index=1}
+::: {layout="[100,-5,60]" layout-valign="center"}
+Reinforcement learning
+![](contents/assets/rl-outline.svg)
+
+Strengths
+: 
+More general \
+Unknown dynamics OK
+
+Weaknesses
+: 
+Sample complexity \
+Stability guarantees?
+:::
+::::
+
+:::: {.fragment  fragment-index=1}
+::: {layout="[100,-5,60]" layout-valign="center"}
+Neural Passivity-based Control
+![](contents/assets/pbc-ml-outline.svg)
+
+Strengths
+: 
+Stability guarantees \
+Closed-form policy \
+Need to solve PDEs
+
+Weaknesses
+: 
+Model uncertainties \
+
+:::
+::::
+
+## 2. Proposed Method
+
+
+
+

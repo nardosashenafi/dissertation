@@ -1,0 +1,104 @@
+# Appendix {visibility="uncounted"}
+
+## Bias-Variance Tradeoff
+
+::: {.callout-important icon=false}
+## Bias-Variance Tradeoff
+$$
+\begin{aligned}
+h(x) &= \sin(x) \\
+\mathcal{D} &= {h(x)+\epsilon_i, \epsilon_i \sim \mathcal{N}(0, \delta)} \\
+y &= y(x; \mathcal{D}) \\
+\mathbb{E}_{\mathcal{D}}[(y-h)^2] &= {\underbrace{(\mathbb{E}_{\mathcal{D}}[y-h])^2}_{\text{bias}^2}} + {\underbrace{\mathbb{E}_{\mathcal{D}}[y - \mathbb{E}_{\mathcal{D}}(y)^2]}_{\text{variance}}}
+\end{aligned}
+$$
+:::
+*Finding deterministic solution under noise has low bias and high variance (overfits)
+
+## Bayesian Learning {.smaller}
+<!-- ###################################################################### -->
+
+
+$$
+p(\theta \mid \mathcal{D}) = \frac{\overbrace{p(\mathcal{D} \mid
+\theta)}^{\text{likelihood}}\overbrace{p(\theta)}^{\text{prior}}}
+{\underbrace{\int_\theta p(\mathcal{D} \mid \theta^\prime)p(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} \underbrace{\approx q(\theta;
+z)}_{\text{VI}}.
+$$
+
+:::: {.fragment .semi-fade-out fragment-index=1}
+::: {layout="[1,1]" layout-valign="center"}
+![Show ELBO convergence.](contents/assets/pbc-outline.svg){width=200%}
+
+::: {.callout-important icon=false}
+## KL-divergence and ELBO
+$$
+\begin{aligned}
+D_{\text{KL}} &= \mathbb{E}_{\theta \sim q}\left[ \log \frac{q(\theta;
+z)}{p(\theta \mid \mathcal{D})}\right] \\
+&= \log p(\mathcal{D}) - \mathbb{E}_{\theta \sim q}\left[ \log
+\frac{p(\mathcal{D} \mid \theta) p(\theta)}{q(\theta; z)} \right] \\
+\mathcal{L}(\mathcal{D}; z) &= \mathbb{E}_{\theta \sim q}\left[ \log
+p(\mathcal{D} \mid \theta) p(\theta) - \log q(\theta; z) \right]
+\end{aligned}
+$$
+:::
+
+:::
+::::
+
+:::: {.fragment fragment-index=1}
+::: {layout="[1,1]" layout-valign="center"}
+![Show prob. distribution](contents/assets/pbc-outline.svg){width=100%}
+
+::: {.callout-tip icon=false}
+## Prediction through marginalization
+$$
+\begin{aligned}
+\hat{m} &= \frac{1}{N}\sum_{\theta \sim q} m(x, \theta).
+\end{aligned}
+$$
+:::
+
+:::
+::::
+
+## <span style="font-variant:small-caps;">NeuralIdaPbc</span> Main Problem {.smaller visibility="uncounted"}
+<!-- ###################################################################### -->
+
+$$\begin{aligned} \underset{\theta}{\text{minimize}} && J(\theta) &= \left\lVert G^{\bot} \left\{ \nabla_{q} H - M_{d}^{\theta}M^{-1} \nabla_{q} H_{d}^{\theta} + J_{2}^{\theta} \left(M_{d}^{\theta}\right)^{-1} p \right\} \right\rVert^2  \\ \text{subject to}  && H_d^{\theta} &= \frac{1}{2} p^{\top} \left( M_{d}^{\theta} \right)^{-1} p + V_{d}^{\theta}(q) \\ && M_d^{\theta}(q) &= \left(M_d^{\theta}(q)\right)^\top \succ 0 \\ && J_{2}^{\theta}(q,p) &= -\left(J_{2}^{\theta}(q,p)\right)^\top \\ && q^\star &= \underset{q}{\arg \min} \, V_{d}^{\theta} (q) \end{aligned}$$
+
+::::: {.fragment}
+:::: {.columns}
+
+::: {.column width=49%}
+
+::: {.callout-tip icon="false"}
+## <span style="font-variant:small-caps;">NeuralIdaPbc</span>
+
+- Solve nonlinear PDEs using neural networks and SoS polynomials
+- Surrogates of $M_d$, $J_2$, $V_d$ are constrained *by construction*
+
+:::
+
+:::
+
+::: {.column width=2%} 
+
+:::
+
+::: {.column width=49%}
+::: {.callout-tip icon="false"}
+## <span style="font-variant:small-caps;">Pinn</span>
+
+- Solve nonlinear PDEs using neural networks
+- Solution surrogates are constrained via penalty term in loss function
+
+
+:::
+:::
+
+::::
+:::::
+

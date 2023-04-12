@@ -1,0 +1,3 @@
+# Switching Control with Deep-net Mixture of Experts: Background
+* Contact Modeling with Linear Complementarity Formulation  
+* Mixture of Experts 

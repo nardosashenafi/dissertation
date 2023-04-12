@@ -1,0 +1,491 @@
+# <span style="font-variant:small-caps;">NeuralPbc</span> {visibility="uncounted"}
+<!-- ###################################################################### -->
+
+Learning storage function from trajectories
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Problem Statement
+<!-- ###################################################################### -->
+
+Consider the mechanical system
+
+$$
+\begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
+\begin{bmatrix} \phantom{-}0 & 1 \\ -1 & 0 \end{bmatrix} 
+\begin{bmatrix} \nabla_q H_{\phantom{d}} \\ \nabla_p H_{\phantom{d}} \end{bmatrix} +
+\begin{bmatrix} 0 \\ G \end{bmatrix} u_\phantom{di}
+$$
+
+__Control task__: stabilize desired equilibrium $x^\star = (q^\star, 0)$
+
+$$u = u_{es} + u_{di} = - G^{\dagger} \nabla_q H_d^{\theta}  - K_D G^\top \nabla_p H_d^{\theta} $$
+
+
+Choosing a suitable $H_d$ is not trivial
+
+::: {.fragment .fade-in fragment-index=2}
+Parameterize $H_d$ by a neural network $H_d^\theta$, and relax control task to bringing $x$ to a small neighborhood of $x^\star$
+:::
+
+::: {.notes}
+* Instead of asking for asymptotic stabilization, we only require that trajectories pass thru a nbhd of $x^\star$
+* This is reasonable because we know how to stabilize a fixed point, e.g. stabilize the linearization of the system using LQR
+* This allows us to find approximations for $H_d^\theta$ using learning techniques
+:::
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Problem Statement
+<!-- ###################################################################### -->
+
+::: {.callout}
+$$
+\begin{aligned}
+\underset{\theta}{\text{minimize}} && J(\theta, x_0) &= \int_{0}^{T} \ell \left(\phi,u^\theta,\theta\right)\, \text{d} t \\
+\text{subject to} &&
+\begin{bmatrix}
+  \dot{q} \\ \dot{p}
+\end{bmatrix} &=
+\begin{bmatrix}
+  0 & I \\ -I & 0
+\end{bmatrix}
+\begin{bmatrix} \nabla_q H \\ \nabla_p H \end{bmatrix} + 
+\begin{bmatrix}
+  0 \\ G
+\end{bmatrix} u^{\theta}
+\\
+&& u^\theta &= - G^{\dagger}\nabla_q H_d^{\theta}  - K_D G^\top \nabla_p H_d^{\theta}
+\end{aligned}
+$$
+:::
+
+- Injecting control task into loss function design 
+- Backprop through closed-loop trajectories
+- Sampling the state space efficiently
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Loss Function
+<!-- ###################################################################### -->
+
+$$
+J(\theta, x_0) = \int_{0}^{T} \ell \left(\phi,u^\theta,\theta\right)\, \text{d} t
+$$
+
+$\ell \triangleq \ell_{\text{set}}(\gamma) + \ell_{\bot}(\gamma,u)$ where
+
+- $\phi$ is the flow of the equation of motion
+ 
+- $\gamma$ is the closed-loop trajectory starting from $x_0$
+
+- $T$ is the time horizon (hyperparameter)
+
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Loss Function
+<!-- ###################################################################### -->
+
+
+$$\ell \triangleq \ell_{\text{set}}(\gamma) + \ell_{\bot}(\gamma,u)$$
+
+:::: {.callout}
+## Set Distance Loss $\ell_{\text{set}}$
+
+Penalizes when closed-loop trajectory $\gamma$ under the current control law is far away from a neighborhood $\mathcal{S}$ of $x^\star$
+
+::: {layout="[100,100]" layout-valign="top"}
+![](contents/assets/pend_damped_phase_edited.svg)
+
+<div>
+
+$$\ell_{\text{set}}(x) = \underset{t}{\inf} \left\{ \lVert a-b \rVert : a \in \gamma(t), b \in \mathcal{S}\right\}$$
+* The set $\mathcal{S}$ may be chosen as
+  * A ball around $x^\star$
+  * Estimated region of attraction
+* No additional loss if any point in $\gamma$ is in $\mathcal{S}$
+</div>
+:::
+::::
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Loss Function
+<!-- ###################################################################### -->
+
+
+$$\ell \triangleq \ell_{\text{set}}(\gamma) + \ell_{\bot}(\gamma,u)$$
+
+
+::::: {.callout}
+## Transversal Distance Loss $\ell_{\bot}$
+
+Measures how close $\gamma$ is to $\gamma^\star$ (expert trajectory) using transverse coordinates $x_\bot$
+
+:::: {layout="[70,100]"}
+
+![](contents/assets/transverseCoordinates.svg)
+
+<div>
+* Coordinate transformation
+  - $\tau \in \mathbb{R}$ a surrogate for time
+  - $x_{\bot} \in \mathbb{R}^{2n-1}$ quantify how far away the current state is from $\gamma^\star$
+* By construction $x_{\bot} \to 0 \iff \gamma = \gamma^\star$
+
+$$\ell_{\bot} = x_\bot^\top Q x_\bot + u^\top R u, \, Q \succeq 0, \, R \succ 0$$
+
+* No preferred orbit? $Q = 0$
+</div>
+
+::::
+:::::
+
+::: {.notes}
+- We can find a coordinate transformation such that 1 coordinate $\tau$ is along the desired orbit and acts as surrogate for time
+- The remaining coordinates $x_{\bot}$ quantify how far away the current state is from the desired trajectory
+:::
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Sampling State Space {.smaller}
+<!-- ###################################################################### -->
+
+Learned policy $u^\theta$ need to perform well for a wide range of $x_0$
+
+:::: {.r-stack}
+::: {.fragment .fade-out fragment-index=0}
+$$J(\theta, x_0) = \int_{0}^{T} \ell \left(\phi,u^\theta,\theta\right)\, \text{d} t$$
+:::
+<!-- $$\hat{J}(\theta) = \mathbb{E}_{x_0 \sim p(\mathbf{x}_0)} \left[ J(\theta, x_0) \right]$$ -->
+::: {.fragment .fade-in fragment-index=0}
+$$J(\theta) = \mathbb{E}_{x_0 \sim p(\mathbf{x}_0)} \left[ \int_{0}^{T} \ell \left(\phi(t,x_0),u^\theta,\theta\right)\, \text{d} t \right]$$
+:::
+::::
+
+Sample state space with technique based on <span style="font-variant:small-caps;">DAgger</span>[^dagger] 
+
+::: {.fragment .fade-in fragment-index=1} 
+1. Simulating system under application of $u^\theta$
+2. Collect samples from the regions of state-space visited by $u^\theta$
+:::
+
+[^dagger]: Ross, S., Gordon, G. J., & Bagnell, J. A. (2011). No-regret reductions for imitation learning and structured prediction. In AISTATS.
+
+::: {.notes}
+* Use dynamics to guide the collection of samples
+:::
+
+## Training
+![](contents/assets/training.png){.absolute top=200 left=50 width="1400" height="250"}
+
+
+## Backprop through ODE Solutions
+<!-- ###################################################################### -->
+
+We need $\partial J / \partial \theta$, which depends ODE solutions
+
+::: {.fragment .fade-in-then-semi-out}
+:crying_cat_face: Combining `autodiff` with numerical ODE solvers 
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+:crying_cat_face: Adjoint sensitivity method: solve the adjoint problem backward in time
+$$\frac{\text{d}\lambda}{\text{d}t} = -\lambda \frac{\partial f}{\partial x}, \quad \frac{\partial J}{\partial \theta} = \lambda(t_0) \frac{\partial f}{\partial x}$$
+:::
+
+::: {.fragment .fade-in}
+:smiley_cat: Adjoint methods + `autodiff` implemented in `DiffEqFlux.jl`
+:::
+
+::: {.notes}
+* Plain `autodiff` causes errors due to numerical ODE integration, high memory consumption
+* Adjoint methods requires storing many passes of the adjoint problem, again high memory consumption
+* `DiffEqFlux` combines the two, avoiding multiple passes through clever implementation, fast an efficient
+:::
+
+
+## `DiffEqFlux.jl` Demo {visibility="uncounted"}
+<!-- ###################################################################### -->
+
+Learning $\dot{x} = f(x)$ where $f$ is a neural network
+
+Regress on MSE between trajectory of $f$ and data
+
+:::: {.r-stack}
+![](contents/assets/diffeqflux_1.png){.fragment .fade-out fragment-index=0}
+
+![](contents/assets/diffeqflux_2.gif){.fragment .fade-in fragment-index=0}
+::::
+
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Algorithm :chart_with_downwards_trend:
+<!-- ###################################################################### -->
+
+:::: {.r-stack}
+
+![](contents/assets/neuralpbc/033.svg){.fragment}
+
+![](contents/assets/neuralpbc/000.svg)
+
+![](contents/assets/neuralpbc/001.svg){.fragment}
+
+![](contents/assets/neuralpbc/002.svg){.fragment}
+
+![](contents/assets/neuralpbc/003.svg){.fragment}
+
+![](contents/assets/neuralpbc/004.svg){.fragment}
+
+![](contents/assets/neuralpbc/005.svg){.fragment}
+
+![](contents/assets/neuralpbc/006.svg){.fragment}
+
+![](contents/assets/neuralpbc/007.svg){.fragment}
+
+![](contents/assets/neuralpbc/008.svg){.fragment}
+
+![](contents/assets/neuralpbc/009.svg){.fragment}
+
+![](contents/assets/neuralpbc/010.svg){.fragment}
+
+![](contents/assets/neuralpbc/011.svg){.fragment}
+
+![](contents/assets/neuralpbc/012.svg){.fragment}
+
+![](contents/assets/neuralpbc/013.svg){.fragment}
+
+![](contents/assets/neuralpbc/014.svg){.fragment}
+
+![](contents/assets/neuralpbc/015.svg){.fragment}
+
+![](contents/assets/neuralpbc/016.svg){.fragment}
+
+![](contents/assets/neuralpbc/021.svg){.fragment}
+
+![](contents/assets/neuralpbc/022.svg){.fragment}
+
+![](contents/assets/neuralpbc/023.svg){.fragment}
+
+![](contents/assets/neuralpbc/024.svg){.fragment}
+
+![](contents/assets/neuralpbc/025.svg){.fragment}
+
+![](contents/assets/neuralpbc/026.svg){.fragment}
+
+![](contents/assets/neuralpbc/027.svg){.fragment}
+
+![](contents/assets/neuralpbc/032.svg){.fragment}
+
+![](contents/assets/neuralpbc/033.svg){.fragment}
+
+::::
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Case Study: IWP
+![](contents/assets/hardware.svg){fig-align="center"}
+
+
+## {background-video="contents/assets/neuralpbc_iwp.mp4" background-size="contain" background-video-muted="true"}
+
+## Robustness via Bayesian Learning {.smaller}
+::: {.callout-tip}
+## System Parameter Uncertainty and Measurement Noise
+![](contents/assets/regular-vs-bayesian.svg){fig-align="center"}
+:::
+
+:::: {layout-ncol="2"}
+
+::: {.callout}
+## Less robust
+:::
+
+::: {.callout}
+## More robust
+:::
+
+::::
+
+## Optimal Control under Uncertainty 
+
+::: {.fragment fragment-index=0}
+::: {.callout-warning icon=false}
+## Linear Dynamical System
+$$
+\Sigma: \quad
+\begin{cases}
+  \dot{x} &= px + u, \\
+  u(x) &= \theta x, \\
+  x(0) &= 1.
+\end{cases}
+$$
+:::
+$$
+  x(t) = e^{(p+\theta)t}
+$$
+Performance Index: 
+$$
+\mathcal{J} = \int_0^T \left( \frac{1}{2}qx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt, q > 0, r \geq 0
+$$
+:::
+
+## Optimal Control under Uncertainty {.smaller}
+
+::: {.fragment fragment-index=0}
+Parameter uncertainty: $p \sim \mathcal{N}(\hat{p}, \sigma_p^2)$.
+
+:::: {layout="[100,-5,60]" layout-valign="center" .fragment data-fragment-index=0 data-id="opt-sol"}
+
+::: {.callout-note icon=false}
+## Deterministic
+$\theta^\star = g(\hat{p}) := -\hat{p} -\sqrt{\hat{p}^2+\frac{q}{r}}$
+:::
+
+::: {.callout-note icon=false}
+## Probabilistic
+$$
+\begin{aligned}
+f_{\theta^\star}(\theta^\star) &= \frac{1}{\sigma_p \sqrt{2\pi}}\left( \
+\frac{1}{2}\left(1+\frac{q}{r{\theta^\star}^2}\right) \right) \\
+&\exp{\left\{ -\frac{1}{2\sigma_p^2}\left( \frac{q}{2r\theta^\star} -
+\frac{\theta^\star}{2} - \hat{p}  \right)^2  \right\} }
+\end{aligned}
+$$
+:::
+::::
+:::
+
+::: {.r-stack}
+![](contents/assets/optimal-dist_1.svg){.fragment data-fragment-index=1 .absolute top=250 right=250 width="700" height="600"}
+
+![](contents/assets/optimal-dist_2.svg){.fragment data-fragment-index=2 .absolute top=250 right=250 width="700" height="600"}
+
+![](contents/assets/optimal-dist_3.svg){.fragment data-fragment-index=3 .absolute top=250 right=250 width="700" height="600"}
+:::
+
+## Parameter Uncertainty and Measurement Noise {auto-animate="true"}
+<!-- ###################################################################### -->
+
+::: {.fragment data-fragment-index=0}
+Same control system with measurement noise: $x \sim \mathcal{N}(x, \sigma^2)$.
+:::
+
+::: {data-id="stoc-system" .fragment data-fragment-index=1}
+
+::: {layout-valign="center"}
+$$
+\Sigma: \quad
+\begin{cases}
+  dx(t) &= (p+\theta)x(t) dt + \theta \sigma dW_t, \\
+  x(0) &= 1.
+\end{cases}
+$$
+:::
+::: {layout-valign="center"}
+$$
+x(t) = e^{(p+\theta)t} + \theta \sigma \int_0^t e^{(p+\theta)(t-s)}dW_s.
+$$
+:::
+
+::: {layout-valign="center"}
+We can compute the expected cost numerically as
+$$
+ \mathbb{E}[\mathcal{J}] = \mathbb{E}_p[\mathbb{E}_W[\mathcal{J} \mid p]].
+$$
+:::
+
+:::
+## Optimal Controller 
+<!-- ###################################################################### -->
+
+::: r-hstack
+![Optimal controller $|\theta^\star|$ minimizing $\mathbb{E}[\mathcal{J}]$](contents/assets/optimal_ctrl.svg){data-id="opt-ctrl"}
+
+![Minimal expected cost $\mathbb{E}[\mathcal{J}]$](contents/assets/optimal_cost.svg){data-id="opt-cost"}
+:::
+
+
+## Energy-Shaping Pendulum Swing-Up {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="60%"}
+![](contents/assets/H_top.jpg)
+:::
+
+::: {.column width="40%"}
+::: {.callout-tip icon=false}
+## Prediction through marginalization
+$$
+\begin{aligned}
+\hat{u} &= \frac{1}{N}\sum_{\theta \sim q} u(x, \theta).
+\end{aligned}
+$$
+:::
+::: {.callout-tip icon=false}
+## Maximum aposterior
+$$
+\begin{aligned}
+\hat{u} &= u(x, \text{argmax} \; q(\theta)).
+\end{aligned}
+$$
+:::
+* Measurement noise: 
+  *$\epsilon_q = 5 \times 10^{-4}$ rad., 
+  *$\epsilon_{\dot{q}} = 5 \times 10^{-2}$ rad/s.
+
+:::
+::::
+
+
+
+## Bayesian Solution
+<!-- ###################################################################### -->
+ 
+$$
+p(\theta \mid \mathcal{\ell}) = \frac{\overbrace{p(\mathcal{\ell} \mid
+\theta)}^{\text{likelihood}}\overbrace{p(\theta)}^{\text{prior}}}
+{\underbrace{\int_\theta p(\mathcal{\ell} \mid \theta^\prime)p(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} \underbrace{\approx q(\theta;
+z)}_{\text{VI}}.
+$$ 
+
+<ol class="fragment" data-fragment-index=0>
+Computing ELBO
+$$ \mathcal{L}(\mathcal{\ell};z) = \mathbb{E}_{\theta \sim q}\left[ \log p(\mathcal{\ell} \mid \theta)p(\theta) - \log q(\theta; z)  \right] $$
+requires: 
+&nbsp;
+  <li class="fragment" data-fragment-index=1> _Likelihood_:
+$$ p\left( \lVert \ell_{\text{set}}(\gamma) + \ell_\bot(\gamma, u) \rVert^2 \mid \theta \right) = \mathcal{N}(0, s). $$
+  </li>
+  <li class="fragment" data-fragment-index=2> _Prior_:
+    <ul>
+      <li> Uninformed or deterministic </li>
+    </ul>
+  </li>
+</ol>
+
+
+
+## Deterministic vs. Bayesian Training {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+* Subtracting rings from the wheel
+    * decreases wheel mass
+    * decreases wheel and pendulum inertia 
+    * moves the center of mass
+
+::: {.callout}
+|Parameter vector $\zeta$| $I_1$ | $I_2$ | $m g l$ |Error|
+|---|:---:|:---:|:---:|:---:|
+|Nominal|$0.0455$|$0.00425$|$1.795$|$0$|
+|3 rings|$0.0417$|$0.00330$|$1.577$|$0.122$|
+|2 rings|$0.0378$|$0.00235$|$1.358$|$0.243$|
+|1 rings|$0.0340$|$0.00141$|$1.140$|$0.365$|
+:::
+:::
+
+::: {.column width="50%"}
+
+![](contents/assets/neuralpbc_bandplot.jpg){width=90% fig-align="center"}
+![](contents/assets/iwp.svg){.absolute top=450 right=100 width="300" height="250"}
+
+:::
+
+::::

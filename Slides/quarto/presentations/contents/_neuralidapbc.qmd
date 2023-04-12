@@ -1,0 +1,251 @@
+# <span style="font-variant:small-caps;">NeuralIdaPbc</span> {visibility="uncounted"}
+<!-- ###################################################################### -->
+
+Solving matching PDEs with neural networks
+
+
+## Motivation {auto-animate="true"}
+<!-- ###################################################################### -->
+
+<span style="font-variant:small-caps;">NeuralPbc</span> is flexible, but guaranteeing stability is hard
+
+Additional structure of <span style="font-variant:small-caps;">IdaPbc</span> facilitates stability analysis
+
+
+<!-- :::: {.r-stack} -->
+
+<!-- ::: {.fragment .fade-out fragment-index=0} -->
+$$ \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = \begin{bmatrix}0 & I \\ -I & 0\end{bmatrix} \begin{bmatrix} \nabla_q H \\ \nabla_p H  \end{bmatrix} + \begin{bmatrix} 0 \\ G \end{bmatrix} u $$
+<!-- ::: -->
+
+Closed-loop port-Hamiltonian dynamics:
+
+<!-- ::: {.fragment .fade-in fragment-index=0} -->
+$$
+\begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix}
+=
+\begin{bmatrix}0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - GK_vG^\top\end{bmatrix}
+\begin{bmatrix} \nabla_q H_d \\ \nabla_p H_d \end{bmatrix}
+$$
+<!-- ::: -->
+<!-- :::: -->
+
+$H_d = \frac{1}{2} p^{\top} M_d(q)^{-1} p + V_d(q),\, M_d \succ 0$
+
+::: {.notes}
+- Further structure not only facilitates stability analysis but also restricts the search to a pd matrix $M_d$ and $V_d$.
+- This search may be performed solely on the configuration space.
+:::
+
+
+## <span style="font-variant:small-caps;">IdaPbc</span> Background {auto-animate="true"}
+<!-- ###################################################################### -->
+
+$$ \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = \begin{bmatrix}0 & M^{-1}M_d \\ -M_dM^{-1} & J_2(q,p) - GK_vG^\top\end{bmatrix} \begin{bmatrix} \nabla_q H_d \\ \nabla_p H_d \end{bmatrix} $$
+
+$H_d = \frac{1}{2} p^{\top} M_d(q)^{-1} p + V_d(q),\, M_d \succ 0$
+
+:::: {layout-ncol="2"}
+
+::: {.callout}
+## Stability results
+
+$$\begin{aligned}\dot{H}_d &= \left( \nabla_p H_d \right)^{\top} \left(-G K_v G^{\top}\right) \nabla_p H_d \\ &\leq -\lambda_{\textrm{min}} \{ K_v \} \left\| \left( \nabla_p H_d \right)^{\top} G \right\|^2 \leq 0 \end{aligned}$$
+
+With $q^\star = \arg \min V_d(q)$, we have $x \to x^\star = (q^\star, 0)$
+:::
+
+::: {.fragment .fade-left}
+::: {.callout}
+## Control synthesis
+
+Choose $u = u_{es} + u_{di}$ where
+$$
+\begin{aligned} 
+Gu_{es} &= \nabla_{q} H - M_{d}M^{-1} \nabla_{q} H_{d} \\
+&\quad\; + J_{2} M_{d}^{-1} p \phantom{\nabla_{p}^{\top}} \\
+u_{di} &= -K_v G^\top \nabla_p H_d \phantom{\left\|\left(\nabla_p\right)^{\top} \right\|^2} 
+\end{aligned}
+$$
+:::
+:::
+
+::::
+
+## <span style="font-variant:small-caps;">NeuralIdaPbc</span> Problem Statement  {transition="fade-in zoom-out"}
+<!-- ###################################################################### -->
+
+:::: {layout="[-10, 100, -10]"}
+::: {.callout}
+$$
+\begin{aligned}
+\underset{\theta}{\text{minimize}} && J(\theta) &= \left\lVert G^{\bot} \left\{ \nabla_{q} H - M_{d}^{\theta}M^{-1} \nabla_{q} H_{d}^{\theta} + J_{2}^{\theta} \left(M_{d}^{\theta}\right)^{-1} p \right\} \right\rVert^2  \\
+\text{subject to} 
+&& H_d^{\theta} &= \frac{1}{2} p^{\top} \left( M_{d}^{\theta} \right)^{-1} p + V_{d}^{\theta}(q)
+\\
+&& M_d^{\theta}(q) &= \left(M_d^{\theta}(q)\right)^\top \succ 0
+\\
+&& J_{2}^{\theta}(q,p) &= -\left(J_{2}^{\theta}(q,p)\right)^\top
+\\
+&& q^\star &= \underset{q}{\arg \min} \, V_{d}^{\theta} (q)
+\end{aligned}
+$$
+:::
+::::
+
+::: {.incremental}
+* Sample configuration space
+:::
+
+
+##
+<!-- ###################################################################### -->
+
+<br/>
+
+:::: {.r-stack}
+
+![](contents/assets/nn-pbc-struct-frame-00.png){.fragment .fade-out fragment-index=0}
+
+![](contents/assets/nn-pbc-struct-frame-01.png){.fragment .fade-in-then-out fragment-index=0}
+
+![](contents/assets/nn-pbc-struct-frame-02.png){.fragment .fade-in-then-out fragment-index=1}
+
+![](contents/assets/nn-pbc-struct-frame-03.png){.fragment .fade-in-then-out fragment-index=2}
+
+![](contents/assets/nn-pbc-struct-frame-04.png){.fragment .fade-in-then-out fragment-index=3}
+
+![](contents/assets/nn-pbc-struct-frame-05.png){.fragment .fade-in-then-out fragment-index=4}
+
+
+::::
+
+## {background-video="contents/assets/iwp-firefox.mp4" background-size="contain" background-video-loop="true" background-video-muted="true"}
+<!-- ###################################################################### -->
+
+
+## Simulated IWP experiments
+<!-- ###################################################################### -->
+
+![](contents/assets/idapbc-iwp-evolution.png)
+
+<!-- ###################################################################### -->
+
+## Deterministic vs. Bayesian Training {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+Performance metric: $\mathcal{J} = \int_0^T \left( \frac{1}{2}qx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt$.
+
+&nbsp;
+
+Simulated dynamics  
+$$
+\begin{aligned}
+dx &= \begin{bmatrix}
+\dot{q}_1 \\ \dot{q_2} \\ \frac{1}{I_1}\left(m g l \sin{q_1} - u^\theta -
+b_1\dot{q}_1\right) \\ \frac{1}{I_2}\left(u^\theta -b_2 \dot{q}_2 \right)
+\end{bmatrix} dt \\
+&+ \nabla_xu^\theta(x) \sigma dW_t.
+\end{aligned}
+$$
+
+
+:::
+
+::: {.column width="40%"}
+
+![](contents/assets/iwp.svg){.absolute top=100 right=0 width="300" height="250"}
+
+![](contents/assets/bandplot.svg){.absolute top=300 right=0 width="400" height="350"}
+
+:::
+
+::::
+
+<!-- ###################################################################### -->
+
+
+## Deterministic vs. Bayesian Training {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+* Subtracting rings from the wheel
+    * decreases wheel mass
+    * decreases wheel and pendulum inertia 
+    * moves the center of mass
+
+::: {.callout}
+|Parameter vector $\zeta$| $I_1$ | $I_2$ | $m g l$ |Error|
+|---|:---:|:---:|:---:|:---:|
+|Nominal|$0.0455$|$0.00425$|$1.795$|$0$|
+|3 rings|$0.0417$|$0.00330$|$1.577$|$0.122$|
+|2 rings|$0.0378$|$0.00235$|$1.358$|$0.243$|
+|1 rings|$0.0340$|$0.00141$|$1.140$|$0.365$|
+:::
+:::
+
+::: {.column width="50%" layout-valign="center"}
+
+![](contents/assets/four-rings.jpg){width=80% layout-valign="center"}
+
+![](contents/assets/idapbc_bar.svg){width=90%}
+
+
+:::
+::::
+
+## {background-video="contents/assets/iwp_bayesian.mp4" background-size="contain" background-video-loop="true" background-video-muted="true"}
+
+
+
+## Data-Driven Control Through Contact {.smaller}
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+&nbsp;
+
+::: {.callout}
+$$
+\begin{aligned}
+\underset{q(\theta) }{\text{min}} 
+&&\quad J(&\phi(t; x_0, u), u) \\
+\text{subject to} 
+&&\quad M(x) dx &- h(x, \dot{x}, u) dt - d\Lambda= 0, \\
+&&\quad u(x; \theta) &= \mathcal{D}\{F(x; \theta)\}, \\
+&&\quad \zeta &\sim \mathcal{N}(\zeta_0, \Sigma_{\zeta}), \\
+&&\quad \theta &\sim q(\theta),
+\end{aligned} 
+$$
+:::
+:::
+
+::: {.column width="48%"}
+
+![](contents/assets/rimless_wheel.svg){width=90%}
+
+:::
+
+::::
+
+::: {.incremental}
+* Impacts and friction modelled through measure differential inclusions.
+* Usually solved through linear complementarity problems (convex optimization).
+* Data-driven PBC designed to be robust against uncertainties (e.g. surface friction).
+:::
+
+## Acknowledgements
+
+![](contents/assets/acknowledgement.jpg){fig-align="center"}
+
+## {background-image="contents/contents/assets/qa_background.png" visibility="uncounted"}
+<!--  -->
