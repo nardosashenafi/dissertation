@@ -1,3 +1,216 @@
-# Switching Control with Deep-net Mixture of Experts: Background
+# Switching Control with Deep-net Mixture of Experts
+
+# Background
 * Contact Modeling with Linear Complementarity Formulation  
 * Mixture of Experts 
+
+## Contact Modeling
+
+* Objective: accurately model contacts, impacts and Coulomb friction.
+
+:::{.fragment fragment-index=0}
+* E.g. Model of bouncing ball
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+* Event detection searches for zero-crossings of the gap function
+* It fails during rapid contact
+:::
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+![](contents/assets/bouncing_ball.jpg){.absolute top=300 left=350 width="400" height="300"}
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+![](contents/assets/bouncing_ball_event-driven_vs_time_stepping.png){.absolute top=320 left=300 width="450" height="350"}
+:::
+
+## Linear Complementarity Formulation {auto-animate=true}
+
+:::{.fragment fragment-index=0}
+* Suppose we have a system with $k$ potential contacts.
+* $x = (q, \dot{q})$, where $q$ is position vector.
+:::
+
+:::{.fragment fragment-index=1}
+* $\lambda_N$ denotes normal contact forces, $\lambda_T$ denotes tangential contact force (Coulomb friction)
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+* Kinematic constraints:
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+- $g_N \in \mathbb{R}^k$ denotes normal distance between contact surfaces
+:::
+
+::: {.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=4}
+- $\gamma_N(q, \dot{q}) = \frac{\partial g_N}{\partial t}$ is the relative 
+normal velocities
+:::
+
+:::{.fragment .fade-in-then-out fragment-index=5}
+- $\gamma_N(q, \dot{q}) = \frac{\partial g_N}{\partial q} \dot{q}$ is the relative normal velocities
+:::
+
+:::{.fragment .fade-in fragment-index=6}
+- $\gamma_N(q, \dot{q}) = W_N \dot{q}$ is the relative normal velocities 
+:::
+
+:::
+
+:::{.fragment .fade-in fragment-index=7}
+- $\gamma_T(q, \dot{q}) = W_T \dot{q}$ is the relative tangential velocities
+:::
+
+
+## Dynamic constraints
+* Model of contact dynamics: manipulator equations
+
+\begin{align*}
+  \begin{gathered}
+    M(q) \ddot{q} + h(q, \dot{q}) - W_N \lambda_N - W_T \lambda_T = 0, \\
+    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), 
+  \end{gathered}
+\end{align*}
+
+:::{.fragment .fade-in fragment-index=0}
+* Notice $\ddot{q}$ is does not exist during impacts
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+* (Moreau 1988) provides compact dynamical model which includes impact as 
+\begin{align*}
+M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
+\dd R = W_N \dot{\lambda}_N \dd t + W_T \dot{\lambda}_T \dd t.
+\end{align*}
+:::
+
+## Complementarity Formulation
+
+* For potential contacts with gaps $g_N \leq 0$, 
+
+\begin{align*}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_T(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_N  \\
+        \lambda_T
+      \end{pmatrix} \geq 0, \\
+  % \end{eqnarray}
+  % \begin{eqnarray}
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_T(q, \dot{q})
+    \end{pmatrix} :=
+      \begin{pmatrix}
+        \gamma_N^+ + \epsilon_N \gamma_N^-  \\
+        \gamma_T^+ + \epsilon_T \gamma_T^-
+      \end{pmatrix},
+  \end{gathered}
+\end{align*}
+
+:::{.fragment fragment-index=0}
+::: {.callout}
+
+| Scenario | $g_N$ | $\gamma_N^-$ | $\gamma_N^+$ | $\xi_N$ | $\lambda_N$|
+|:-----:|:---:|:---:|:---:|:---:|:---:|
+| No contact | $g_N \leq 0$ | $\gamma_N > 0$ | $\gamma_N$ | $(I_k +\epsilon_N)\gamma_N$ | $0$ |
+| Contact or impact | $g_N \leq 0$ | $\gamma_N \leq 0$ | $- \epsilon_N \gamma_N$ | $0$ | $\lambda_N > 0$ |
+
+:::
+:::
+
+## Linear Complementarity Problem (LCP)
+
+<br/>
+
+* Objective: pose the complementarity formulation as quadratic function over the contact forces
+* Define 
+\begin{align*}
+  \lambda_R := \mu \lambda_N + \lambda_T, \\
+  \lambda_L := \mu \lambda_N - \lambda_T, 
+\end{align*}
+* Corresponding complementarity is defined
+\begin{equation*}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_R(q, \dot{q}) \\
+      \xi_L(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_R  \\
+        \lambda_L
+      \end{pmatrix} \geq 0,
+    \end{gathered}
+\end{equation*}
+
+## LCP
+
+
+\begin{align*}
+  \begin{pmatrix}
+    \xi_N \\
+    \xi_R \\
+    \lambda_L
+  \end{pmatrix} =
+      A
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b, 
+\end{align*}
+
+\begin{align*}
+    0 \leq 
+    \left[ A \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b \right]
+    \perp
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} \geq 0.
+\end{align*}
+* MENTION LEMKE
+
+## Moreau's Time-Stepping {auto-animate="true"}
+
+```julia
+    $x(0) = (q(0), \dot{q}(0))$
+    $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
+    for{$t = 0:\Delta t:T$} \Comment{Time stepping}
+       
+    end
+    return $\phi$
+```
+
+## Moreau Time-Stepping {auto-animate="true"}
+
+```julia
+    $x(0) = (q(0),  ̇q)$
+    $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
+    for{$t = 0:\Delta t:T$} \Comment{Time stepping}
+        $t_M = t + \nicefrac{\Delta t}{2}$
+        $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
+        $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
+        $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
+        $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)
+        $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
+        $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
+    end
+    return $\phi$
+```

@@ -85,6 +85,8 @@
 
 ## Existing Methods {.smaller transition="fade"}
 
+<br/>
+
 :::: {.fragment .semi-fade-out fragment-index=1}
 ::: {layout="[100,-5,60]" layout-valign="center"}
 Reinforcement learning
@@ -122,6 +124,16 @@ Model uncertainties \
 
 ## 2. Proposed Method
 
+:::: {.r-vstack}
+:::{.fragment  fragment-index=0}
+Bayesian Neural Passivity-based Control
+![](contents/assets/pbc-ml-outline.svg){.absolute top=0 left=250 width="500" height="400"}
+:::
 
+::: {.fragment  fragment-index=1}
+<!-- Bayesian Neural Passivity-based Control -->
+![](contents/assets/regular-vs-bayesian.svg){.absolute top=200 left=150 width="700" height="600"}
+:::
+::::
 
 
