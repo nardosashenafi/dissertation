@@ -10,7 +10,7 @@ format:
     controls: true
     smaller: false
     slide-number: true
-    footer: "Robust Control of Contact-Rich Robots via Neural Bayesian Inference"
+    # footer: "Robust Control of Contact-Rich Robots via Neural Bayesian Inference"
     chalkboard: 
       buttons: false
     preview-links: auto
@@ -22,6 +22,13 @@ format:
       - reveal-plugins/animate/svg.min.js
     plugins:
       - RevealAnimate
+    header-includes:
+      - | 
+        ```{=html}
+        
+        \usepackage{algorithm2e}
+        ```
+      # - \usepackage[noend]{algpseudocode}
 ---
 
 {{< include contents/_frontmatter.qmd >}}
@@ -30,7 +37,7 @@ format:
 
 {{< include contents/_background_moe.qmd >}}
 
-{{< include contents/_background_pbc.qmd >}}
+<!-- {{< include contents/_background_pbc.qmd >}} -->
 
 <!-- {{< include contents/_justification.qmd >}} -->
 

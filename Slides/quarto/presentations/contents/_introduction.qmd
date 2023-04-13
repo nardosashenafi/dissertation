@@ -77,7 +77,10 @@
 <br/>
 <br/>
 
-* Our method uses data-driven technique to *automatically* learn the mixture of expert controller and the switching conditionals
+* Our method uses data-driven technique to *automatically* learn a mixture of expert controller and the switching conditionals
+
+<br/>
+
 * We design contact-aware controllers by training on trajectories generated from accurate contact models
 
 ## 2. Operating in uncertain environment 

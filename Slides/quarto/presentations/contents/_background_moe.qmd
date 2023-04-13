@@ -29,15 +29,15 @@
 
 :::{.fragment fragment-index=0}
 * Suppose we have a system with $k$ potential contacts.
-* $x = (q, \dot{q})$, where $q$ is position vector.
+* $x = (q, \dot{q})$, where $q \in \mathbb{R}^m$ is position vector.
 :::
 
 :::{.fragment fragment-index=1}
-* $\lambda_N$ denotes normal contact forces, $\lambda_T$ denotes tangential contact force (Coulomb friction)
+* $\lambda_N \in \mathbb{R}^k$ denotes normal contact forces, $\lambda_T \in \mathbb{R}^k$ denotes tangential contact force (Coulomb friction)
 :::
 
 :::{.fragment .fade-in fragment-index=2}
-* Kinematic constraints:
+* Geometric and kinematic constraints are defined as follows:
 :::
 
 :::{.fragment .fade-in fragment-index=3}
@@ -67,6 +67,9 @@ normal velocities
 
 
 ## Dynamic constraints
+
+<br/>
+
 * Model of contact dynamics: manipulator equations
 
 \begin{align*}
@@ -86,11 +89,13 @@ normal velocities
 M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
 \dd R = W_N \dot{\lambda}_N \dd t + W_T \dot{\lambda}_T \dd t.
 \end{align*}
+
+* We integrate these equations via Moreau's time stepping algorithm
 :::
 
 ## Complementarity Formulation
 
-* For potential contacts with gaps $g_N \leq 0$, 
+* For potential contacts with gaps $g_N \leq 0$, the following holds.
 
 \begin{align*}
   \begin{gathered}
@@ -118,14 +123,14 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
 \end{align*}
 
 :::{.fragment fragment-index=0}
-::: {.callout}
+<!-- ::: {.callout} -->
 
 | Scenario | $g_N$ | $\gamma_N^-$ | $\gamma_N^+$ | $\xi_N$ | $\lambda_N$|
 |:-----:|:---:|:---:|:---:|:---:|:---:|
 | No contact | $g_N \leq 0$ | $\gamma_N > 0$ | $\gamma_N$ | $(I_k +\epsilon_N)\gamma_N$ | $0$ |
-| Contact or impact | $g_N \leq 0$ | $\gamma_N \leq 0$ | $- \epsilon_N \gamma_N$ | $0$ | $\lambda_N > 0$ |
+| Contact or impact | $g_N \leq 0$ | $\gamma_N \leq 0$ | $- \epsilon_N \gamma_N$ | $0$ | $\lambda_N \geq 0$ |
 
-:::
+<!-- ::: -->
 :::
 
 ## Linear Complementarity Problem (LCP)
@@ -154,8 +159,7 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
     \end{gathered}
 \end{equation*}
 
-## LCP
-
+* These definitions help express $\xi_N, \xi_R, \xi_L$ as affine functions of $\lambda_N, \lambda_R, \lambda_L$
 
 \begin{align*}
   \begin{pmatrix}
@@ -171,6 +175,31 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
     \end{pmatrix} + b, 
 \end{align*}
 
+## LCP
+
+* We substitute the affine functions into the complementarity formulation
+
+:::{.r-stack}
+:::{.fragment .fade-in-then-out fragment-index=0}
+\begin{equation*}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_R(q, \dot{q}) \\
+      \xi_L(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_N  \\
+        \lambda_R  \\
+        \lambda_L
+      \end{pmatrix} \geq 0,
+    \end{gathered}
+\end{equation*}
+:::
+
+:::{.fragment .fade-in fragment-index=1}
 \begin{align*}
     0 \leq 
     \left[ A \begin{pmatrix}
@@ -183,34 +212,331 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
       \lambda_N \\
       \lambda_R \\
       \xi_L
-    \end{pmatrix} \geq 0.
+    \end{pmatrix} \geq 0
 \end{align*}
-* MENTION LEMKE
+:::
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+* The LCP can be posed as a feasibility problem and solved for $\lambda_N, \lambda_R, \xi_L$
+* In the presence of friction, the LCP is a non-convex optimization problem
+* We use pivotting (basis-exchange) technique called Lemke's algorithm to solve the LCP
+:::
 
 ## Moreau's Time-Stepping {auto-animate="true"}
 
-```julia
-    $x(0) = (q(0), \dot{q}(0))$
-    $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
-    for{$t = 0:\Delta t:T$} \Comment{Time stepping}
-       
-    end
-    return $\phi$
-```
+\begin{algorithm}
+  \Input{$x_0$}
+\end{algorithm}
 
-## Moreau Time-Stepping {auto-animate="true"}
+## Mixture of Experts (MOE)
 
-```julia
-    $x(0) = (q(0),  ̇q)$
-    $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
-    for{$t = 0:\Delta t:T$} \Comment{Time stepping}
-        $t_M = t + \nicefrac{\Delta t}{2}$
-        $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
-        $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
-        $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
-        $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)
-        $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
-        $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
-    end
-    return $\phi$
-```
+* typically used to fit ensemble of expert models to high variance or multi-modal dataset
+* This architecture provides the experts and a gating network, which divides the input space $x$ into state partitions within which a single expert is active
+![](contents/assets/gaussian_moe.png){.absolute top=300 left=150 width="750" height="350"}
+
+## Mixture of Experts (MOE)
+
+<br/>
+
+* We select maximum number of experts 
+* Let us denote the experts with 
+$F(x;\theta) = \{F_1(x;\theta_1), \dots , F_{N_F}(x;\theta_{N_F}) \}$, and their parameters are given by the set $\theta = \{\theta_1, \dots , \theta_{N_F} \}$
+* Each expert $F_i$ resides in a particular state partition $i$
+* The gating network $\mathbf{P}(x| \psi)$ provides the probability of input state $x$ belonging to each state partition. It is denoted by
+
+\begin{align*}
+  \mathbf{P}(x| \psi) := (P_1(x| \psi), \dots, P_{N_F}(x | \psi))
+\end{align*}
+
+* The objective is to learn the parameters $(\psi, \theta)$ that best fit 
+the dataset
+
+## E.g. Old Faithful {auto-animate="true"}
+
+
+* **Objective**: learn two expert Gaussian models to predict duration given waiting time
+
+::::{.columns}
+
+:::{.column  width="50%"}
+* The experts are chosen as
+$$
+F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
+$$
+
+<!-- :::{.r-stack} -->
+
+:::{.fragment .fade-in fragment-index=0}
+* The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
+:::
+
+<!-- :::{.fragment .fade-in-then-out  fragment-index=1}
+* The gating network is $\mathbf{P}(x | \psi) = \{\psi, 1 - \psi \}$
+::: -->
+
+<!-- 
+:::{.fragment .fade-in  fragment-index=2}
+* The gating network is $\mathbf{P}(x | \psi) = \{ \textrm{Sig}(\psi), 1 - \textrm{Sig}(\psi) \}$
+::: -->
+
+<!-- ::: -->
+
+:::{.fragment .fade-in  fragment-index=1}
+* Learn the parameters $\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}$ and $\psi$ from dataset
+$\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
+:::
+
+
+:::
+
+:::{.column  width="50%"}
+![](contents/assets/old_faithful.png){.absolute top=100 left=600 width="550" height="400"}
+:::
+
+:::{.fragment .fade-in  fragment-index=2}
+* *Expectation Maximization*: maximizes log likelihood
+$$
+\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \Big( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \Big) P_i(x_j, \psi)
+$$
+:::
+
+
+::::
+
+
+## E.g. Old Faithful {auto-animate="true"}
+
+<br/>
+
+* *Expectation Maximization*: maximizes log likelihood
+$$
+\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \Big( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \Big) P_i(x_j, \psi)
+$$
+
+* We use stochastic gradient descent to update the parameters
+$$
+\psi \leftarrow \psi + \frac{\partial \ln \{P(\mathbb{D} | \theta, \psi) \} }{\partial \psi }
+$$ 
+$$
+\theta \leftarrow \theta + \frac{\partial \ln \{P(\mathbb{D} | \theta, \psi) \} }{\partial \theta }
+$$ 
+
+* Gradients can be found analytically or via auto-differentiation techniques
+
+## Generalization of the log likelihood
+
+* The experts can take many forms. The likelihood can be generalized as
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N} ( \| F_i(x_j; \theta_i) - y_j \| \; | \; 0, s)  P_i(x_j, \psi),
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \Biggl( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \Biggr) P_i(x_j, \psi),
+$$
+:::
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+* For gradient-based techniques, we can extract the relevant parts and simplify the likelihood
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+:::{.callout-note icon=false}
+## Likelihood
+$$
+\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+$$
+:::
+:::
+
+## Mixture of Expert Controller
+
+<br/>
+
+* **Objective**: learn contact-aware mixture of expert controller and a gating network 
+* We pose the search over the parameters $\psi, \theta$ as the following optimization problem
+
+<br/> 
+
+\begin{align*}
+    \begin{aligned}
+        \underset{\psi, \theta}{\textrm{minimize}} 
+        & & & \int_0^T \ell (x(t),u) \dd t , \\%
+        \textrm{subject to}
+        & & & M(q) \dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
+        & & & u = \{F_i(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
+    \end{aligned}
+\end{align*}
+
+## Training 
+
+<br/>
+
+::: {.incremental}
+* Training procedure:
+  + Start from initial parameters $(\psi, \theta)$
+  + Sample initial state $x_0$
+  + Generate trajectories $\phi(x_0, u, T)$ using current parameters
+  \begin{gather*}
+    i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \\
+    u(x; \psi, \theta) = F_i(x; \theta_i) \\
+    M(q) \dd \dot{q} + h(x; \psi, \theta) \dd t - \dd R  = 0 \text{ (Moreau's time stepping)}
+  \end{gather*}
+  + Assign a running cost $\ell$ to the trajectories based on performance
+  + Update parameters $(\psi, \theta)$ to minimize running cost
+:::
+
+## Performance Objective
+
+<br/>
+
+\begin{align*}
+    \begin{aligned}
+        \underset{\psi, \theta}{\textrm{minimize}} 
+        & & & \int_0^T \ell (x(t),u) \dd t , \\%
+        \textrm{subject to}
+        & & & M(q) \dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
+        & & & u = \{F_i(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
+    \end{aligned}
+\end{align*}
+
+:::{.fragment fragment-index=0}
+1. Accumulated loss: total quadratic loss from desired state $x^*$
+\begin{gather*}
+\ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u \\
+\mathcal{Q} \succ 0, \mathcal{R} \succeq 0
+\end{gather*}
+:::
+
+:::{.fragment fragment-index=1}
+The correspond likelihood function is
+:::
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+$$
+\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi)
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+$$
+\mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell (x(t+\Delta t), F_i ) P_i (x(t) | \psi ) 
+$$
+
+:::
+:::
+
+## Performance Objective
+
+::::{.columns}
+
+:::{.column width="60%"}
+
+2. Minimum Loss Trajectory (MTL):
+
+* Accumulated loss may not reflect desired behavior. E.g. Simple pendulum
+
+
+:::{.fragment fragment-index=0}
+* Simple pendulum needs to pump slowly, which would accumulate large cost
+:::
+
+:::
+
+:::{.column width="40%"}
+
+:::{.fragment fragment-index=0}
+![](contents/assets/mtl.svg){fig-align="right"}
+:::
+
+:::
+::::
+
+
+:::{.fragment fragment-index=1}
+* MTL encourages trajectories to *eventually* lead to a minimum cost
+
+\begin{align*}
+    \begin{gathered}
+        t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \}  \\
+        \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
+    \end{gathered} 
+\end{align*}
+:::
+
+## State Sampling
+
+* **Objective**: efficiently sample the state space and learn MOE controller for all initial states
+
+## State Sampling
+<!-- ###################################################################### -->
+
+:::: {.r-stack}
+
+![](contents/assets/neuralpbc/033.svg){.fragment}
+
+![](contents/assets/neuralpbc/000.svg)
+
+![](contents/assets/neuralpbc/001.svg){.fragment}
+
+![](contents/assets/neuralpbc/002.svg){.fragment}
+
+![](contents/assets/neuralpbc/003.svg){.fragment}
+
+![](contents/assets/neuralpbc/004.svg){.fragment}
+
+![](contents/assets/neuralpbc/005.svg){.fragment}
+
+![](contents/assets/neuralpbc/006.svg){.fragment}
+
+![](contents/assets/neuralpbc/007.svg){.fragment}
+
+![](contents/assets/neuralpbc/008.svg){.fragment}
+
+![](contents/assets/neuralpbc/009.svg){.fragment}
+
+![](contents/assets/neuralpbc/010.svg){.fragment}
+
+![](contents/assets/neuralpbc/011.svg){.fragment}
+
+![](contents/assets/neuralpbc/012.svg){.fragment}
+
+![](contents/assets/neuralpbc/013.svg){.fragment}
+
+![](contents/assets/neuralpbc/014.svg){.fragment}
+
+![](contents/assets/neuralpbc/015.svg){.fragment}
+
+![](contents/assets/neuralpbc/016.svg){.fragment}
+
+![](contents/assets/neuralpbc/021.svg){.fragment}
+
+![](contents/assets/neuralpbc/022.svg){.fragment}
+
+![](contents/assets/neuralpbc/023.svg){.fragment}
+
+![](contents/assets/neuralpbc/024.svg){.fragment}
+
+![](contents/assets/neuralpbc/025.svg){.fragment}
+
+![](contents/assets/neuralpbc/026.svg){.fragment}
+
+![](contents/assets/neuralpbc/027.svg){.fragment}
+
+![](contents/assets/neuralpbc/032.svg){.fragment}
+
+![](contents/assets/neuralpbc/033.svg){.fragment}
+
+::::
