@@ -37,6 +37,10 @@ format:
 
 {{< include contents/_background_moe.qmd >}}
 
+{{< include contents/_methods_moe.qmd >}}
+
+{{< include contents/_results_moe.qmd >}}
+
 <!-- {{< include contents/_background_pbc.qmd >}} -->
 
 <!-- {{< include contents/_justification.qmd >}} -->

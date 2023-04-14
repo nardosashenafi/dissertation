@@ -1,0 +1,96 @@
+# Case Studies
+
+## Stable Switching {auto-animate="true"}
+
+* Given two unstable closed-loop systems
+
+::::{.columns}
+
+:::{.column width=65%}
+
+\begin{align*}
+    \dot{x} &= A_1x = \begin{bmatrix} 0 & -1 \\ 2 & 0 \end{bmatrix} x, \\
+    \dot{x} &= A_2x = \begin{bmatrix} 0 & -2 \\ 1 & 0 \end{bmatrix} x,
+\end{align*}
+find stable switching system that converges to $x^*=(0, 0)$
+
+:::{.fragment fragment-index=1}
+* Maximum number of state partitions set to 4
+:::
+
+:::
+
+:::{.column width=35%}
+
+:::{.fragment fragment-index=0}
+![](contents/assets/unstable_switching.png){.absolute top=20 left=700 width="400" height="400"}
+:::
+
+:::
+::::
+
+:::{.fragment fragment-index=2}
+* The gating network $\mathbf{P}(x | \psi)$ is a fully-connected neural net with 4 outputs
+* There are 4 experts with parameters $\theta_i$ 
+\begin{align*}
+    F_i(\theta_i) = \begin{cases}
+       0, & \theta_i > \frac{1}{2}, \\
+       1, & \theta_i \leq \frac{1}{2},
+    \end{cases}
+\end{align*}
+:::
+
+## Stable Switching {auto-animate="true"}
+
+* The gating network $\mathbf{P}(x | \psi)$ is a fully-connected neural net with 4 outputs
+* There are 4 experts with parameters $\theta_i$ 
+\begin{align*}
+    F_i(\theta_i) = \begin{cases}
+       0, & \theta_i > \frac{1}{2}, \\
+       1, & \theta_i \leq \frac{1}{2},
+    \end{cases}
+\end{align*}
+
+:::{.fragment fragment-index=0}
+* **Objective**: learn $(\psi, \theta)$ that minimize the accumulated loss
+$$
+\ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u, \; \; \mathcal{Q} = \begin{bmatrix} 3 & 0 \\ 0 & 3 \end{bmatrix}, \mathcal{R} = 0
+$$
+:::
+
+:::{.fragment fragment-index=1}
+* The corresponding likelihood is
+:::
+
+:::{.r-stack}
+:::{.fragment .fade-in-then-out fragment-index=2}
+$$
+\mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell (x(t+\Delta t), F_i ) P_i (x(t) | \psi ) 
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+\begin{gather*}
+    \mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \mathcal{l} P_i (x(t) | \psi ) \\
+        \mathcal{l} = \theta_i \ell (x(t + \Delta t), F_i(\theta_i) ) + (1 - \theta_i)\ell (x(t + \Delta t), F_i(1-\theta_i) ) 
+\end{gather*}
+:::
+
+:::
+
+## Results
+
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
+
+## Training progress
+
+![](contents/assets/switching_training.svg){.absolute top=20 left=100 width="750" height="750"}
+
+## Cartpole with wall barriers
+
+ADD VIDEO OF ONE CONTROLLER FAILING
+
+## Problem statement
+ 
+* **Objective**: learn the parameters $\psi, \theta$ that stabilize the cartpole to the upward equilibrium
+* The 3 experts and the gating network are given by neural nets

@@ -933,8 +933,13 @@ F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 </div>
 </div>
 </div>
+</section></section>
+<section>
+<section id="mixture-of-expert-controller" class="title-slide slide level1 center">
+<h1>Mixture of Expert Controller</h1>
+
 </section>
-<section id="mixture-of-expert-controller" class="slide level2">
+<section id="mixture-of-expert-controller-1" class="slide level2">
 <h2>Mixture of Expert Controller</h2>
 <p><br></p>
 <ul>
@@ -1045,38 +1050,164 @@ M(q) \dd \dot{q} + h(x; \psi, \theta) \dd t - \dd R  = 0 \text{ (Moreau's time s
 \end{align*}</annotation></semantics></math></p>
 </div>
 </section>
-<section id="state-sampling-algorithm" class="slide level2">
-<h2><span class="smallcaps">State Sampling</span> Algorithm <span class="emoji" data-emoji="chart_with_downwards_trend">📉</span></h2>
+<section id="state-sampling" class="slide level2">
+<h2>State Sampling</h2>
+<ul>
+<li><strong>Objective</strong>: efficiently sample the state space and learn MOE controller for all initial states</li>
+</ul>
+</section>
+<section id="state-sampling-1" class="slide level2">
+<h2>State Sampling</h2>
 <!-- ###################################################################### -->
 <div class="r-stack">
 <p><img data-src="contents/assets/neuralpbc/033.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/000.svg"></p>
-<p><img data-src="contents/assets/neuralpbc/001.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/002.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/003.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/004.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/005.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/006.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/007.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/008.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/009.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/010.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/011.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/012.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/013.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/014.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/015.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/016.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/021.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/022.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/023.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/024.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/025.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/026.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/027.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/032.svg" class="fragment"></p>
-<p><img data-src="contents/assets/neuralpbc/033.svg" class="fragment"></p>
+<!-- ![](contents/assets/neuralpbc/000.svg)
+
+![](contents/assets/neuralpbc/001.svg){.fragment}
+
+![](contents/assets/neuralpbc/002.svg){.fragment}
+
+![](contents/assets/neuralpbc/003.svg){.fragment}
+
+![](contents/assets/neuralpbc/004.svg){.fragment}
+
+![](contents/assets/neuralpbc/005.svg){.fragment}
+
+![](contents/assets/neuralpbc/006.svg){.fragment}
+
+![](contents/assets/neuralpbc/007.svg){.fragment}
+
+![](contents/assets/neuralpbc/008.svg){.fragment}
+
+![](contents/assets/neuralpbc/009.svg){.fragment}
+
+![](contents/assets/neuralpbc/010.svg){.fragment}
+
+![](contents/assets/neuralpbc/011.svg){.fragment}
+
+![](contents/assets/neuralpbc/012.svg){.fragment}
+
+![](contents/assets/neuralpbc/013.svg){.fragment}
+
+![](contents/assets/neuralpbc/014.svg){.fragment}
+
+![](contents/assets/neuralpbc/015.svg){.fragment}
+
+![](contents/assets/neuralpbc/016.svg){.fragment}
+
+![](contents/assets/neuralpbc/021.svg){.fragment}
+
+![](contents/assets/neuralpbc/022.svg){.fragment}
+
+![](contents/assets/neuralpbc/023.svg){.fragment}
+
+![](contents/assets/neuralpbc/024.svg){.fragment}
+
+![](contents/assets/neuralpbc/025.svg){.fragment}
+
+![](contents/assets/neuralpbc/026.svg){.fragment}
+
+![](contents/assets/neuralpbc/027.svg){.fragment}
+
+![](contents/assets/neuralpbc/032.svg){.fragment}
+
+![](contents/assets/neuralpbc/033.svg){.fragment} -->
 </div>
+</section></section>
+<section>
+<section id="case-studies" class="title-slide slide level1 center">
+<h1>Case Studies</h1>
+
+</section>
+<section id="stable-switching" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Stable Switching</h2>
+<ul>
+<li>Given two unstable closed-loop systems</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:65%;">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right"><mover><mi>x</mi><mo accent="true">̇</mo></mover></mtd><mtd columnalign="left"><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center"><mn>0</mn></mtd><mtd columnalign="center"><mo>−</mo><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center"><mn>2</mn></mtd><mtd columnalign="center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>x</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right"><mover><mi>x</mi><mo accent="true">̇</mo></mover></mtd><mtd columnalign="left"><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center"><mn>0</mn></mtd><mtd columnalign="center"><mo>−</mo><mn>2</mn></mtd></mtr><mtr><mtd columnalign="center"><mn>1</mn></mtd><mtd columnalign="center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>x</mi><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+    \dot{x} &amp;= A_1x = \begin{bmatrix} 0 &amp; -1 \\ 2 &amp; 0 \end{bmatrix} x, \\
+    \dot{x} &amp;= A_2x = \begin{bmatrix} 0 &amp; -2 \\ 1 &amp; 0 \end{bmatrix} x,
+\end{align*}</annotation></semantics></math> find stable switching system that converges to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo>*</mo></msup><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">x^*=(0, 0)</annotation></semantics></math></p>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Maximum number of state partitions set to 4</li>
+</ul>
+</div>
+</div><div class="column" style="width:35%;">
+<div class="fragment" data-fragment-index="0">
+<p><img data-src="contents/assets/unstable_switching.png" class="absolute" style="top: 20px; left: 700px; width: 400px; height: 400px; "></p>
+</div>
+</div>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>The gating network <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="bold"><mi>𝐏</mi></mstyle><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{P}(x | \psi)</annotation></semantics></math> is a fully-connected neural net with 4 outputs</li>
+<li>There are 4 experts with parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right"><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left"><msub><mi>θ</mi><mi>i</mi></msub><mo>&gt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left"><mn>1</mn><mo>,</mo></mtd><mtd columnalign="left"><msub><mi>θ</mi><mi>i</mi></msub><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr></mtable></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  F_i(\theta_i) = \begin{cases}
+     0, &amp; \theta_i &gt; \frac{1}{2}, \\
+     1, &amp; \theta_i \leq \frac{1}{2},
+  \end{cases}
+\end{align*}</annotation></semantics></math></li>
+</ul>
+</div>
+</section>
+<section id="stable-switching-1" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Stable Switching</h2>
+<ul>
+<li>The gating network <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="bold"><mi>𝐏</mi></mstyle><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{P}(x | \psi)</annotation></semantics></math> is a fully-connected neural net with 4 outputs</li>
+<li>There are 4 experts with parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right"><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left"><msub><mi>θ</mi><mi>i</mi></msub><mo>&gt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left"><mn>1</mn><mo>,</mo></mtd><mtd columnalign="left"><msub><mi>θ</mi><mi>i</mi></msub><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr></mtable></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  F_i(\theta_i) = \begin{cases}
+     0, &amp; \theta_i &gt; \frac{1}{2}, \\
+     1, &amp; \theta_i \leq \frac{1}{2},
+  \end{cases}
+\end{align*}</annotation></semantics></math></li>
+</ul>
+<div class="fragment" data-fragment-index="0">
+<ul>
+<li><strong>Objective</strong>: learn <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>ψ</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\psi, \theta)</annotation></semantics></math> that minimize the accumulated loss <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><msup><mi>x</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mstyle mathvariant="script"><mi>𝒬</mi></mstyle><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><msup><mi>x</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>u</mi><mi>⊤</mi></msup><mstyle mathvariant="script"><mi>ℛ</mi></mstyle><mi>u</mi><mo>,</mo><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mstyle mathvariant="script"><mi>𝒬</mi></mstyle><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center"><mn>3</mn></mtd><mtd columnalign="center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center"><mn>0</mn></mtd><mtd columnalign="center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mstyle mathvariant="script"><mi>ℛ</mi></mstyle><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+\ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u, \; \; \mathcal{Q} = \begin{bmatrix} 3 &amp; 0 \\ 0 &amp; 3 \end{bmatrix}, \mathcal{R} = 0
+</annotation></semantics></math></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>The corresponding likelihood is</li>
+</ul>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="double-struck"><mi>𝕃</mi></mstyle><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow><mi>T</mi></munderover><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mo>−</mo><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>F</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+\mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell (x(t+\Delta t), F_i ) P_i (x(t) | \psi ) 
+</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="center"><mstyle mathvariant="double-struck"><mi>𝕃</mi></mstyle><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow><mi>T</mi></munderover><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mo>−</mo><mstyle mathvariant="script"><mi>𝓁</mi></mstyle><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="center"><mstyle mathvariant="script"><mi>𝓁</mi></mstyle><mo>=</mo><msub><mi>θ</mi><mi>i</mi></msub><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{gather*}
+    \mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \mathcal{l} P_i (x(t) | \psi ) \\
+        \mathcal{l} = \theta_i \ell (x(t + \Delta t), F_i(\theta_i) ) + (1 - \theta_i)\ell (x(t + \Delta t), F_i(1-\theta_i) ) 
+\end{gather*}</annotation></semantics></math></p>
+</div>
+</div>
+</section>
+<section id="results" class="slide level2">
+<h2>Results</h2>
+
+<img data-src="contents/assets/switching_results.svg" class="r-stretch quarto-figure-center"><p class="caption">&nbsp; Control input (purple <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_1x</annotation></semantics></math>, yellow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_2 x</annotation></semantics></math>) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition</p></section>
+<section id="training-progress" class="slide level2">
+<h2>Training progress</h2>
+<p><img data-src="contents/assets/switching_training.svg" class="absolute" style="top: 20px; left: 100px; width: 750px; height: 750px; "></p>
+</section>
+<section id="cartpole-with-wall-barriers" class="slide level2">
+<h2>Cartpole with wall barriers</h2>
+<p>ADD VIDEO OF ONE CONTROLLER FAILING</p>
+</section>
+<section id="problem-statement" class="slide level2">
+<h2>Problem statement</h2>
+<ul>
+<li><strong>Objective</strong>: learn the parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ψ</mi><mo>,</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\psi, \theta</annotation></semantics></math> that stabilize the cartpole to the upward equilibrium</li>
+<li>The 3 experts and the gating network are given by neural nets</li>
+</ul>
 <!-- {{< include contents/_background_pbc.qmd >}} -->
 <!-- {{< include contents/_justification.qmd >}} -->
 <!-- {{< include contents/_neuralpbc.qmd >}} -->
