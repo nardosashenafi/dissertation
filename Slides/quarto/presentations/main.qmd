@@ -22,12 +22,11 @@ format:
       - reveal-plugins/animate/svg.min.js
     plugins:
       - RevealAnimate
-    header-includes:
-      - | 
-        ```{=html}
-        
-        \usepackage{algorithm2e}
-        ```
+    # header-includes:
+    #   - | 
+    #     ```{=latex}
+    #     \usepackage{algorithm2e}
+    #     ```
       # - \usepackage[noend]{algpseudocode}
 ---
 

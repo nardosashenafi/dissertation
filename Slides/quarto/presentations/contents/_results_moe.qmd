@@ -88,7 +88,22 @@ $$
 
 ## Cartpole with wall barriers
 
-ADD VIDEO OF ONE CONTROLLER FAILING
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+{{< video contents/assets/cartpole-firefox.mp4 aspect-ratio="4x3" width="950" >}}
+(Sirichotiyakul *ACC 2022*)
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+{{< video contents/assets/cartpole_oneController.mp4 width="900" height="650" >}}
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+{{< video contents/assets/moeController.mp4 width="900" height="650" >}}
+:::
+
+:::
 
 ## Problem statement
  
