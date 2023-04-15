@@ -468,7 +468,10 @@
 </ul>
 <p><br></p>
 <ul>
-<li>We design contact-aware controllers by training on trajectories generated from accurate contact models</li>
+<li>We design <em>contact-aware</em> controllers by training on trajectories generated from accurate contact models
+<ul>
+<li><em>Contact-aware</em> controllers minimize the adverse effects of contacts or leverage the potential contacts to their advantage</li>
+</ul></li>
 </ul>
 </section>
 <section id="operating-in-uncertain-environment" class="slide level2">
@@ -1204,23 +1207,58 @@ M(q) \dd \dot{q} + h(x; \psi, \theta) \dd t - \dd R  = 0 \text{ (Moreau's time s
 <h2>Cartpole with wall barriers</h2>
 <div class="r-stack">
 <div class="fragment fade-in-then-out" data-fragment-index="0">
-<video id="video_shortcode_videojs_video1" width="950" class="video-js vjs-default-skin " controls="" preload="auto" data-setup="{}" title=""><source src="contents/assets/cartpole-firefox.mp4"></video>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Cartpole: pendulum hinged on an actuated cart</li>
+<li><strong>Objective</strong>: swingup the pendulum to the upright using the control authority on the cart</li>
+<li><em>Linear Quadratic Regulator (LQR)</em> IS used to stabilize after swingup</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<video id="video_shortcode_videojs_video1" width="600" class="video-js vjs-default-skin " controls="" preload="auto" data-setup="{}" title=""><source src="contents/assets/cartpole-firefox.mp4"></video>
 <p>(Sirichotiyakul <em>ACC 2022</em>)</p>
 </div>
-<div class="fragment fade-in" data-fragment-index="1">
-<video id="video_shortcode_videojs_video2" width="900" height="650" class="video-js vjs-default-skin " controls="" preload="auto" data-setup="{}" title=""><source src="contents/assets/cartpole_oneController.mp4"></video>
+</div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>The wall barriers create a contact-rich (hybrid) system</li>
+<li>Notice <em>LQR</em> fails due to the impact from the wall</li>
+<li>We employ contact-aware MOE controller to
+<ul>
+<li>leverage the impacts from the wall</li>
+<li>switch to a policy that assists in the catching process</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<video id="video_shortcode_videojs_video2" width="600" class="video-js vjs-default-skin " controls="" preload="auto" data-setup="{}" title=""><source src="contents/assets/cartpole_oneController.mp4"></video>
+</div>
+</div>
 </div>
 <div class="fragment fade-in" data-fragment-index="2">
 <video id="video_shortcode_videojs_video3" width="900" height="650" class="video-js vjs-default-skin " controls="" preload="auto" data-setup="{}" title=""><source src="contents/assets/moeController.mp4"></video>
 </div>
 </div>
 </section>
-<section id="problem-statement" class="slide level2">
-<h2>Problem statement</h2>
+<section id="observations" class="slide level2">
+<h2>Observations</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li><strong>Objective</strong>: learn the parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ψ</mi><mo>,</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\psi, \theta</annotation></semantics></math> that stabilize the cartpole to the upward equilibrium</li>
-<li>The 3 experts and the gating network are given by neural nets</li>
+<li>The MOE controller switches just after impact</li>
+<li>After impact, the active expert applies rapid braking</li>
 </ul>
+<p><img data-src="contents/assets/moe_traj_control.jpg"></p>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>There is a relationship between the minimum gap between the pendulum and the walls, and the expert used</li>
+<li>An expert is dedicated to states with low chance of contact and viceversa</li>
+</ul>
+<p><img data-src="contents/assets/gapContourAndBins.jpg"></p>
+</div>
+</div>
 <!-- {{< include contents/_background_pbc.qmd >}} -->
 <!-- {{< include contents/_justification.qmd >}} -->
 <!-- {{< include contents/_neuralpbc.qmd >}} -->

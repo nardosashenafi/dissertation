@@ -91,12 +91,38 @@ $$
 :::{.r-stack}
 
 :::{.fragment .fade-in-then-out fragment-index=0}
-{{< video contents/assets/cartpole-firefox.mp4 aspect-ratio="4x3" width="950" >}}
-(Sirichotiyakul *ACC 2022*)
+
+::::{.columns}
+:::{.column width=50%}
+* Cartpole: pendulum hinged on an actuated cart
+* **Objective**: swingup the pendulum to the upright using the control authority on the cart
+* *Linear Quadratic Regulator (LQR)* IS used to stabilize after swingup
 :::
 
-:::{.fragment .fade-in fragment-index=1}
-{{< video contents/assets/cartpole_oneController.mp4 width="900" height="650" >}}
+:::{.column width=50%}
+{{< video contents/assets/cartpole-firefox.mp4 aspect-ratio="4x3" width="600" >}}
+(Sirichotiyakul *ACC 2022*)
+:::
+::::
+
+:::
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+::::{.columns}
+
+:::{.column width=50%}
+* The wall barriers create a contact-rich (hybrid) system
+* Notice *LQR* fails due to the impact from the wall
+* We employ contact-aware MOE controller to 
+    + leverage the impacts from the wall
+    + switch to a policy that assists in the catching process
+:::
+
+:::{.column width=50%}
+{{< video contents/assets/cartpole_oneController.mp4 aspect-ratio="4x3" width="600" >}}
+:::
+
+::::
 :::
 
 :::{.fragment .fade-in fragment-index=2}
@@ -105,7 +131,21 @@ $$
 
 :::
 
-## Problem statement
- 
-* **Objective**: learn the parameters $\psi, \theta$ that stabilize the cartpole to the upward equilibrium
-* The 3 experts and the gating network are given by neural nets
+## Observations
+
+::::{.columns}
+
+:::{.column width=50%}
+* The MOE controller switches just after impact
+* After impact, the active expert applies rapid braking
+
+![](contents/assets/moe_traj_control.jpg)
+:::
+
+:::{.column width=50%}
+* There is a relationship between the minimum gap between the pendulum and the walls, and the expert used
+* An expert is dedicated to states with low chance of contact and viceversa
+
+![](contents/assets/gapContourAndBins.jpg)
+:::
+::::

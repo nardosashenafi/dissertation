@@ -81,7 +81,8 @@
 
 <br/>
 
-* We design contact-aware controllers by training on trajectories generated from accurate contact models
+* We design *contact-aware* controllers by training on trajectories generated from accurate contact models
+    + *Contact-aware* controllers minimize the adverse effects of contacts or leverage the potential contacts to their advantage
 
 ## 2. Operating in uncertain environment 
 
