@@ -32,8 +32,8 @@ Arash Komaee, Ph.D.
 
 <br>
 
-:::: {.columns}
-::: {.column width="65%"}
+<!-- :::: {.columns}
+::: {.column width="65%"} -->
 
 ::: {.fragment .fade-in-then-semi-out fragment-index=0}
 ### <span style="font-variant:small-caps;">Published</span>
@@ -41,16 +41,16 @@ Arash Komaee, Ph.D.
 * ***ACC 2022***: Bayesian NeuralPBC
 * ***L-CSS 2022***: Bayesian NeuralPBC
     + ***CDC 2022***
-* ***Arxiv 2022***: Theoretical Justification of Robustness
-:::
+* ***Arxiv 2022***: Control Design via Bayesian Inference: Theoretical Justification of Robustness
+<!-- ::: -->
 
 :::
 
-::: {.column width="35%"} 
+<!-- ::: {.column width="35%"}  -->
 ::: {.fragment .fade-in fragment-index=1}
 ### <span style="font-variant:small-caps;">Upcoming Submissions</span>
 * Mixture of Experts
 * Bayesian NeuralPBC on Rimless Wheel
 :::
-:::
-:::: 
+<!-- ::: -->
+<!-- ::::  -->

@@ -27,49 +27,48 @@
 :::
 
 
-## 1. Mode Changes in Contact-Rich Robots 
+## 1. Motivation 
 <!-- ###################################################################### -->
-:::: {.columns}
-:::{.column  width="50%"}
-![](contents/assets/walkingmodes.jpg){.absolute top=200 left=0 width="400" height="300"}
-:::
-
-:::{.column  width="50%"}
-
-<br/>
-<br/>
-
-* Contacts cause mode changes
-* Each mode has distinct dynamics
-* Controlled by switching amongst several policies
-:::
-::::
-
-## Motivation
-
-<!-- ## {background-video="contents/assets/nhcm_total.mp4" background-video-muted="true"}
-::: {.fragment .fade-in fragment-index=0}
-<div class="semi-transparent-overlay"></div> -->
-<!-- ::: -->
 
 :::: {.columns}
 :::{.column  width="50%"}
 
-<br/>
-<br/>
+:::{.r-vstack}
 
+:::{.fragment fragment-index=0}
+![](contents/assets/walkingmodes.jpg){width="400" height="300"}
+:::
+
+:::{.fragment fragment-index=1}
 * Switching control does not scale well
     + E.g. Cooperative manipulation
     + $k$ contacts can have upto $2^k$ contact combinations
 * It is difficult to parameterize the switching condition 
 :::
+:::
+
+:::
 
 :::{.column  width="50%"}
+
+:::{.r-vstack}
+
+:::{.fragment fragment-index=0}
+
+* Contacts cause mode changes
+* Each mode has distinct dynamics
+* Controlled by switching among several policies
+:::
+
 <br/>
 
-
+:::{.fragment fragment-index=1}
 ![](contents/assets/nhcm.png){fig-align="right" width="400" height="300"}
 :::
+
+:::
+:::
+
 ::::
 
 
@@ -81,7 +80,7 @@
 
 <br/>
 
-* We design *contact-aware* controllers by training on trajectories generated from accurate contact models
+* We infer *contact-aware* controllers by training on trajectories generated from accurate contact models
     + *Contact-aware* controllers minimize the adverse effects of contacts or leverage the potential contacts to their advantage
 
 ## 2. Operating in uncertain environment 

@@ -1,12 +1,25 @@
+# Uncertainty Handling via Neural Bayesian Inference
+
+## Proposed Method
+:::: {.r-vstack}
+Bayesian Neural Passivity-based Control
+![](contents/assets/pbc-ml-outline.svg){.absolute top=0 left=250 width="500" height="400"}
+
+<!-- Bayesian Neural Passivity-based Control -->
+![](contents/assets/regular-vs-bayesian.svg){.absolute top=200 left=150 width="700" height="600"}
+::::
+
 
 # Background {visibility="uncounted"}
 <!-- ###################################################################### -->
 
-Passive System Theory and Passivity-Based Control (PBC)
-
+* Passive System Theory and Passivity-Based Control (PBC)
+* Bayesian Learning
 
 ## Dissipativity {auto-animate="true"}
 <!-- ###################################################################### -->
+
+<br/>
 
 A dynamical system
 
@@ -14,82 +27,47 @@ $$
 \Sigma: \quad
 \begin{cases}
   \dot{x} &= f(x,u) \\
-  y &= h(x,u)
+  y &= g(x,u)
 \end{cases}
-\quad x \in \mathcal{X} \subset \mathbb{R}^{2n}, \, u \in \mathcal{U} \subset \mathbb{R}^{m} 
+\quad x \in \mathcal{X} \subset \mathbb{R}^{2m}, \, u \in \mathcal{U} \subset \mathbb{R}^{n} 
 $$
 
-is __dissipative__ with respect to some supply rate $s$ if there exists a *storage function* $\mathcal{H}: \mathcal{X} \to \mathbb{R}^{+}$ such that
+is __dissipative__ with respect to some supply rate $s$ if there exists a *storage function* $H: \mathcal{X} \to \mathbb{R}^{+}$ such that
 
 $$
-\mathcal{H}\left(  x(t_1) \right) \leq  \mathcal{H}\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t
+H\left(  x(t_1) \right) \leq  H\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t
 $$
 
 for all $x(t_0) = x_0$, all input $u$, and all $t_1 \geq t_0$
 
-
-## Dissipativity {auto-animate="true"}
-
-$$
-\mathcal{H}\left(  x(t_1) \right) \leq  \mathcal{H}\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t
-$$
-
-:::: {.callout}
-## Dissipation Inequality
-
-::: {.incremental}
-- Stored energy at $t_1$ is *at most* equal to stored energy at $t_0$, plus externally supplied energy $s(u,y)$
-- No generation of energy, only internal dissipation
-- With $s(t) \equiv 0$, trajectories tend towards minimum of $\mathcal{H}$
-:::
-::::
-
-
-## Passivity
-<!-- ###################################################################### -->
-
-The system $\Sigma$ is __passive__ if it is dissipative with supply rate
-
-$$s = u^\top y.$$
-
-It is __output strictly passive__ if it is dissipative with supply rate
-
-$$s = u^\top y - \delta \lVert y \rVert^2, \; \delta > 0.$$
-
-It is __input strictly passive__ if it is dissipative with supply rate
-
-
-$$s = u^\top y - \delta \lVert u \rVert^2, \; \delta > 0.$$
-
-
-
 ## Stability of Passive Systems {auto-animate="true"}
 <!-- ###################################################################### -->
+
+<br/>
 
 $$
 \Sigma: \quad
 \begin{cases}
   \dot{x} &= f(x,u), && f(0,0) = 0, \\
-  y &= h(x,u), && h(0,0) = 0,
+  y &= g(x,u), && g(0,0) = 0,
 \end{cases}
 $$
 
 
-$u^{\top} y \geq \dot{\mathcal{H}} = \frac{\partial\mathcal{H}}{\partial x} f(x,u),\quad \mathcal{H} \geq 0,\quad y \equiv 0 \implies x \equiv 0$
+
+\begin{gather*}
+u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
+\quad H \geq 0,\quad y \equiv 0 \implies x \equiv 0.
+\end{gather*}
+
+<br/> 
 
 ::: {.callout-note icon="false"}
 ## Lemma (Khalil, 2002)
 The origin of $\Sigma$ is: 
 
 - __stable__ if $\Sigma$ is passive,
-- __asymptotically stable__ if $\Sigma$ is output strictly passive,
-- __globally asymptotically stable__ if $\Sigma$ is output strictly passive and the storage function $\mathcal{H}(x) \to \infty$ as $\lVert x \rVert \to \infty$ (radially unbounded)
-:::
-
-
-::: {.notes}
-* Notice that we only require that the function $\mathcal{H}$ be positive semidefinite and not necessarily positive definite as per usual Lyapunov conditions.
-* Observability (detectability) ensures LaSalle's theorem works.
+- __asymptotically stable__ if $\Sigma$ is output strictly passive ($s = u^\top y - \delta \lVert y \rVert^2, \; \delta > 0$).
 :::
 
 
@@ -103,6 +81,9 @@ The origin of $\Sigma$ is:
 :::
 
 ::: {.column width="70%"}
+
+<br/> 
+
 Kirchoff's law
 
 $$
@@ -118,11 +99,11 @@ $$
 
 ::::
 
-Let $\mathcal{H} = \mathcal{V} + \mathcal{T}$, integrate to obtain
+Let $H = \mathcal{V} + \mathcal{T}$, integrate to obtain
 
 $$
-\underbrace{\mathcal{H}(t)}_{\textrm{available}} -
-\underbrace{\mathcal{H}(0)}_{\textrm{initial}} 
+\underbrace{H(t)}_{\textrm{available}} -
+\underbrace{H(0)}_{\textrm{initial}} 
 = 
 \underbrace{\int_{0}^{t} v(\tau)i(\tau)\, \text{d} \tau}_{\textrm{supplied}} - 
 \underbrace{\int_{0}^{t} Ri^2(\tau)\, \text{d} \tau}_{\textrm{dissipated}}
@@ -134,6 +115,8 @@ $$
 ## Simple Pendulum {auto-animate="false" auto-animate-easing="ease"}
 <!-- ###################################################################### -->
 
+<br/> 
+
 :::: {.callout-note icon="false"}
 
 ## Energy Shaping
@@ -144,7 +127,7 @@ $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
 \begin{bmatrix} \phantom{-}0 & 1 \\ -1 & 0 \end{bmatrix} 
 \begin{bmatrix} \nabla_q H_{\phantom{d}} \\ \nabla_p H_{\phantom{d}} \end{bmatrix} +
-\begin{bmatrix} 0 \\ G \end{bmatrix} u_\phantom{di},
+\begin{bmatrix} 0 \\ \Omega \end{bmatrix} u_\phantom{di},
 \qquad y = \dot{q}
 $$
 
@@ -155,7 +138,7 @@ Choose $u = u_{es} + u_{di}$ that transforms system into a passive one  with $x^
 
 ::: {.fragment .fade-in  fragment-index=2}
 
-$Gu_{es} = \nabla_q H  - \nabla_q H_d , \quad Gu_{di} = -GK_D G^\top \nabla_p H_d$
+$\Omega u_{es} = \nabla_q H  - \nabla_q H_d , \quad \Omega u_{di} = -\Omega K_D \Omega^\top \nabla_p H_d$
 :::
 
 
@@ -166,7 +149,7 @@ $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
 \begin{bmatrix} \phantom{-}0 & 1 \\ -1 & 0 \end{bmatrix} 
 \begin{bmatrix} \nabla_q H_d \\ \nabla_p H_d \end{bmatrix} +
-\begin{bmatrix} 0 \\ G \end{bmatrix} u_{di},
+\begin{bmatrix} 0 \\ \Omega \end{bmatrix} u_{di},
 \qquad y = \dot{q}
 $$
 :::
@@ -175,7 +158,7 @@ $$
 
 $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
-\begin{bmatrix} \phantom{-}0 & 1 \\ -1 & -G K_D G^\top \end{bmatrix} 
+\begin{bmatrix} \phantom{-}0 & 1 \\ -1 & -\Omega K_D \Omega^\top \end{bmatrix} 
 \begin{bmatrix} \nabla_q H_d \\ \nabla_p H_d \end{bmatrix},
 \qquad y = \dot{q}
 $$
@@ -190,17 +173,19 @@ $$
 ##  Simple Pendulum  {auto-animate="false" auto-animate-easing="ease"}
 <!-- ###################################################################### -->
 
+<br/> 
+
 :::: {.callout-tip icon="false"}
 
 ## Control Synthesis via PBC
 
 Choose $u = u_{es} + u_{di}$ that transforms system into a passive one with $x^\star =  (q^\star, 0)$
 
-$Gu_{es} = \nabla_q H  - \nabla_q H_d , \quad Gu_{di} = -GK_D G^\top \nabla_p H_d$
+$\Omega u_{es} = \nabla_q H  - \nabla_q H_d , \quad \Omega u_{di} = -\Omega K_D \Omega^\top \nabla_p H_d$
 
 $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
-\begin{bmatrix} \phantom{-}0 & 1 \\ -1 & -G K_D G^\top \end{bmatrix} 
+\begin{bmatrix} \phantom{-}0 & 1 \\ -1 & -\Omega K_D \Omega^\top \end{bmatrix} 
 \begin{bmatrix} \nabla_q H_d \\ \nabla_p H_d \end{bmatrix},
 \qquad y = \dot{q}
 $$
@@ -222,29 +207,8 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 
 ::::
 
-## {background-video="contents/assets/ballbot_youtube_trim_reverse.mp4"}
-<!-- ###################################################################### -->
 
-:::: {.r-stack}
-
-::: {.fragment .fade-in fragment-index=0}
-<div class="semi-transparent-overlay"></div>
-:::
-
-<center>![](contents/assets/Ballbot_Rezero_2010.jpg){.fragment .fade-in-then-out fragment-index=0 height=640}</center>
-
-<center>![](contents/assets/ballbot_schematic.png){.fragment .fade-in-then-semi-out fragment-index=1 width=800}</center>
-
-![](contents/assets/ballbot_derivation_1.png){.fragment .fade-in-then-semi-out .absolute top=200 left=20 width=800 }
-
-![](contents/assets/ballbot_derivation_2.png){.fragment .fade-in-then-semi-out .absolute top=20 right=20 width=800 }
-
-:::{.fragment}
-:::
-
-::::
-
-## Our Methods {.smaller transition="fade"}
+## <span style="font-variant:small-caps;">NeuralPbc</span> {visibility="uncounted"}
 <!-- ###################################################################### -->
 
 ::: {layout="[100,-5,60]" layout-valign="center"}
@@ -262,6 +226,40 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 * Systematic approach
 * Performance objective included
 * Stability is _intrinsic_
-* Model uncertainty considerations possible
+* *Lacks model uncertainty considerations*
 :::
 ::::
+
+
+## <span style="font-variant:small-caps;">NeuralPbc</span> Problem Statement
+<!-- ###################################################################### -->
+
+<br/>
+
+::: {.callout-tip icon="false"}
+## <span style="font-variant:small-caps;">NeuralPbc</span> Optimization Problem 
+
+$$
+\begin{aligned}
+\underset{\theta}{\text{minimize}} &&& \ell \left(\phi,u^\theta \right)\, \\
+\text{subject to} &&
+\begin{bmatrix}
+  \dot{q} \\ \dot{p}
+\end{bmatrix} &=
+\begin{bmatrix}
+  0 & I \\ -I & 0
+\end{bmatrix}
+\begin{bmatrix} \nabla_q H \\ \nabla_p H \end{bmatrix} + 
+\begin{bmatrix}
+  0 \\ \Omega
+\end{bmatrix} u^{\theta}
+\\
+&& u^\theta &= - \Omega^{\dagger}\nabla_q H_d^{\theta}  - K_D \Omega^\top \nabla_p H_d^{\theta}
+\end{aligned}
+$$
+:::
+
+- Parameterize $H_d$ by a neural network $H_d^\theta$, 
+- Desired performance characterized by $\ell$,
+- Approximate solutions to the PDEs found via stochastic gradient descent.
+

@@ -6,7 +6,7 @@
 
 ## Contact Modeling
 
-* Objective: accurately model contacts, impacts and Coulomb friction.
+* **Objective**: accurately model contacts, impacts and Coulomb friction.
 
 :::{.fragment fragment-index=0}
 * E.g. Model of bouncing ball
@@ -133,95 +133,6 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
 <!-- ::: -->
 :::
 
-## Linear Complementarity Problem (LCP)
-
-<br/>
-
-* Objective: pose the complementarity formulation as quadratic function over the contact forces
-* Define 
-\begin{align*}
-  \lambda_R := \mu \lambda_N + \lambda_T, \\
-  \lambda_L := \mu \lambda_N - \lambda_T, 
-\end{align*}
-* Corresponding complementarity is defined
-\begin{equation*}
-  \begin{gathered}
-    0 \leq 
-    \begin{pmatrix}
-      \xi_R(q, \dot{q}) \\
-      \xi_L(q, \dot{q})
-    \end{pmatrix} 
-    \perp
-      \begin{pmatrix}
-        \lambda_R  \\
-        \lambda_L
-      \end{pmatrix} \geq 0,
-    \end{gathered}
-\end{equation*}
-
-* These definitions help express $\xi_N, \xi_R, \xi_L$ as affine functions of $\lambda_N, \lambda_R, \lambda_L$
-
-\begin{align*}
-  \begin{pmatrix}
-    \xi_N \\
-    \xi_R \\
-    \lambda_L
-  \end{pmatrix} =
-      A
-    \begin{pmatrix}
-      \lambda_N \\
-      \lambda_R \\
-      \xi_L
-    \end{pmatrix} + b, 
-\end{align*}
-
-## LCP
-
-* We substitute the affine functions into the complementarity formulation
-
-:::{.r-stack}
-:::{.fragment .fade-in-then-out fragment-index=0}
-\begin{equation*}
-  \begin{gathered}
-    0 \leq 
-    \begin{pmatrix}
-      \xi_N(q, \dot{q}) \\
-      \xi_R(q, \dot{q}) \\
-      \xi_L(q, \dot{q})
-    \end{pmatrix} 
-    \perp
-      \begin{pmatrix}
-        \lambda_N  \\
-        \lambda_R  \\
-        \lambda_L
-      \end{pmatrix} \geq 0,
-    \end{gathered}
-\end{equation*}
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-\begin{align*}
-    0 \leq 
-    \left[ A \begin{pmatrix}
-      \lambda_N \\
-      \lambda_R \\
-      \xi_L
-    \end{pmatrix} + b \right]
-    \perp
-    \begin{pmatrix}
-      \lambda_N \\
-      \lambda_R \\
-      \xi_L
-    \end{pmatrix} \geq 0
-\end{align*}
-:::
-:::
-
-:::{.fragment .fade-in fragment-index=2}
-* The LCP can be posed as a feasibility problem and solved for $\lambda_N, \lambda_R, \xi_L$
-* In the presence of friction, the LCP is a non-convex optimization problem
-* We use pivotting (basis-exchange) technique called Lemke's algorithm to solve the LCP
-:::
 
 ## Moreau's Time-Stepping {auto-animate="true"}
 

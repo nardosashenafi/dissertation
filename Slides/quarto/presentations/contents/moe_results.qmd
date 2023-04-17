@@ -78,13 +78,33 @@ $$
 
 :::
 
-## Results
-
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
 
 ## Training progress
 
-![](contents/assets/switching_training.svg){.absolute top=20 left=100 width="750" height="750"}
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter0.svg){top=100 left=300 }
+:::
+
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter200.svg){ top=50 left=300 }
+:::
+
+
+:::{.fragment .fade-in fragment-index=2}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter1400.svg){ top=100 left=300 }
+:::
+
+:::
+
+## Final Result
+
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
+
+
+<!-- ![](contents/assets/switching_training.svg){.absolute top=20 left=100 width="750" height="750"} -->
 
 ## Cartpole with wall barriers
 
@@ -96,7 +116,7 @@ $$
 :::{.column width=50%}
 * Cartpole: pendulum hinged on an actuated cart
 * **Objective**: swingup the pendulum to the upright using the control authority on the cart
-* *Linear Quadratic Regulator (LQR)* IS used to stabilize after swingup
+* *Linear Quadratic Regulator (LQR)* is used to stabilize after swingup
 :::
 
 :::{.column width=50%}
@@ -136,16 +156,34 @@ $$
 ::::{.columns}
 
 :::{.column width=50%}
+
 * The MOE controller switches just after impact
 * After impact, the active expert applies rapid braking
 
 ![](contents/assets/moe_traj_control.jpg)
+
 :::
 
 :::{.column width=50%}
+
+:::{.fragment fragment-index=0}
 * There is a relationship between the minimum gap between the pendulum and the walls, and the expert used
 * An expert is dedicated to states with low chance of contact and viceversa
 
 ![](contents/assets/gapContourAndBins.jpg)
 :::
+:::
+
 ::::
+
+## Conclusions
+
+<br/>
+<br/>
+
+:::{.incremental}
+* We provide a data-driven control design that *automatically* reasons about the effects of contact forces
+* The framework leverages the switching controllers to stabilize the multi-modal 
+dynamical system
+* The gating network successsfully parameterizes the control-switching conditionals that achieves the desired performance
+:::

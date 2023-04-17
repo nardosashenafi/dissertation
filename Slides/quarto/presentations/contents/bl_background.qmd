@@ -1,0 +1,34 @@
+## Bayesian Learning
+ 
+<br/>
+
+* **Objective**: Given finite dataset with inherent noise, we are in search of a regression model
+
+:::: {.columns}
+
+:::{.column width=50%}
+* E.g. Recognizing handwritten digits from images
+    + noise due to differences in individual handwriting
+* *Stochastic models* provide generalized predictions 
+and report the uncertainty in each prediction
+:::
+
+:::{.column width=50%}
+![](contents/assets/handwritten_images.png){.absolute top=250 left=700 width="350" height="300"}
+:::
+
+::::
+
+## Training Stochastic Models
+
+:::: {.columns}
+
+:::{.column width=50%}
+* Stochastic models denoted by $F(x;\theta)$
+* The parameters are drawn from the distribution $P(\theta)$
+:::
+
+:::{.column width=50%}
+
+:::
+:::: 

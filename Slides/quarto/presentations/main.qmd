@@ -30,17 +30,19 @@ format:
       # - \usepackage[noend]{algpseudocode}
 ---
 
-{{< include contents/_frontmatter.qmd >}}
+{{< include contents/frontmatter.qmd >}}
 
-{{< include contents/_introduction.qmd >}}
+{{< include contents/introduction.qmd >}}
 
-{{< include contents/_background_moe.qmd >}}
+{{< include contents/moe_background.qmd >}}
 
-{{< include contents/_methods_moe.qmd >}}
+{{< include contents/moe_methods.qmd >}}
 
-{{< include contents/_results_moe.qmd >}}
+{{< include contents/moe_results.qmd >}}
 
-<!-- {{< include contents/_background_pbc.qmd >}} -->
+{{< include contents/pbc_background.qmd >}} 
+
+{{< include contents/bl_background.qmd >}} 
 
 <!-- {{< include contents/_justification.qmd >}} -->
 
