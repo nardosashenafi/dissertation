@@ -10,7 +10,7 @@
 <link href="main_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="main_files/libs/quarto-contrib/videojs/video.min.js"></script>
 <link href="main_files/libs/quarto-contrib/videojs/video-js.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.3.326">
+  <meta name="generator" content="quarto-1.3.319">
 
   <meta name="author" content="Nardos Ashenafi">
   <title>Robust Control of Contact-Rich Robots via Neural Bayesian Inference</title>
@@ -1465,38 +1465,116 @@ vi - Ri^2 &amp;= \frac{\text{d}}{\text{d} t} \left(
 <li>Approximate solutions to the PDEs found via stochastic gradient descent.</li>
 </ul>
 </section>
-<section id="bayesian-learning" class="slide level2">
-<h2>Bayesian Learning</h2>
+<section id="bayesian-learning" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Bayesian Learning</h2>
 <p><br></p>
 <ul>
 <li><strong>Objective</strong>: Given finite dataset with inherent noise, we are in search of a regression model</li>
 </ul>
 <div class="columns">
-<div class="column" style="width:50%;">
+<div class="column" style="width:60%;">
+<div class="fragment" data-fragment-index="0">
 <ul>
 <li>E.g. Recognizing handwritten digits from images
 <ul>
 <li>noise due to differences in individual handwriting</li>
 </ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="1">
+<ul>
 <li><em>Stochastic models</em> provide generalized predictions and report the uncertainty in each prediction</li>
 </ul>
-</div><div class="column" style="width:50%;">
-<p><img data-src="contents/assets/handwritten_images.png" class="absolute" style="top: 250px; left: 700px; width: 350px; height: 300px; "></p>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="fragment" data-fragment-index="0">
+<p><img data-src="contents/assets/handwritten_images.png" class="absolute" style="top: 250px; left: 700px; width: 350px; height: 200px; "></p>
+</div>
 </div>
 </div>
 </section>
-<section id="training-stochastic-models" class="slide level2">
-<h2>Training Stochastic Models</h2>
+<section id="training-stochastic-models" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Training Stochastic Models</h2>
 <div class="columns">
-<div class="column" style="width:50%;">
+<div class="column" style="width:60%;">
+<div class="{r-vstack}">
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Expectation Maximization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">minimize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><munder><mo>∑</mo><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>,</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>∈</mo><mi>𝔻</mi></mrow></munder><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">∥</mo><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>θ</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta)}{\text{minimize}} &amp;&amp;&amp; \sum_{(x_j, y_j) \in \mathbb{D}}
+\| F(x_j; \theta) - y_j \| , \\
+\text{subject to} &amp;&amp;
+\theta &amp;\sim P(\theta) \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment fade-in" data-fragment-index="1">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Expectation Maximization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">minimize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><munder><mo>∑</mo><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>,</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>∈</mo><mi>𝔻</mi></mrow></munder><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">∥</mo><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>θ</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta;z)}{\text{minimize}} &amp;&amp;&amp; \sum_{(x_j, y_j) \in \mathbb{D}}
+\| F(x_j; \theta) - y_j \|, \\
+\text{subject to} &amp;&amp;
+\theta &amp;\sim P(\theta;z) \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+</div>
+<!-- r-stack -->
+<div class="fragment fade-in" data-fragment-index="2">
+<p><img data-src="contents/assets/overfitting.svg" class="absolute" style="top: 150px; left: 0px; width: 650px; height: 650px; "></p>
+</div>
+<!-- fragment -->
+</div>
+<!-- r-vstack -->
+</div><!-- column --><div class="column" style="width:40%;">
+<div class="r-vstack">
+<p><img data-src="contents/assets/handwritten_images.png"></p>
+<div class="fragment fade-in" data-fragment-index="2">
+<div>
 <ul>
-<li>Stohastic models denoted by <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F(x;\theta)</annotation></semantics></math></li>
-<li>The parameters are drawn from the distribution <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(\theta)</annotation></semantics></math></li>
+<li class="fragment">Expectation maximization is prone to overfitting
+<ul>
+<li class="fragment">Reduces accuracy of predictions</li>
+<li class="fragment">Reports near-zero prediction uncertainty (<em>overconfident</em>)</li>
+</ul></li>
+<li class="fragment"><strong>Solution</strong>: enforce variance on the posterior</li>
 </ul>
-</div><div class="column" style="width:50%;">
-
 </div>
+<!--incremental -->
 </div>
+<!-- fragment -->
+</div>
+<!-- r-vstack -->
+</div><!-- column -->
+</div>
+</section>
+<section id="bias-variance-trade-off" class="slide level2">
+<h2>Bias-Variance Trade-Off</h2>
 <!-- {{< include contents/_justification.qmd >}} -->
 <!-- {{< include contents/_neuralpbc.qmd >}} -->
 <!-- {{< include contents/_background_idapbc.qmd >}} -->

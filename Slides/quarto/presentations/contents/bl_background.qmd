@@ -1,4 +1,4 @@
-## Bayesian Learning
+## Bayesian Learning {auto-animate=true}
  
 <br/>
 
@@ -6,29 +6,114 @@
 
 :::: {.columns}
 
-:::{.column width=50%}
+:::{.column width=60%}
+
+:::{.fragment fragment-index=0}
 * E.g. Recognizing handwritten digits from images
     + noise due to differences in individual handwriting
+:::
+
+:::{.fragment fragment-index=1}
 * *Stochastic models* provide generalized predictions 
 and report the uncertainty in each prediction
 :::
 
-:::{.column width=50%}
-![](contents/assets/handwritten_images.png){.absolute top=250 left=700 width="350" height="300"}
 :::
 
+:::{.column width=40%}
+
+:::{.fragment fragment-index=0}
+![](contents/assets/handwritten_images.png){.absolute top=250 left=700 width="350" height="200"}
+:::
+
+:::
 ::::
 
-## Training Stochastic Models
+## Training Stochastic Models {auto-animate=true}
 
 :::: {.columns}
 
-:::{.column width=50%}
-* Stochastic models denoted by $F(x;\theta)$
-* The parameters are drawn from the distribution $P(\theta)$
-:::
+:::{.column width=60%}
 
-:::{.column width=50%}
+:::{r-vstack}
 
-:::
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{P(\theta)}{\text{minimize}} &&& \sum_{(x_j, y_j) \in \mathbb{D}}
+\| F(x_j; \theta) - y_j \| , \\
+\text{subject to} &&
+\theta &\sim P(\theta) \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+::: 
+<!-- fragment -->
+
+:::{.fragment .fade-in fragment-index=1}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{P(\theta;z)}{\text{minimize}} &&& \sum_{(x_j, y_j) \in \mathbb{D}}
+\| F(x_j; \theta) - y_j \|, \\
+\text{subject to} &&
+\theta &\sim P(\theta;z) \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+::: 
+<!-- fragment -->
+::: 
+<!-- r-stack -->
+
+:::{.fragment .fade-in fragment-index=2}
+![](contents/assets/overfitting.svg){.absolute top=150 left=0 width="650" height="650"}
+::: 
+<!-- fragment -->
+
+::: 
+<!-- r-vstack -->
+::: 
+<!-- column -->
+
+:::{.column width=40%}
+
+:::{.r-vstack}
+![](contents/assets/handwritten_images.png)
+
+:::{.fragment .fade-in fragment-index=2}
+:::{.incremental}
+* Expectation maximization is prone to overfitting
+    + Reduces accuracy of predictions
+    + Reports near-zero prediction uncertainty (*overconfident*)
+* **Solution**: enforce variance on the posterior 
+::: 
+<!--incremental -->
+
+::: 
+<!-- fragment -->
+
+::: 
+<!-- r-vstack -->
+
+::: 
+<!-- column -->
 :::: 
+
+## Bias-Variance Trade-Off
+
+## Proposed Method
+
+
+

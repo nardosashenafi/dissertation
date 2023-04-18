@@ -130,6 +130,17 @@
 * We use pivotting (basis-exchange) technique called Lemke's algorithm to solve the LCP
 :::
 
+## Uncertainty in Predictions
+
+* The uncertainty associated with each prediction is given by~\cite{jospin2020hands}
+\begin{align*}
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta;z)} \| F(x; \theta) - \hat{F}(x)|\^2.
+\end{align*}
+where $\hat{F}(x)$ is the marginalized prediction given by
+\begin{align*}
+  \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta;z)} F(x; \theta),
+\end{align*} 
+
 
 ## Bias-Variance Tradeoff
 
