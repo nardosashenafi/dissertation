@@ -167,7 +167,7 @@ from pre-impact velocities by~\eqref{eq:postimpactVel}.
 %
 In this scenario, the quantity $\xi_N$ evaluates to zero, because
 \begin{align*}
-  \xi_N &= -\epsilon_N \gamma_N^- + \epsilon_N \gamma_N^- = 0.
+  \xi_N &= \gamma_N^+ + \epsilon_N \gamma_N^- = -\epsilon_N \gamma_N^- + \epsilon_N \gamma_N^- = 0.
 \end{align*}
 %
 The complementarity constraint in~\eqref{eq:complementarity} states that when
@@ -190,6 +190,7 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
 
 \begin{table}
   \centering
+  \caption{Linear Complementarity Formulation: Possible contact scenarios}
   \begin{tabular}{|c|c|c|c|c|c|}
     \hline
     Scenario & $g_N$ & $\gamma_N^-$ & $\gamma_N^+$ & $\xi_N$ & $\lambda_N$ \\
@@ -198,7 +199,6 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
     Contact or impact & $g_N \leq 0$ &  $\gamma_N \leq 0$ & $- \epsilon_N \gamma_N$ & $0$ & $\lambda_N \geq 0$ \\
     \hline
   \end{tabular}
-  \caption{Linear Complementarity Formulation: Possible contact scenarios}
   \label{tab:complementarity}
 \end{table}
 
@@ -212,6 +212,8 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
       \node[] at (-1.1, -0.3) {\small $\xi_N$};
       \node[] at (4.6, 2.5) {\small $\lambda_T$};
       \node[] at (6.2, -0.3) {\small $\xi_T$};
+      \node[] at (4.8, 1.3) {\small $\mu \lambda_N$};
+      \node[] at (3.7, -1.3) {\small $-\mu \lambda_N$};
       % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
   \end{tikzpicture}
   \caption{Left: Complementarity condition for normal contact forces. Right: Characteristics of Coulomb friction as a function of $\xi_T$}
@@ -229,8 +231,8 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
       \node[] at (0.5, 2.5) {\small $\lambda_T$};
       \node[] at (-1.9, -0.3) {\small $\xi_L$};
       \node[] at (1.9, -0.3) {\small $\xi_R$};
-      \node[] at (5.0, 2.5) {\small $\lambda_L := \mu \lambda_N - \lambda_T$};
-      \node[] at (6.5, 2.5) {\small $\lambda_R := \mu \lambda_N + \lambda_T$};
+      \node[] at (4.3, 2.0) {\small $\lambda_L = \mu \lambda_N - \lambda_T$};
+      \node[] at (7.6, 1.0) {\small $\lambda_R = \mu \lambda_N + \lambda_T$};
       \node[] at (4.2, -0.3) {\small $\xi_L$};
       \node[] at (7.8, -0.3) {\small $\xi_R$};
       % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
@@ -243,9 +245,9 @@ With this understanding in mind, we extend the complementarity condition
 in~\eqref{eq:complementarity} to a system with normal and tangential contact
 forces.
 %
-Unfortunately, the complementarity constraints given in
-Table~\ref{tab:complementarity} do not directly translate to tangential contact
-forces $\lambda_T$ and relative velocities $\xi_T$.
+Unfortunately, the complementarity relationship between $\lambda_N$ and $\xi_N$
+given in Table~\ref{tab:complementarity} does not directly translate to the
+tangential components $\lambda_T$ and $\xi_T$.
 %
 % For instance, unlike the normal contact force $\lambda_N$, the tangential
 % force (Coulomb friction) $\lambda_T$ is not constrained to non-negative
@@ -257,7 +259,7 @@ on a flat surface with Coulomb friction.
 The properties of the contact forces exerted on the sliding box are depicted in
 Figure~\ref{fig:unilateral_primitive}.
 %
-On the left, we show the graphical representation of the complementarity
+On the left, we provide a visual representation of the complementarity
 constraint between $\lambda_N$ and $\xi_N$.
 %
 On the right, we have the relationship between Coulomb forces $\lambda_T$ and
@@ -277,7 +279,7 @@ Notice, the relationship between $\lambda_T$ and $\xi_T$ is not complementary.
 However, the plot of $\lambda_T$ can be split into two components $\lambda_R$
 and $\lambda_L$ as shown in Figure~\ref{fig:tangential_to_complementarity},
 which individually resemble the complementarity properties of $\lambda_N$ and
-$\xi_T$ in Figure~\ref{fig:unilateral_primitive}.
+$\xi_N$ in Figure~\ref{fig:unilateral_primitive}.
 %
 The new quantities $\lambda_R$ and $\lambda_L$ are defined as~\cite{glocker2005formulation}
 \begin{align*}
@@ -286,7 +288,7 @@ The new quantities $\lambda_R$ and $\lambda_L$ are defined as~\cite{glocker2005f
 \end{align*}
 \noindent and the corresponding complementarity condition becomes
 %
-\begin{equation*}
+\begin{equation}
   \begin{gathered}
     0 \leq 
     \begin{pmatrix}
@@ -299,11 +301,21 @@ The new quantities $\lambda_R$ and $\lambda_L$ are defined as~\cite{glocker2005f
         \lambda_L
       \end{pmatrix} \geq 0,
     \end{gathered}
-\end{equation*}
+    \label{eq:tangential_complementarity}
+\end{equation}
 where $\xi_T = \xi_R - \xi_L$.
 %
-These definitions help us express the resultant pre- and post-impact
-velocities $\xi_N, \xi_R, \xi_L$ as the following affine function: 
+
+From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N, \xi_R$ and $\xi_L$ can
+be expressed as an affine function of the contact forces $\lambda_N, \lambda_R$
+and $\lambda_L$.
+%
+This allows us to express the complementarity constraints
+in~\eqref{eq:complementarity} and~\eqref{eq:tangential_complementarity} as a
+quadratic function of the contact forces.
+%
+The affine function that relates $\xi_N, \xi_R, \xi_L$ with $\lambda_N,
+\lambda_R, \lambda_L$ is given by~\cite{glocker2005formulation}: 
 \begin{align*}
   \begin{pmatrix}
     \xi_N \\
