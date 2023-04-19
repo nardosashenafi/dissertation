@@ -198,9 +198,11 @@ We present two viable choices for the running cost function.
         \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
         \begin{algorithmic}[1]
             % \algrenewcommand\algorithmicindent{0em} % No indent
+            \State $\phi \leftarrow \{ x_0 \}$
                 \For{$t = 0:\Delta t:T$}     
                     \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
                     \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$\Comment{Algorithm~\eqref{algo:moreau}}
+                    \State $\phi \leftarrow \phi \cup x(t+\Delta t)$
                 \EndFor
                 \State $t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi\}$
                 \State $\mathbb{L} = - \ell(x(t_{min}), u) \sum_{t=0}^{t_{min}}P_i(x(t) | \psi)  $

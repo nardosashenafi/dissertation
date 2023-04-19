@@ -9,6 +9,8 @@
 
 <br/> 
 
+:::{.callout-tip icon="false"}
+## Optimization Problem
 \begin{align*}
     \begin{aligned}
         \underset{\psi, \theta}{\textrm{minimize}} 
@@ -18,6 +20,7 @@
         & & & u = \{F_i(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
     \end{aligned}
 \end{align*}
+:::
 
 ## Training 
 

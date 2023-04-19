@@ -45,10 +45,9 @@ and report the uncertainty in each prediction
 
 $$
 \begin{aligned}
-\underset{P(\theta)}{\text{minimize}} &&& \sum_{(x_j, y_j) \in \mathbb{D}}
-\| F(x_j; \theta) - y_j \| , \\
+\underset{P(\theta)}{\text{maximize}} &&& P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
 \text{subject to} &&
-\theta &\sim P(\theta) \\
+& \theta \sim P(\theta) \\
 && \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
 \end{aligned}
 $$
@@ -63,10 +62,9 @@ $$
 
 $$
 \begin{aligned}
-\underset{P(\theta;z)}{\text{minimize}} &&& \sum_{(x_j, y_j) \in \mathbb{D}}
-\| F(x_j; \theta) - y_j \|, \\
+\underset{P(\theta;z)}{\text{maximize}} &&& P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
 \text{subject to} &&
-\theta &\sim P(\theta;z) \\
+& \theta \sim P(\theta;z) \\
 && \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
 \end{aligned}
 $$
@@ -111,8 +109,74 @@ $$
 <!-- column -->
 :::: 
 
-## Bias-Variance Trade-Off
+## Bias-Variance Trade-Off {auto-animate=true}
 
+
+<br/>
+
+* Prior distribution plays the role of a *regularization term*
+
+::::{.columns}
+
+:::{.column width=50%}
+
+:::{.fragment fragment-index=0}
+:::{.callout-warning icon="false"}
+## Posterior Distribution
+$$
+P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
+\theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
+{\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} 
+$$ 
+:::
+:::
+
+:::
+
+:::{.column width=50%}
+![](contents/assets/overfitting.svg){.absolute top=0 left=600 width="600" height="600"}
+:::
+
+::::
+
+:::{.fragment fragment-index=1}
+:::{.incremental}
+* The likelihood and the prior are in a tug of war, which prevents the posterior from overfitting on training dataset
+* Prior distribution can be
+    + *Informed*: allows us to inject prior knowledge
+    + *Uninformed*: starts randomly but every so often gets updated by the posterior
+:::
+:::
+
+## Estimating Posterior Distribution {auto-animate=true}
+
+
+::::{.columns}
+
+:::{.column width=50%}
+
+:::
+
+:::{.column width=50%}
+
+:::{.r-stack}
+:::{.callout-warning icon="false"}
+## Posterior Distribution
+$$
+P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
+\theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
+{\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} 
+$$ 
+:::
+<!-- callout -->
+:::
+<!-- stack -->
+:::
+<!-- column -->
+
+::::
 ## Proposed Method
 
 
