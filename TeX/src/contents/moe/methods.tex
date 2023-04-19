@@ -114,7 +114,7 @@ We present two viable choices for the running cost function.
     We weigh each running cost $\ell(x_i(\Delta t), F_i)$ by its
     \textit{responsibility} $P_i(x_0 | \psi)$ and sum the product to get the
     likelihood.
-    \begin{algorithm}[H]
+    \begin{algorithm}[tb]
         \setstretch{1.2}
         \caption{Accumulated Loss}
         \label{algo:accumulated_loss}
@@ -189,8 +189,7 @@ We present two viable choices for the running cost function.
     every integration step, as shown in Algorithm~\eqref{algo:mtl}; this greatly
     reduces the computational cost.
     %
-    
-    \begin{algorithm}[H]
+    \begin{algorithm}[tb]
         \setstretch{1.2}
         \caption{Minimum Trajectory Loss}
         \label{algo:mtl}

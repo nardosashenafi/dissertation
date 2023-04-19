@@ -183,8 +183,8 @@ non-zero, which is analogues to contact surfaces approaching each other or
 moving away from each other, but the normal contact forces $\lambda_N$ must be
 zero. 
 %
-There exists no scenario when both the contact force $\lambda_N$ and the
-difference in pre- and post-impact velocities $\xi_N$ are both positive.
+There exists no scenario when both the contact force $\lambda_N$ and $\xi_N$ are
+both positive, hence $\xi_N^\top \lambda_N = 0$ must always hold.
 %
 This concept is summarized as shown in Table~\ref{tab:complementarity}.
 
@@ -406,7 +406,7 @@ post-impact velocities as follows:
 %
 This procedure is repeated for time horizon $T$.
 }
-\begin{algorithm}[H]
+\begin{algorithm}[tb]
   \setstretch{1.2}
     \caption{Moreau's Time Stepping Algorithm}
     \label{algo:moreau}

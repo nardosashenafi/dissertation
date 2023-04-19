@@ -140,9 +140,9 @@ mechanism, but it does not yet converge to the desired equilibrium $x^*$.
 The explorative state sampling technique visits states close to the desired
 equilibrium, allowing the training to learn the distinct boundaries of each
 partition at the origin. 
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
-    \includegraphics[width=1.0\linewidth]{switching_results.eps}
+    \includegraphics[width=0.9\linewidth]{switching_results.eps}
     \caption{Final stable switching system. Left: Control input $F_i=\{0, 1\}$ in
     the state space. Purple corresponds to $F_i=0$ or $\dot{x} = A_1x$. Yellow
     corresponds to $F_i=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
@@ -151,7 +151,6 @@ partition at the origin.
     state partitions that can stabilize the system.}
     \label{fig:final_switching}
 \end{figure}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cartpole with Wall Contacts}
@@ -183,6 +182,7 @@ a single swing-up controller.
     Figure~\ref{fig:final_switching}}
     \label{fig:switching_training}
 \end{figure} 
+
 \subsubsection{System Model}
 \label{sssec:cartpole_model}
 
@@ -232,7 +232,7 @@ t=0.001$.
 %     \caption{Cartpole with wall contacts}
 %     \label{fig:cartpole_contact}
 % \end{figure}
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
     \begin{tikzpicture}
     
@@ -315,7 +315,7 @@ commands $V(t)$ as follows.
 \end{align*} 
 \noindent where $A_m$ and $B_m$ consist of system parameters of the motor.
 
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{moe_traj_control.eps}
     \caption{A sample trajectory starting from downward equilibrium at rest.
