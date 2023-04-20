@@ -16,6 +16,8 @@
 :::{.fragment fragment-index=1}
 * *Stochastic models* provide generalized predictions 
 and report the uncertainty in each prediction
+    + The model is given by $F(x;\theta)$ where the parameter $\theta$ is a sample drawn from a distribution
+
 :::
 
 :::
@@ -45,10 +47,10 @@ and report the uncertainty in each prediction
 
 $$
 \begin{aligned}
-\underset{P(\theta)}{\text{maximize}} &&& P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
 \text{subject to} &&
-& \theta \sim P(\theta) \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
 \end{aligned}
 $$
 ::: 
@@ -62,23 +64,36 @@ $$
 
 $$
 \begin{aligned}
-\underset{P(\theta;z)}{\text{maximize}} &&& P(\mathbb{D} | \theta)  = \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
+\underset{P(\theta| \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
 \text{subject to} &&
-& \theta \sim P(\theta;z) \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+& \theta \sim P(\theta| \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
 \end{aligned}
 $$
 ::: 
 <!-- callout -->
 ::: 
 <!-- fragment -->
+
+<!-- :::{.fragment .fade-in fragment-index=2}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{z}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
+\text{subject to} &&
+& \theta \sim Q(\theta;z), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+
+:::  -->
+<!-- fragment -->
 ::: 
 <!-- r-stack -->
 
-:::{.fragment .fade-in fragment-index=2}
-![](contents/assets/overfitting.svg){.absolute top=150 left=0 width="650" height="650"}
-::: 
-<!-- fragment -->
 
 ::: 
 <!-- r-vstack -->
@@ -87,8 +102,23 @@ $$
 
 :::{.column width=40%}
 
-:::{.r-vstack}
-![](contents/assets/handwritten_images.png)
+![](contents/assets/handwritten_images.png){.absolute top=50 left=750 width="350" height="200"}
+
+
+::: 
+<!-- column -->
+:::: 
+
+:::: {.columns}
+
+:::{.column width=60%}
+:::{.fragment .fade-in fragment-index=2}
+![](contents/assets/overfitting.svg){.absolute top=150 left=0 width="650" height="650"}
+::: 
+<!-- fragment -->
+:::
+
+:::{.column width=40%}
 
 :::{.fragment .fade-in fragment-index=2}
 :::{.incremental}
@@ -101,13 +131,9 @@ $$
 
 ::: 
 <!-- fragment -->
+:::
 
-::: 
-<!-- r-vstack -->
-
-::: 
-<!-- column -->
-:::: 
+::::
 
 ## Bias-Variance Trade-Off {auto-animate=true}
 
@@ -116,68 +142,125 @@ $$
 
 * Prior distribution plays the role of a *regularization term*
 
-::::{.columns}
+:::{.r-stack}
 
-:::{.column width=50%}
+:::{.fragment .fade-in-then-out fragment-index=0}
+:::{.callout-important icon=false}
+## Bayesian Inference
 
-:::{.fragment fragment-index=0}
-:::{.callout-warning icon="false"}
-## Posterior Distribution
 $$
-P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
-\theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
-{\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
-d\theta^\prime}_{\text{evidence}}} 
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
+:::
+<!-- fragment -->
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+:::{.callout-warning icon="false"}
+## Regularization via Prior Distribution
+$$
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2)
 $$ 
+$$
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \frac{1}{2 \pi s_1s_2}\exp(-\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2)\exp(-\frac{1}{2s_2^2}\| \theta - \theta_0 \|^2)
+$$ 
+$$
+\ln P(\mathbb{D} | \theta) P(\theta) = \ln{\frac{N}{2 \pi s_1s_2}} + \sum_{j=1}^{N} -\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2 - \frac{1}{2s_2^2}\| \theta - \theta_0 \|^2
+$$
 :::
-:::
+<!-- callout -->
 
 :::
+<!-- fragment -->
 
-:::{.column width=50%}
-![](contents/assets/overfitting.svg){.absolute top=0 left=600 width="600" height="600"}
+:::{.fragment .fade-in fragment-index=2}
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
 :::
+<!-- fragment -->
+:::
+<!-- r-stack-->
 
-::::
+:::{.fragment fragment-index=3}
 
-:::{.fragment fragment-index=1}
-:::{.incremental}
-* The likelihood and the prior are in a tug of war, which prevents the posterior from overfitting on training dataset
 * Prior distribution can be
     + *Informed*: allows us to inject prior knowledge
     + *Uninformed*: starts randomly but every so often gets updated by the posterior
-:::
+
 :::
 
 ## Estimating Posterior Distribution {auto-animate=true}
 
+<br/>
+
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
+* **Variational Inference**: approximates the posterior $P(\theta | \mathbb{D})$ with a pre-selected distribution $Q(\theta; z)$
+* **Objective**: collect $N_\theta$ samples from the current posterior $Q(\theta; z)$ and maximize <span style="font-variant:small-caps;">Elbo</span> 
+$$
+  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right].
+$$
+
+
+## Robustness via Bayesian Learning 
 
 ::::{.columns}
+:::{.column width=50%}
+
+<br/>
+<br/>
+
+:::{.incremental}
+* <span style="font-variant:small-caps;">NeuralPbc</span> assumes a nominal model $\dot{x} = f(x, u)$
+* The trained controller must not overfit on the observations generated from the nominal model
+
+:::
+:::
 
 :::{.column width=50%}
 
-:::
+![](contents/assets/regular-vs-bayesian.svg){.absolute width="600" heigth="600"}
 
-:::{.column width=50%}
-
-:::{.r-stack}
-:::{.callout-warning icon="false"}
-## Posterior Distribution
-$$
-P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
-\theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
-{\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
-d\theta^\prime}_{\text{evidence}}} 
-$$ 
-:::
-<!-- callout -->
-:::
-<!-- stack -->
 :::
 <!-- column -->
 
 ::::
-## Proposed Method
 
-
-
+:::{.fragment fragment-index=0}
+:::{.incremental}
+* **Our method**: $H_d$ is a stochastic function
+    + achieves the performance objective $\ell$ for samples $\theta \sim P(\theta | \mathbb{D})$
+    + searches for ensemble of parameters that meet the desired performance 
+:::
+:::

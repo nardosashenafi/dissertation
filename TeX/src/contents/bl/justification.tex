@@ -119,7 +119,7 @@ equation~\eqref{eq:optimal_theta}, yielding
 \end{align*}
 %
 Hence, the distribution of the optimal cost conditioned on the system parameter
-$p$ is 
+$p_s$ is 
 %
 \begin{align*} 
     f_{\mc{J}^\star}(\mc{J}^\star) &=f_p\left(h^{-1}(\mc{J}^\star)\right)
@@ -189,13 +189,16 @@ Noise}
 Consider the scenario in which the system~\eqref{eq:first-order} is also subject
 to measurement errors; that is, our measurement model for the state $x$ is
 probabilistic and is distributed according to the Gaussian $\mc{N}(x,
-\sigma^2)$. Since the controller uses this measurement to determine its action,
+\sigma)$. Since the controller uses this measurement to determine its action,
 the closed-loop system has to be modelled as a stochastic differential equation
 (SDE), given by
 %
-\begin{equation} \begin{cases} \dd x(t) =
-(p_s+\theta)x(t) \; \dd t + \theta\sigma \; \dd W_t, \\ x(0) = 1,
-\end{cases} \label{eq:first-order-SDE} \end{equation}
+\begin{equation} 
+  \begin{cases} 
+    \dd x(t) = (p_s+\theta)x(t) \; \dd t + \theta\sigma \; \dd W_t, \\ x(0) = 1,
+  \end{cases} 
+  \label{eq:first-order-SDE}
+\end{equation}
 %
 where $W$ denotes the Wiener process~\cite{evans2012introduction}. The initial
 state is assumed deterministic and is set to unity for simplicity.  

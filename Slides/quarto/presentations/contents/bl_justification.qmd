@@ -1,0 +1,126 @@
+# Theoretical Justification of Robustness
+## Optimal Control under Uncertainty 
+
+<br/>
+
+::: {.fragment fragment-index=0}
+::: {.callout-warning icon=false}
+## Optimal Control for a Linear System
+$$
+\Sigma: \quad
+\begin{cases}
+  \dot{x} &= p_s x + u, \\
+  u(x) &= \theta x, \\
+  x(0) &= 1.
+\end{cases}
+$$
+:::
+$$
+  x(t) = e^{(p_s+\theta)t}
+$$
+:::
+::: {.fragment fragment-index=1}
+
+Performance Index: 
+$$
+\mathcal{J} = \int_0^T \left( \frac{1}{2}cx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt
+$$
+:::
+
+<br/>
+
+::::{.columns}
+
+:::{.column width=50%}
+::: {.fragment fragment-index=2}
+$$
+\mathcal{J}_\infty = -\frac{1}{4}\frac{c+r\theta^2}{p_s+\theta}
+$$
+:::
+:::
+
+:::{.column width=50%}
+:::{.fragment fragment-index=3}
+$\theta^\star = -p_s -\sqrt{p_s^2+\frac{c}{r}}$
+:::
+:::
+::::
+
+
+## Optimal Control under Uncertainty 
+
+
+
+::: {.fragment fragment-index=0}
+Parameter uncertainty: $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$.
+
+:::: {layout="[50,-5,110]" layout-valign="center" .fragment data-fragment-index=0 data-id="opt-sol"}
+
+::: {.callout-note icon=false}
+## Deterministic
+\begin{align*}
+g(p_s) &:= -p_s -\sqrt{p_s^2+\frac{c}{r}} \\
+\theta^\star &= g(\hat{p}_s)
+\end{align*}
+:::
+
+::: {.callout-note icon=false}
+## Probabilistic
+$$
+\begin{aligned}
+f_{\theta^\star}(\theta^\star) &= f_p\left(g^{-1}(\theta^\star)\right)
+        \left| \frac{d}{d\theta}g^{-1}(\theta^\star) \right|, \\ 
+&= \frac{1}{\sigma_p \sqrt{2\pi}}\left( \
+\frac{1}{2}\left(1+\frac{c}{r{\theta^\star}^2}\right) \right) \exp{\left\{ -\frac{1}{2\sigma_p^2}\left( \frac{c}{2r\theta^\star} -
+\frac{\theta^\star}{2} - \hat{p}_s  \right)^2  \right\} }
+\end{aligned}
+$$
+:::
+::::
+
+:::
+
+:::{.fragment fragment-index=1}
+$(c, r) = (100, 1)$
+:::
+::: {.r-stack}
+![](contents/assets/optimal-dist_1.svg){.fragment data-fragment-index=1 .absolute top=250 right=250 width="700" height="600"}
+
+![](contents/assets/optimal-dist_2.svg){.fragment data-fragment-index=2 .absolute top=250 right=250 width="700" height="600"}
+
+![](contents/assets/optimal-dist_3.svg){.fragment data-fragment-index=3 .absolute top=250 right=250 width="700" height="600"}
+:::
+
+
+## System Parameter and Measurement Uncertainties
+
+:::: {layout="[50,-5,110]" layout-valign="center" }
+
+::: {.callout-warning icon=false}
+## Model of measurement noise
+$$
+\Sigma: \quad
+  \begin{cases} 
+    \dd x(t) = (p_s+\theta)x(t) \; \dd t + \theta\sigma \; \dd W_t, \\ x(0) = 1,
+  \end{cases} 
+$$
+$$
+ x(t) = e^{(p_s+\theta)t} + \theta\sigma \int_0^t e^{(p_s+\theta)(t-s)}dW_s.
+$$
+:::
+
+:::{.callout-note icon="false"}
+## Performance Index 
+\begin{align*}
+\mathcal{J} &= \int_0^T \left( \frac{1}{2}cx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt,\\
+(c, r) &= (1, 1), \\
+T &= \hat{p}_s = 3. 
+\end{align*}
+:::
+
+::::
+* $W$ Wiener process, measurement error given by $\mathcal{N}(x, \sigma)$
+* Left figure: optimal parameter $\theta^*$, Right: minimal cost $\mathbb{E}[\mathcal{J}] = \mathbb{E}_{p_s}\left[\mathbb{E}_W\left[\mathcal{J}
+\mid p_s \right]\right]$
+![](contents/assets/measurement_noise.svg){.absolute top=370 left=50 width="1000" height="1000"}
+

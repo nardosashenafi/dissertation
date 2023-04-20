@@ -44,6 +44,10 @@ format:
 
 {{< include contents/bl_background.qmd >}} 
 
+<!-- {{< include contents/bl_justification.qmd >}} -->
+
+{{< include contents/bl_methods.qmd >}} 
+
 <!-- {{< include contents/_justification.qmd >}} -->
 
 <!-- {{< include contents/_neuralpbc.qmd >}} -->
