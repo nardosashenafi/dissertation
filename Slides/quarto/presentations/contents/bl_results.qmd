@@ -1,0 +1,33 @@
+# Case Studies
+
+
+## Deterministic vs. Bayesian Training 
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+* Subtracting rings from the wheel
+    * decreases wheel mass
+    * decreases wheel and pendulum inertia 
+    * moves the center of mass
+
+::: {.callout}
+|Parameter vector $\zeta$| $I_1$ | $I_2$ | $m g l$ |Error|
+|---|:---:|:---:|:---:|:---:|
+|Nominal|$0.0455$|$0.00425$|$1.795$|$0$|
+|3 rings|$0.0417$|$0.00330$|$1.577$|$0.122$|
+|2 rings|$0.0378$|$0.00235$|$1.358$|$0.243$|
+|1 rings|$0.0340$|$0.00141$|$1.140$|$0.365$|
+:::
+:::
+
+::: {.column width="50%"}
+
+![](contents/assets/neuralpbc_bandplot.jpg){width=90% fig-align="center"}
+![](contents/assets/iwp.svg){width=30% fig-align="right"}
+
+:::
+
+::::

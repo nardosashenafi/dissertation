@@ -48,7 +48,7 @@ format:
 
 {{< include contents/bl_methods.qmd >}} 
 
-<!-- {{< include contents/_justification.qmd >}} -->
+{{< include contents/bl_results.qmd >}} 
 
 <!-- {{< include contents/_neuralpbc.qmd >}} -->
 

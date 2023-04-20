@@ -683,7 +683,7 @@ pre-selected posterior $Q(\theta;z)$.
         \State $J \gets 0$ \Comment{Batch loss}
         \State $\theta \sim Q(\theta; z)$ \Comment{Sample parameters of $H^\theta_d$}
             \For{$(x_0) \sim \mathcal {D}_N$}
-            \State $p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)$\Comment{Sample a system parameter}
+            \State $p_s &\sim \mathbb{U}(p_{min}, p_{max})$\Comment{Sample a system parameter}
             \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ 
             \EndFor

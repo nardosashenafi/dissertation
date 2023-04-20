@@ -142,6 +142,79 @@ where $\hat{F}(x)$ is the marginalized prediction given by
 \end{align*} 
 
 
+## Bias-Variance Trade-Off {auto-animate=true}
+
+
+<br/>
+
+* Prior distribution plays the role of a *regularization term*
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
+:::
+<!-- fragment -->
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+:::{.callout-warning icon="false"}
+## Regularization via Prior Distribution
+$$
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2)
+$$ 
+$$
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \frac{1}{2 \pi s_1s_2}\exp(-\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2)\exp(-\frac{1}{2s_2^2}\| \theta - \theta_0 \|^2)
+$$ 
+$$
+\ln P(\mathbb{D} | \theta) P(\theta) = \ln{\frac{N}{2 \pi s_1s_2}} + \sum_{j=1}^{N} -\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2 - \frac{1}{2s_2^2}\| \theta - \theta_0 \|^2
+$$
+:::
+<!-- callout -->
+
+:::
+<!-- fragment -->
+
+:::{.fragment .fade-in fragment-index=2}
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
+:::
+<!-- fragment -->
+:::
+<!-- r-stack-->
+
+:::{.fragment fragment-index=3}
+
+* Prior distribution can be
+    + *Informed*: allows us to inject prior knowledge
+    + *Uninformed*: starts randomly but every so often gets updated by the posterior
+
+:::
+
 ## Bias-Variance Tradeoff
 
 ::: {.callout-important icon=false}

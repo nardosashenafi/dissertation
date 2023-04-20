@@ -4,10 +4,15 @@
 
 <br/>
 
+:::{.fragment fragment-index=0}
 * **Objective**: learn contact-aware mixture of expert controller and a gating network 
-* We pose the search over the parameters $\psi, \theta$ as the following optimization problem
+* Two major modifications to the *old faithful* example
+    + training dataset is generated from trajectories
+    + prediction error is replaced by running cost $\ell$ of the trajectories
+:::
 
-<br/> 
+:::{.fragment fragment-index=1}
+* We pose the search over the parameters $\psi, \theta$ as the following optimization problem
 
 :::{.callout-tip icon="false"}
 ## Optimization Problem
@@ -20,6 +25,7 @@
         & & & u = \{F_i(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
     \end{aligned}
 \end{align*}
+:::
 :::
 
 ## Training 
@@ -84,6 +90,8 @@ $$
 
 ## Performance Objective
 
+<br/>
+
 ::::{.columns}
 
 :::{.column width="60%"}
@@ -120,12 +128,12 @@ $$
 \end{align*}
 :::
 
-## State Sampling
+## State Sampling 
 
-* **Objective**: efficiently sample the state space and learn MOE controller for all initial states
-
-## State Sampling
-<!-- ###################################################################### -->
+**Objective**: meet performance for various initial states
+$$
+J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ]
+$$
 
 :::: {.r-stack}
 

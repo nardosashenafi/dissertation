@@ -241,7 +241,7 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 
 $$
 \begin{aligned}
-\underset{\theta}{\text{minimize}} &&& \ell \left(\phi,u^\theta \right)\, \\
+\underset{\theta}{\text{minimize}} && J(\phi, u^\theta) &= \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ], \\
 \text{subject to} &&
 \begin{bmatrix}
   \dot{q} \\ \dot{p}
@@ -254,12 +254,12 @@ $$
   0 \\ \Omega
 \end{bmatrix} u^{\theta}
 \\
-&& u^\theta &= - \Omega^{\dagger}\nabla_q H_d^{\theta}  - K_D \Omega^\top \nabla_p H_d^{\theta}
+&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
 \end{aligned}
 $$
 :::
 
 - Parameterize $H_d$ by a neural network $H_d^\theta$, 
-- Desired performance characterized by $\ell$,
+- Desired performance characterized by $\ell$ observed from trajectory $\phi$
 - Approximate solutions to the PDEs found via stochastic gradient descent.
 

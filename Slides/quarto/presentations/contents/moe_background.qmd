@@ -140,100 +140,47 @@ M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
   \Input{$x_0$}
 \end{algorithm}
 
-## Mixture of Experts (MOE)
 
-* typically used to fit ensemble of expert models to high variance or multi-modal dataset
-* This architecture provides the experts and a gating network, which divides the input space $x$ into state partitions within which a single expert is active
-![](contents/assets/gaussian_moe.png){.absolute top=300 left=150 width="750" height="350"}
-
-## Mixture of Experts (MOE)
-
-<br/>
-
-* We select maximum number of experts 
-* Let us denote the experts with 
-$F(x;\theta) = \{F_1(x;\theta_1), \dots , F_{N_F}(x;\theta_{N_F}) \}$, and their parameters are given by the set $\theta = \{\theta_1, \dots , \theta_{N_F} \}$
-* Each expert $F_i$ resides in a particular state partition $i$
-* The gating network $\mathbf{P}(x| \psi)$ provides the probability of input state $x$ belonging to each state partition. It is denoted by
-
-\begin{align*}
-  \mathbf{P}(x| \psi) := (P_1(x| \psi), \dots, P_{N_F}(x | \psi))
-\end{align*}
-
-* The objective is to learn the parameters $(\psi, \theta)$ that best fit 
-the dataset
-
-## E.g. Old Faithful {auto-animate="true"}
+## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
 
 
 * **Objective**: learn two expert Gaussian models to predict duration given waiting time
 
 ::::{.columns}
 
+<!-- :::{.r-stack} -->
+
 :::{.column  width="50%"}
+
+:::{.fragment .fade-in fragment-index=0}
 * The experts are chosen as
 $$
 F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 $$
+:::
+:::{.fragment .fade-in fragment-index=1}
 
-<!-- :::{.r-stack} -->
-
-:::{.fragment .fade-in fragment-index=0}
 * The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
 :::
-
-<!-- :::{.fragment .fade-in-then-out  fragment-index=1}
-* The gating network is $\mathbf{P}(x | \psi) = \{\psi, 1 - \psi \}$
-::: -->
-
-<!-- 
-:::{.fragment .fade-in  fragment-index=2}
-* The gating network is $\mathbf{P}(x | \psi) = \{ \textrm{Sig}(\psi), 1 - \textrm{Sig}(\psi) \}$
-::: -->
-
-<!-- ::: -->
-
-:::{.fragment .fade-in  fragment-index=1}
+:::{.fragment .fade-in fragment-index=2}
 * Learn the parameters $\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}$ and $\psi$ from dataset
 $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
 :::
-
-
 :::
+
 
 :::{.column  width="50%"}
 ![](contents/assets/old_faithful.png){.absolute top=100 left=600 width="550" height="400"}
 :::
 
-:::{.fragment .fade-in  fragment-index=2}
-* *Expectation Maximization*: maximizes log likelihood
-$$
-\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \Big( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \Big) P_i(x_j, \psi)
-$$
-:::
-
-
 ::::
 
-
-## E.g. Old Faithful {auto-animate="true"}
-
-<br/>
-
+:::{.fragment .fade-in fragment-index=3}
 * *Expectation Maximization*: maximizes log likelihood
 $$
-\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \Big( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \Big) P_i(x_j, \psi)
+\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)
 $$
-
-* We use stochastic gradient descent to update the parameters
-$$
-\psi \leftarrow \psi + \frac{\partial \ln \{P(\mathbb{D} | \theta, \psi) \} }{\partial \psi }
-$$ 
-$$
-\theta \leftarrow \theta + \frac{\partial \ln \{P(\mathbb{D} | \theta, \psi) \} }{\partial \theta }
-$$ 
-
-* Gradients can be found analytically or via auto-differentiation techniques
+:::
 
 ## Generalization of the log likelihood
 
@@ -249,7 +196,7 @@ $$
 
 :::{.fragment .fade-in fragment-index=1}
 $$
-  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \Biggl( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \Biggr) P_i(x_j, \psi),
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \right) P_i(x_j, \psi),
 $$
 :::
 :::

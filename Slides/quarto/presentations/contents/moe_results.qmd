@@ -9,8 +9,8 @@
 :::{.column width=65%}
 
 \begin{align*}
-    \dot{x} &= A_1x = \begin{bmatrix} 0 & -1 \\ 2 & 0 \end{bmatrix} x, \\
-    \dot{x} &= A_2x = \begin{bmatrix} 0 & -2 \\ 1 & 0 \end{bmatrix} x,
+    \dot{x} = A_1x = \begin{bmatrix} 0 & -1 \\ 2 & 0 \end{bmatrix} x, \; \;
+    \dot{x} = A_2x = \begin{bmatrix} 0 & -2 \\ 1 & 0 \end{bmatrix} x,
 \end{align*}
 find stable switching system that converges to $x^*=(0, 0)$
 
@@ -38,44 +38,7 @@ find stable switching system that converges to $x^*=(0, 0)$
        1, & \theta_i \leq \frac{1}{2},
     \end{cases}
 \end{align*}
-:::
-
-## Stable Switching {auto-animate="true"}
-
-* The gating network $\mathbf{P}(x | \psi)$ is a fully-connected neural net with 4 outputs
-* There are 4 experts with parameters $\theta_i$ 
-\begin{align*}
-    F_i(\theta_i) = \begin{cases}
-       0, & \theta_i > \frac{1}{2}, \\
-       1, & \theta_i \leq \frac{1}{2},
-    \end{cases}
-\end{align*}
-
-:::{.fragment fragment-index=0}
 * **Objective**: learn $(\psi, \theta)$ that minimize the accumulated loss
-$$
-\ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u, \; \; \mathcal{Q} = \begin{bmatrix} 3 & 0 \\ 0 & 3 \end{bmatrix}, \mathcal{R} = 0
-$$
-:::
-
-:::{.fragment fragment-index=1}
-* The corresponding likelihood is
-:::
-
-:::{.r-stack}
-:::{.fragment .fade-in-then-out fragment-index=2}
-$$
-\mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell (x(t+\Delta t), F_i ) P_i (x(t) | \psi ) 
-$$
-:::
-
-:::{.fragment .fade-in fragment-index=3}
-\begin{gather*}
-    \mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \mathcal{l} P_i (x(t) | \psi ) \\
-        \mathcal{l} = \theta_i \ell (x(t + \Delta t), F_i(\theta_i) ) + (1 - \theta_i)\ell (x(t + \Delta t), F_i(1-\theta_i) ) 
-\end{gather*}
-:::
-
 :::
 
 
@@ -93,88 +56,62 @@ $$
 :::
 
 
-:::{.fragment .fade-in fragment-index=2}
+:::{.fragment .fade-in-then-out fragment-index=2}
 ![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter1400.svg){ top=100 left=300 }
 :::
 
+:::{.fragment .fade-in fragment-index=3}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
 :::
 
-## Final Result
+:::
 
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
+## {background-video="contents/assets/cartpole-firefox.mp4" background-size="contain" background-video-muted="true"}
 
-
-<!-- ![](contents/assets/switching_training.svg){.absolute top=20 left=100 width="750" height="750"} -->
 
 ## Cartpole with wall barriers
 
-:::{.r-stack}
-
-:::{.fragment .fade-in-then-out fragment-index=0}
+<br/>
 
 ::::{.columns}
-:::{.column width=50%}
-* Cartpole: pendulum hinged on an actuated cart
-* **Objective**: swingup the pendulum to the upright using the control authority on the cart
-* *Linear Quadratic Regulator (LQR)* is used to stabilize after swingup
-:::
 
 :::{.column width=50%}
-{{< video contents/assets/cartpole-firefox.mp4 aspect-ratio="4x3" width="600" >}}
-(Sirichotiyakul *ACC 2022*)
-:::
-::::
 
-:::
-
-:::{.fragment .fade-in-then-out fragment-index=1}
-::::{.columns}
-
-:::{.column width=50%}
-* The wall barriers create a contact-rich (hybrid) system
+:::{.fragment .fade-in fragment-index=1}
 * Notice *LQR* fails due to the impact from the wall
-* We employ contact-aware MOE controller to 
-    + leverage the impacts from the wall
-    + switch to a policy that assists in the catching process
+* MOE controller training
+    + there are three deep-net experts $F_i(x;\theta_i)$
+    + the gating network is also a neural net
+    + running cost is MTL 
+:::
 :::
 
 :::{.column width=50%}
+
+:::{.fragment .fade-in fragment-index=0}
 {{< video contents/assets/cartpole_oneController.mp4 aspect-ratio="4x3" width="600" >}}
 :::
 
-::::
 :::
+::::
 
-:::{.fragment .fade-in fragment-index=2}
+
+<!-- :::{.fragment .fade-in fragment-index=2}
 {{< video contents/assets/moeController.mp4 width="900" height="650" >}}
-:::
+::: -->
 
-:::
 
-## Observations
 
-::::{.columns}
+## {background-video="contents/assets/cartpole_hardware.mp4" background-size="contain" background-video-muted="true"}
 
-:::{.column width=50%}
+## Results 
 
-* The MOE controller switches just after impact
-* After impact, the active expert applies rapid braking
+* The contact-aware MOE controller  
+    + leverages the impacts from the wall
+    + switches to a policy that *rapidly brakes* to assist in the catching process
 
-![](contents/assets/moe_traj_control.jpg)
+![](contents/assets/moe_traj_control.jpg){fig-align="center"}
 
-:::
-
-:::{.column width=50%}
-
-:::{.fragment fragment-index=0}
-* There is a relationship between the minimum gap between the pendulum and the walls, and the expert used
-* An expert is dedicated to states with low chance of contact and viceversa
-
-![](contents/assets/gapContourAndBins.jpg)
-:::
-:::
-
-::::
 
 ## Conclusions
 
