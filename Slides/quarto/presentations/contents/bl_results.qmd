@@ -1,10 +1,18 @@
 # Case Studies
 
 
-## Deterministic vs. Bayesian Training 
+## Deterministic vs. Bayesian
 <!-- ###################################################################### -->
 
+<br/>
+
 :::: {.columns}
+
+::: {.column width="50%"}
+
+![](contents/assets/hardware.svg){width=70% fig-align="center"}
+
+:::
 
 ::: {.column width="50%"}
 
@@ -13,21 +21,61 @@
     * decreases wheel and pendulum inertia 
     * moves the center of mass
 
-::: {.callout}
-|Parameter vector $\zeta$| $I_1$ | $I_2$ | $m g l$ |Error|
-|---|:---:|:---:|:---:|:---:|
-|Nominal|$0.0455$|$0.00425$|$1.795$|$0$|
-|3 rings|$0.0417$|$0.00330$|$1.577$|$0.122$|
-|2 rings|$0.0378$|$0.00235$|$1.358$|$0.243$|
-|1 rings|$0.0340$|$0.00141$|$1.140$|$0.365$|
-:::
-:::
-
-::: {.column width="50%"}
-
 ![](contents/assets/neuralpbc_bandplot.jpg){width=90% fig-align="center"}
-![](contents/assets/iwp.svg){width=30% fig-align="right"}
 
 :::
 
 ::::
+
+## {background-video="contents/assets/4_rings_hardware.mp4" background-size="contain" background-video-muted="true"}
+
+## Rimless Wheel
+
+![](contents/assets/rimlesswheel.svg){width=90% fig-align="center"}
+
+* Performance objective: achieve hip speed $x_c^* = 1$m/s
+\begin{align*}
+    J_T = \sum_{t=0}^{T} \| \dot{x}_c^* - \dot{x}_c(t; \theta) \|
+\end{align*}
+* Uncertainty in elevation under each spoke
+$$
+p_s \sim \mathbb{U}(0 \textrm{cm}, 2\textrm{cm}) 
+$$
+
+
+## {background-video="contents/assets/rw_uneven_success.mp4" background-size="contain" background-video-muted="true"}
+
+
+## Deterministic vs Bayesian
+
+::::{.columns}
+:::{.column width=50%}
+![](contents/assets/RW_deter_trajectory2.svg){width=90% fig-align="center"}
+
+:::
+
+:::{.column width=50%}
+
+\begin{align*}
+p_s &\sim \mathbb{U}(0, p_{max})  \\
+p_{max} &= [0, 0.5, 1, 1.5, 2] \textrm{cm} \\
+J_T &= \sum_{t=0}^{T} \| \dot{x}_c^* - \dot{x}_c(t; \theta) \|
+\end{align*}
+
+![](contents/assets/simulationComparison.svg){width=90% fig-align="center"}
+:::
+::::
+
+## Conclusions
+
+<br/>
+
+:::{.incremental}
+* MOE controller: multi-modal controller for multi-modal dynamics
+* <span style="font-variant:small-caps;">NeuralPbc</span> + Bayesian inference = robust controller with stability properties
+* Future work
+    + manipulation task
+    + multi-modal controller in uncertain environment
+:::
+
+# Q&A

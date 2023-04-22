@@ -36,7 +36,7 @@
 :::{.r-vstack}
 
 :::{.fragment fragment-index=0}
-![](contents/assets/walkingmodes.jpg){width="400" height="300"}
+![](contents/assets/walking.svg){}
 :::
 
 :::{.fragment fragment-index=1}
@@ -80,10 +80,18 @@
 
 <br/>
 
-* We infer *contact-aware* controllers by training on trajectories generated from accurate contact models
+* We infer *contact-aware* controllers by training on trajectories generated from contact models
     + *Contact-aware* controllers minimize the adverse effects of contacts or leverage the potential contacts to their advantage
 
-## 2. Operating in uncertain environment 
+## 2. Operating under Uncertain Conditions
+
+<br/>
+
+<br/>
+
+{{< video contents/assets/rw_even.mp4 >}}
+
+## {background-video="contents/assets/rw_failing.MP4" background-size="contain" background-video-muted="true"}
 
 
 ## Existing Methods {.smaller transition="fade"}

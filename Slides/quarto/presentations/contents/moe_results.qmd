@@ -119,8 +119,7 @@ find stable switching system that converges to $x^*=(0, 0)$
 <br/>
 
 :::{.incremental}
-* We provide a data-driven control design that *automatically* reasons about the effects of contact forces
-* The framework leverages the switching controllers to stabilize the multi-modal 
-dynamical system
+* We provide a data-driven control design that *automatically* learns several policies and the necessary switching scheme
+* The framework leverages the switching controllers to stabilize the multi-modal dynamical system
 * The gating network successsfully parameterizes the control-switching conditionals that achieves the desired performance
 :::

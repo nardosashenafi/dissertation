@@ -7,139 +7,115 @@
 ## Contact Modeling
 
 * **Objective**: accurately model contacts, impacts and Coulomb friction.
-
-:::{.fragment fragment-index=0}
 * E.g. Model of bouncing ball
-:::
 
-:::{.fragment .fade-in fragment-index=1}
-* Event detection searches for zero-crossings of the gap function
-* It fails during rapid contact
-:::
+::::{.columns}
 
-:::{.fragment .fade-in-then-out fragment-index=0}
-![](contents/assets/bouncing_ball.jpg){.absolute top=300 left=350 width="400" height="300"}
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-![](contents/assets/bouncing_ball_event-driven_vs_time_stepping.png){.absolute top=320 left=300 width="450" height="350"}
-:::
-
-## Linear Complementarity Formulation {auto-animate=true}
-
-:::{.fragment fragment-index=0}
-* Suppose we have a system with $k$ potential contacts.
-* $x = (q, \dot{q})$, where $q \in \mathbb{R}^m$ is position vector.
-:::
-
-:::{.fragment fragment-index=1}
-* $\lambda_N \in \mathbb{R}^k$ denotes normal contact forces, $\lambda_T \in \mathbb{R}^k$ denotes tangential contact force (Coulomb friction)
-:::
-
-:::{.fragment .fade-in fragment-index=2}
-* Geometric and kinematic constraints are defined as follows:
-:::
-
-:::{.fragment .fade-in fragment-index=3}
-- $g_N \in \mathbb{R}^k$ denotes normal distance between contact surfaces
-:::
-
-::: {.r-stack}
-
-:::{.fragment .fade-in-then-out fragment-index=4}
-- $\gamma_N(q, \dot{q}) = \frac{\partial g_N}{\partial t}$ is the relative 
-normal velocities
-:::
-
-:::{.fragment .fade-in-then-out fragment-index=5}
-- $\gamma_N(q, \dot{q}) = \frac{\partial g_N}{\partial q} \dot{q}$ is the relative normal velocities
-:::
-
-:::{.fragment .fade-in fragment-index=6}
-- $\gamma_N(q, \dot{q}) = W_N \dot{q}$ is the relative normal velocities 
-:::
-
-:::
-
-:::{.fragment .fade-in fragment-index=7}
-- $\gamma_T(q, \dot{q}) = W_T \dot{q}$ is the relative tangential velocities
-:::
-
-
-## Dynamic constraints
+:::{.column width=50%}
 
 <br/>
 
-* Model of contact dynamics: manipulator equations
-
-\begin{align*}
-  \begin{gathered}
-    M(q) \ddot{q} + h(q, \dot{q}) - W_N \lambda_N - W_T \lambda_T = 0, \\
-    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), 
-  \end{gathered}
-\end{align*}
-
-:::{.fragment .fade-in fragment-index=0}
-* Notice $\ddot{q}$ is does not exist during impacts
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-* (Moreau 1988) provides compact dynamical model which includes impact as 
-\begin{align*}
-M(q) \dd \dot{q} + h(q, \dot{q}) \dd t - \dd R = 0, \\
-\dd R = W_N \dot{\lambda}_N \dd t + W_T \dot{\lambda}_T \dd t.
-\end{align*}
-
-* We integrate these equations via Moreau's time stepping algorithm
-:::
-
-## Complementarity Formulation
-
-* For potential contacts with gaps $g_N \leq 0$, the following holds.
-
-\begin{align*}
-  \begin{gathered}
-    0 \leq 
-    \begin{pmatrix}
-      \xi_N(q, \dot{q}) \\
-      \xi_T(q, \dot{q})
-    \end{pmatrix} 
-    \perp
-      \begin{pmatrix}
-        \lambda_N  \\
-        \lambda_T
-      \end{pmatrix} \geq 0, \\
-  % \end{eqnarray}
-  % \begin{eqnarray}
-    \begin{pmatrix}
-      \xi_N(q, \dot{q}) \\
-      \xi_T(q, \dot{q})
-    \end{pmatrix} :=
-      \begin{pmatrix}
-        \gamma_N^+ + \epsilon_N \gamma_N^-  \\
-        \gamma_T^+ + \epsilon_T \gamma_T^-
-      \end{pmatrix},
-  \end{gathered}
-\end{align*}
-
 :::{.fragment fragment-index=0}
-<!-- ::: {.callout} -->
-
-| Scenario | $g_N$ | $\gamma_N^-$ | $\gamma_N^+$ | $\xi_N$ | $\lambda_N$|
-|:-----:|:---:|:---:|:---:|:---:|:---:|
-| No contact | $g_N \leq 0$ | $\gamma_N > 0$ | $\gamma_N$ | $(I_k +\epsilon_N)\gamma_N$ | $0$ |
-| Contact or impact | $g_N \leq 0$ | $\gamma_N \leq 0$ | $- \epsilon_N \gamma_N$ | $0$ | $\lambda_N \geq 0$ |
-
-<!-- ::: -->
+\begin{align*}
+  g_N &= y \\
+  \dot{g}_N &= \underbrace{\begin{bmatrix} 0 & 1 \end{bmatrix}}_{W_N} \begin{bmatrix}
+  \dot{x} \\ \dot{y}
+  \end{bmatrix} =: \gamma_N
+\end{align*}
 :::
+
+:::{.fragment fragment-index=1}
+$$
+\gamma_N^+ = \epsilon_N \gamma_N^-
+$$
+:::
+
+:::{.fragment fragment-index=2}
+* Complementarity Condition
+$$
+0 \leq \xi_N \perp \lambda_N \geq 0
+$$
+:::
+
+:::
+
+:::{.column width=50%}
+:::{.fragment fragment-index=0}
+![](contents/assets/bouncingball.svg){fig-align="center"}
+:::
+
+:::{.fragment fragment-index=1}
+![](contents/assets/bouncingball_resolved.svg){fig-align="center"}
+:::
+
+:::
+::::
 
 
 ## Moreau's Time-Stepping {auto-animate="true"}
 
-\begin{algorithm}
-  \Input{$x_0$}
-\end{algorithm}
+:::{.fragment fragment-index=0}
+* Check if $g_N \leq 0$ at $t + \frac{\Delta t}{2}$
+* Solve complementarity
+:::
 
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+\begin{align*}
+  \begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix} &(\dot{q}^+ - \dot{q}^-) - W_N \lambda_N - \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t = 0 
+\end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+\begin{align*}
+  \dot{q}^+ &= \begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + \dot{q}^- 
+\end{align*}
+:::
+
+:::
+
+:::{.r-stack}
+:::{.fragment .fade-in-then-out fragment-index=2}
+\begin{align*}
+  \xi_N = W_N\dot{q}^+ + \epsilon_N W_N \dot{q}^- 
+\end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+\begin{align*}
+  \xi_N = W_N\begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + (1 + \epsilon_N) W_N \dot{q}^-
+\end{align*}
+:::
+
+:::
+
+:::{.fragment .fade-in fragment-index=4}
+Complementarity condition
+  \begin{align*}
+    \xi_N \lambda_N = 0, \;  
+    \xi_N \geq 0, \lambda_N \geq 0
+  \end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=4}
+* For non-convex optimization, use *Lemke's algorithm*
+:::
 
 ## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
 
