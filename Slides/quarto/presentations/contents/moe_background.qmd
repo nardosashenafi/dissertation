@@ -26,7 +26,7 @@
 
 :::{.fragment fragment-index=1}
 $$
-\gamma_N^+ = \epsilon_N \gamma_N^-
+\gamma_N^+ = -\epsilon_N \gamma_N^-
 $$
 :::
 

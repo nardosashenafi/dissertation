@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>moe_background</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="moe_background_files/libs/clipboard/clipboard.min.js"></script>
+<script src="moe_background_files/libs/quarto-html/quarto.js"></script>
+<script src="moe_background_files/libs/quarto-html/popper.min.js"></script>
+<script src="moe_background_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="moe_background_files/libs/quarto-html/anchor.min.js"></script>
+<link href="moe_background_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="moe_background_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="moe_background_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="moe_background_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="moe_background_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="switching-control-with-deep-net-mixture-of-experts" class="level1">
+<h1>Switching Control with Deep-net Mixture of Experts</h1>
+</section>
+<section id="background" class="level1">
+<h1>Background</h1>
+<ul>
+<li>Contact Modeling with Linear Complementarity Formulation<br>
+</li>
+<li>Mixture of Experts</li>
+</ul>
+<section id="contact-modeling" class="level2">
+<h2 class="anchored" data-anchor-id="contact-modeling">Contact Modeling</h2>
+<ul>
+<li><strong>Objective</strong>: accurately model contacts, impacts and Coulomb friction.</li>
+<li>E.g. Model of bouncing ball</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><br></p>
+<div class="fragment" data-fragment-index="0">
+<p><span class="math display">\[\begin{align*}
+  g_N &amp;= y \\
+  \dot{g}_N &amp;= \underbrace{\begin{bmatrix} 0 &amp; 1 \end{bmatrix}}_{W_N} \begin{bmatrix}
+  \dot{x} \\ \dot{y}
+  \end{bmatrix} =: \gamma_N
+\end{align*}\]</span></p>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p><span class="math display">\[
+\gamma_N^+ = -\epsilon_N \gamma_N^-
+\]</span></p>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Complementarity Condition <span class="math display">\[
+0 \leq \xi_N \perp \lambda_N \geq 0
+\]</span></li>
+</ul>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment" data-fragment-index="0">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="contents/assets/bouncingball.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="fragment" data-fragment-index="1">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="contents/assets/bouncingball_resolved.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="moreaus-time-stepping" class="level2" data-auto-animate="true">
+<h2 data-auto-animate="true" class="anchored" data-anchor-id="moreaus-time-stepping">Moreau’s Time-Stepping</h2>
+<div class="fragment" data-fragment-index="0">
+<ul>
+<li>Check if <span class="math inline">\(g_N \leq 0\)</span> at <span class="math inline">\(t + \frac{\Delta t}{2}\)</span></li>
+<li>Solve complementarity</li>
+</ul>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p><span class="math display">\[\begin{align*}
+  \begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix} &amp;(\dot{q}^+ - \dot{q}^-) - W_N \lambda_N - \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t = 0
+\end{align*}\]</span></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<p><span class="math display">\[\begin{align*}
+  \dot{q}^+ &amp;= \begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + \dot{q}^-
+\end{align*}\]</span></p>
+</div>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<p><span class="math display">\[\begin{align*}
+  \xi_N = W_N\dot{q}^+ + \epsilon_N W_N \dot{q}^-
+\end{align*}\]</span></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<p><span class="math display">\[\begin{align*}
+  \xi_N = W_N\begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + (1 + \epsilon_N) W_N \dot{q}^-
+\end{align*}\]</span></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="4">
+<p>Complementarity condition <span class="math display">\[\begin{align*}
+    \xi_N \lambda_N = 0, \;  
+    \xi_N \geq 0, \lambda_N \geq 0
+  \end{align*}\]</span></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="4">
+<ul>
+<li>For non-convex optimization, use <em>Lemke’s algorithm</em></li>
+</ul>
+</div>
+</section>
+<section id="mixture-of-experts-moe-old-faithful" class="level2" data-auto-animate="true">
+<h2 data-auto-animate="true" class="anchored" data-anchor-id="mixture-of-experts-moe-old-faithful">Mixture of Experts (MOE): Old Faithful</h2>
+<ul>
+<li><strong>Objective</strong>: learn two expert Gaussian models to predict duration given waiting time</li>
+</ul>
+<div class="columns">
+<!-- :::{.r-stack} --><div class="column" style="width:50%;">
+<div class="fragment fade-in" data-fragment-index="0">
+<ul>
+<li>The experts are chosen as <span class="math display">\[
+F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
+\]</span></li>
+</ul>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<ul>
+<li>The gating network is a neural net <span class="math inline">\(\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]\)</span></li>
+</ul>
+</div>
+<div class="fragment fade-in" data-fragment-index="2">
+<ul>
+<li>Learn the parameters <span class="math inline">\(\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}\)</span> and <span class="math inline">\(\psi\)</span> from dataset <span class="math inline">\(\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}\)</span></li>
+</ul>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img src="contents/assets/old_faithful.png" class="absolute" data-top="100" data-left="600" width="550" height="400"></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<ul>
+<li><em>Expectation Maximization</em>: maximizes log likelihood <span class="math display">\[
+\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)
+\]</span></li>
+</ul>
+</div>
+</section>
+<section id="generalization-of-the-log-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="generalization-of-the-log-likelihood">Generalization of the log likelihood</h2>
+<ul>
+<li>The experts can take many forms. The likelihood can be generalized as</li>
+</ul>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p><span class="math display">\[
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N} ( \| F_i(x_j; \theta_i) - y_j \| \; | \; 0, s)  P_i(x_j, \psi),
+\]</span></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<p><span class="math display">\[
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \right) P_i(x_j, \psi),
+\]</span></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="2">
+<ul>
+<li>For gradient-based techniques, we can extract the relevant parts and simplify the likelihood <span class="math display">\[
+\ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi).
+\]</span></li>
+</ul>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Likelihood
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math display">\[
+\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi).
+\]</span></p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
