@@ -103,7 +103,7 @@ P(J | \theta)  = \mathcal{N}(J | \; 0, s), \\
 \end{gather*}
 * Update parameters $z$ to maximize <span style="font-variant:small-caps;">Elbo</span>
 \begin{align*}
-z \leftarrow z + \frac{\partial \mathcal{L}}{\partial z}
+z \leftarrow z + \alpha_i \frac{\partial \mathcal{L}}{\partial z}
 \end{align*}
 :::
 

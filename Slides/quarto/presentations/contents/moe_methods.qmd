@@ -1,17 +1,15 @@
-# Mixture of Expert Controller
+# Mixture of Experts Controller
 
-## Mixture of Expert Controller
+## Mixture of Experts Controller
 
 <br/>
 
 :::{.fragment fragment-index=0}
 * **Objective**: learn contact-aware mixture of expert controller and a gating network 
-* Two major modifications to the *old faithful* example
-    + training dataset is generated from trajectories
-    + prediction error is replaced by running cost $\ell$ of the trajectories
 :::
 
 :::{.fragment fragment-index=1}
+* All the experts and the gating network are given by neural nets
 * We pose the search over the parameters $\psi, \theta$ as the following optimization problem
 
 :::{.callout-tip icon="false"}
@@ -61,7 +59,7 @@
 \end{align*}
 
 :::{.fragment fragment-index=0}
-1. Accumulated loss: total quadratic loss from desired state $x^*$
+* Accumulated loss: total quadratic loss from desired state $x^*$
 \begin{gather*}
 \ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u \\
 \mathcal{Q} \succ 0, \mathcal{R} \succeq 0
@@ -69,63 +67,23 @@
 :::
 
 :::{.fragment fragment-index=1}
-The correspond likelihood function is
+The corresponding likelihood function is
 :::
 
 :::{.r-stack}
 
 :::{.fragment .fade-in-then-out fragment-index=1}
 $$
-\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi)
+\ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)
 $$
 :::
 
 :::{.fragment .fade-in fragment-index=2}
 $$
-\mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell (x(t+\Delta t), F_i ) P_i (x(t) | \psi ) 
+\ln \{P(\phi | \theta, \psi) \} = \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{\ell (x(t+\Delta t), F_i )^2}{s^2} \right) P_i(x(t), \psi)
 $$
 
 :::
-:::
-
-## Performance Objective
-
-<br/>
-
-::::{.columns}
-
-:::{.column width="60%"}
-
-2. Minimum Trajectory Loss (MTL):
-
-* Accumulated loss may not reflect desired behavior. E.g. Simple pendulum
-
-
-:::{.fragment fragment-index=0}
-* Simple pendulum needs to pump slowly, which would accumulate large cost
-:::
-
-:::
-
-:::{.column width="40%"}
-
-:::{.fragment fragment-index=0}
-![](contents/assets/mtl.svg){fig-align="right"}
-:::
-
-:::
-::::
-
-
-:::{.fragment fragment-index=1}
-* MTL encourages trajectories to *eventually* lead to a minimum cost
-
-\begin{align*}
-    \begin{gathered}
-        t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \}  \\
-        \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
-    \end{gathered} 
-\end{align*}
 :::
 
 ## State Sampling 

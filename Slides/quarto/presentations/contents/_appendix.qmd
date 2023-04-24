@@ -1,5 +1,119 @@
 # Appendix {visibility="uncounted"}
 
+
+## Contact Modeling
+
+* **Objective**: accurately model contacts, impacts and Coulomb friction.
+* E.g. Model of bouncing ball
+
+::::{.columns}
+
+:::{.column width=50%}
+
+<br/>
+
+:::{.fragment fragment-index=0}
+\begin{align*}
+  g_N &= y \\
+  \dot{g}_N &= \underbrace{\begin{bmatrix} 0 & 1 \end{bmatrix}}_{W_N} \begin{bmatrix}
+  \dot{x} \\ \dot{y}
+  \end{bmatrix} =: \gamma_N
+\end{align*}
+:::
+
+:::{.fragment fragment-index=1}
+$$
+\gamma_N^+ = -\epsilon_N \gamma_N^-
+$$
+:::
+
+:::{.fragment fragment-index=2}
+* Complementarity Condition
+$$
+0 \leq \xi_N \perp \lambda_N \geq 0
+$$
+:::
+
+:::
+
+:::{.column width=50%}
+:::{.fragment fragment-index=0}
+![](contents/assets/bouncingball.svg){fig-align="center"}
+:::
+
+:::{.fragment fragment-index=1}
+![](contents/assets/bouncingball_resolved.svg){fig-align="center"}
+:::
+
+:::
+::::
+
+
+## Moreau's Time-Stepping {auto-animate="true"}
+
+:::{.fragment fragment-index=0}
+* Check if $g_N \leq 0$ at $t + \frac{\Delta t}{2}$
+* Solve complementarity
+:::
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+\begin{align*}
+  \begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix} &(\dot{q}^+ - \dot{q}^-) - W_N \lambda_N - \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t = 0 
+\end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+\begin{align*}
+  \dot{q}^+ &= \begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + \dot{q}^- 
+\end{align*}
+:::
+
+:::
+
+:::{.r-stack}
+:::{.fragment .fade-in-then-out fragment-index=2}
+\begin{align*}
+  \xi_N = W_N\dot{q}^+ + \epsilon_N W_N \dot{q}^- 
+\end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+\begin{align*}
+  \xi_N = W_N\begin{bmatrix}
+    m & 0 \\
+    0 & m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + (1 + \epsilon_N) W_N \dot{q}^-
+\end{align*}
+:::
+
+:::
+
+:::{.fragment .fade-in fragment-index=4}
+Complementarity condition
+  \begin{align*}
+    \xi_N \lambda_N = 0, \;  
+    \xi_N \geq 0, \lambda_N \geq 0
+  \end{align*}
+:::
+
+:::{.fragment .fade-in fragment-index=4}
+* For non-convex optimization, use *Lemke's algorithm*
+:::
+
 ## Complementarity Formulation
 
 * For potential contacts with gaps $g_N \leq 0$, the following holds.
@@ -118,6 +232,191 @@
 * We use pivotting (basis-exchange) technique called Lemke's algorithm to solve the LCP
 :::
 
+## Generalization of the log likelihood
+
+* The experts can take many forms. The likelihood can be generalized as
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N} ( \| F_i(x_j; \theta_i) - y_j \| \; | \; 0, s)  P_i(x_j, \psi),
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \right) P_i(x_j, \psi),
+$$
+:::
+:::
+
+:::{.fragment .fade-in fragment-index=2}
+* For gradient-based techniques, we can extract the relevant parts and simplify the likelihood
+$$
+  \ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+$$
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+:::{.callout-note icon=false}
+## Likelihood
+$$
+\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+$$
+:::
+:::
+
+
+## Performance Objective
+
+<br/>
+
+::::{.columns}
+
+:::{.column width="60%"}
+
+2. Minimum Trajectory Loss (MTL):
+
+* Accumulated loss may not reflect desired behavior. E.g. Simple pendulum
+
+
+:::{.fragment fragment-index=0}
+* Simple pendulum needs to pump slowly, which would accumulate large cost
+:::
+
+:::
+
+:::{.column width="40%"}
+
+:::{.fragment fragment-index=0}
+![](contents/assets/mtl.svg){fig-align="right"}
+:::
+
+:::
+::::
+
+
+:::{.fragment fragment-index=1}
+* MTL encourages trajectories to *eventually* lead to a minimum cost
+
+\begin{align*}
+    \begin{gathered}
+        t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \}  \\
+        \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
+    \end{gathered} 
+\end{align*}
+:::
+
+
+## Stable Switching {auto-animate="true"}
+
+* Given two unstable closed-loop systems
+
+::::{.columns}
+
+:::{.column width=65%}
+
+\begin{align*}
+    \dot{x} = A_1x = \begin{bmatrix} 0 & -1 \\ 2 & 0 \end{bmatrix} x, \; \;
+    \dot{x} = A_2x = \begin{bmatrix} 0 & -2 \\ 1 & 0 \end{bmatrix} x,
+\end{align*}
+find stable switching system that converges to $x^*=(0, 0)$
+
+:::{.fragment fragment-index=1}
+* Maximum number of state partitions set to 4
+:::
+
+:::
+
+:::{.column width=35%}
+
+:::{.fragment fragment-index=0}
+![](contents/assets/unstable_switching.png){.absolute top=20 left=700 width="400" height="400"}
+:::
+
+:::
+::::
+
+:::{.fragment fragment-index=2}
+* The gating network $\mathbf{P}(x | \psi)$ is a fully-connected neural net with 4 outputs
+* There are 4 experts with parameters $\theta_i$ 
+\begin{align*}
+    F_i(\theta_i) = \begin{cases}
+       0, & \theta_i > \frac{1}{2}, \\
+       1, & \theta_i \leq \frac{1}{2},
+    \end{cases}
+\end{align*}
+* **Objective**: learn $(\psi, \theta)$ that minimize the accumulated loss
+:::
+
+
+## Training progress
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter0.svg){top=100 left=300 }
+:::
+
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter200.svg){ top=50 left=300 }
+:::
+
+
+:::{.fragment .fade-in-then-out fragment-index=2}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter1400.svg){ top=100 left=300 }
+:::
+
+:::{.fragment .fade-in fragment-index=3}
+![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
+:::
+
+:::
+
+
+## Passive System Example
+<!-- ###################################################################### -->
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![](contents/assets/passive-system-example.png)
+:::
+
+::: {.column width="70%"}
+
+<br/> 
+
+Kirchoff's law
+
+$$
+\begin{aligned}
+v &= Ri + \frac{1}{C} \int_{0}^{t} i(\tau) \, \text{d}\tau + L \frac{\text{d} i}{\text{d} t} \\
+vi - Ri^2 &= \frac{\text{d}}{\text{d} t} \left( 
+  \underbrace{\frac{1}{2C} \left( \int_{0}^{t} i(\tau)\, \text{d} \tau \right)^2}_{\mathcal{V}} + 
+  \underbrace{\frac{1}{2} Li^2}_{\mathcal{T}}  
+\right)
+\end{aligned}
+$$
+:::
+
+::::
+
+Let $H = \mathcal{V} + \mathcal{T}$, integrate to obtain
+
+$$
+\underbrace{H(t)}_{\textrm{available}} -
+\underbrace{H(0)}_{\textrm{initial}} 
+= 
+\underbrace{\int_{0}^{t} v(\tau)i(\tau)\, \text{d} \tau}_{\textrm{supplied}} - 
+\underbrace{\int_{0}^{t} Ri^2(\tau)\, \text{d} \tau}_{\textrm{dissipated}}
+<
+\int_{0}^{t} v(\tau) i(\tau) \, \text{d} \tau
+$$
+
+
 ## Uncertainty in Predictions
 
 
@@ -133,6 +432,144 @@ where $\hat{F}(x)$ is the marginalized prediction given by
   \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta;z)} F(x; \theta),
 \end{align*} 
 :::
+
+
+## Training Stochastic Models {auto-animate=true}
+
+:::: {.columns}
+
+:::{.column width=60%}
+
+:::{r-vstack}
+
+:::{.r-stack}
+
+:::{.fragment .fade-in-then-out fragment-index=0}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
+\text{subject to} &&
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+::: 
+<!-- fragment -->
+
+:::{.fragment .fade-in-then-out fragment-index=1}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{P(\theta| \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
+\text{subject to} &&
+& \theta \sim P(\theta| \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+::: 
+<!-- fragment -->
+
+:::{.fragment .fade-in fragment-index=2}
+:::{.callout-important icon=false}
+## Expectation Maximization
+
+$$
+\begin{aligned}
+\underset{z}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
+\text{subject to} &&
+& \theta \sim Q(\theta;z), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+::: 
+<!-- fragment -->
+::: 
+<!-- r-stack -->
+
+
+::: 
+<!-- r-vstack -->
+::: 
+<!-- column -->
+
+:::{.column width=40%}
+
+![](contents/assets/handwritten_images.png){.absolute top=50 left=750 width="350" height="200"}
+
+
+::: 
+<!-- column -->
+:::: 
+
+:::: {.columns}
+
+:::{.column width=60%}
+:::{.fragment .fade-in fragment-index=3}
+![](contents/assets/overfitting.svg){.absolute top=150 left=0 width="650" height="650"}
+::: 
+<!-- fragment -->
+:::
+
+:::{.column width=40%}
+
+:::{.fragment .fade-in fragment-index=3}
+:::{.incremental}
+* Expectation maximization is prone to overfitting
+    + Reduces accuracy of predictions
+    + Reports near-zero prediction uncertainty (*overconfident*)
+* **Solution**: enforce variance on the posterior 
+::: 
+<!--incremental -->
+
+::: 
+<!-- fragment -->
+:::
+
+::::
+
+## Bias-Variance Trade-Off {auto-animate=true}
+
+
+<br/>
+
+* Prior distribution plays the role of a *regularization term*
+
+:::{.fragment .fade-in fragment-index=0}
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{z}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim Q(\theta;z), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+:::
+<!-- fragment -->
+
+:::{.fragment fragment-index=1}
+
+* Prior distribution can be
+    + *Informed*: allows us to inject prior knowledge
+    + *Uninformed*: starts randomly but every so often gets updated by the posterior
+
+:::
+
 
 ## Bias-Variance Trade-Off {auto-animate=true}
 
@@ -206,6 +643,30 @@ $$
     + *Uninformed*: starts randomly but every so often gets updated by the posterior
 
 :::
+
+## Estimating Posterior Distribution {auto-animate=true}
+
+<br/>
+
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{z}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &&
+& \theta \sim Q(\theta;z), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+
+* **Variational Inference**: approximates the posterior $P(\theta | \mathbb{D})$ with a pre-selected distribution $Q(\theta; z)$
+* **Objective**: collect $N_\theta$ samples from the current posterior $Q(\theta; z)$ and maximize <span style="font-variant:small-caps;">Elbo</span> 
+$$
+  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right].
+$$
 
 ## Bias-Variance Tradeoff
 

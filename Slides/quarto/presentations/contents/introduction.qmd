@@ -27,51 +27,23 @@
 :::
 
 
-## 1. Mode Changes
+## Challenge 1: Mode Changes
 <!-- ###################################################################### -->
 
-:::: {.columns}
-:::{.column  width="50%"}
-
-:::{.r-vstack}
 
 :::{.fragment fragment-index=0}
-![](contents/assets/walking.svg){}
+![](contents/assets/nhcm.png){fig-align="center" width="350" height="250"}
 :::
 
 :::{.fragment fragment-index=1}
-* Switching control does not scale well
-    + E.g. Cooperative manipulation
-* It is difficult to parameterize the switching condition 
-:::
-:::
-
-:::
-
-:::{.column  width="50%"}
-
-:::{.r-vstack}
-
-:::{.fragment fragment-index=0}
-
 * Contacts cause mode changes
 * Each mode has distinct dynamics
-* Controlled by switching among several policies
+* Switching control does not scale well
+* It is difficult to parameterize the switching condition 
 :::
 
-<br/>
 
-:::{.fragment fragment-index=1}
-![](contents/assets/nhcm.png){fig-align="right" width="400" height="300"}
-:::
-
-:::
-:::
-
-::::
-
-
-## 1. Proposed Method
+## Challenge 1: Proposed Method
 <br/>
 <br/>
 
@@ -82,7 +54,7 @@
 * We infer *contact-aware* controllers by training on trajectories generated from contact models
     + *Contact-aware* controllers minimize the adverse effects of contacts or leverage the potential contacts to their advantage
 
-## 2. Operating under Uncertain Conditions
+## Challenge 2: Operating under Uncertain Conditions
 
 <br/>
 
@@ -93,7 +65,7 @@
 ## {background-video="contents/assets/rw_failing.MP4" background-size="contain" background-video-muted="true"}
 
 
-## 2. Existing Methods {.smaller transition="fade"}
+## Challenge 2: Existing Methods {.smaller transition="fade"}
 
 <br/>
 
@@ -123,7 +95,6 @@ Strengths
 : 
 Stability guarantees \
 Closed-form policy \
-Need to solve PDEs
 Reasons about model uncertainties \
 
 :::

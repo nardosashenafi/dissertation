@@ -1,15 +1,5 @@
 # Uncertainty Handling via Neural Bayesian Inference
 
-## Proposed Method
-:::: {.r-vstack}
-Bayesian Neural Passivity-based Control
-![](contents/assets/pbc-ml-outline.svg){.absolute top=0 left=250 width="500" height="400"}
-
-<!-- Bayesian Neural Passivity-based Control -->
-![](contents/assets/regular-vs-bayesian.svg){.absolute top=200 left=150 width="700" height="600"}
-::::
-
-
 # Background {visibility="uncounted"}
 <!-- ###################################################################### -->
 
@@ -21,8 +11,7 @@ Bayesian Neural Passivity-based Control
 
 <br/>
 
-A dynamical system
-
+* A dynamical system
 $$
 \Sigma: \quad
 \begin{cases}
@@ -31,14 +20,12 @@ $$
 \end{cases}
 \quad x \in \mathcal{X} \subset \mathbb{R}^{2m}, \, u \in \mathcal{U} \subset \mathbb{R}^{n} 
 $$
-
 is __dissipative__ with respect to some supply rate $s$ if there exists a *storage function* $H: \mathcal{X} \to \mathbb{R}^{+}$ such that
-
 $$
 H\left(  x(t_1) \right) \leq  H\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t
 $$
-
 for all $x(t_0) = x_0$, all input $u$, and all $t_1 \geq t_0$
+* It is passive if $s = u^{\top} y$
 
 ## Stability of Passive Systems {auto-animate="true"}
 <!-- ###################################################################### -->
@@ -52,7 +39,6 @@ $$
   y &= g(x,u), && g(0,0) = 0,
 \end{cases}
 $$
-
 
 
 \begin{gather*}
@@ -69,47 +55,6 @@ The origin of $\Sigma$ is:
 - __stable__ if $\Sigma$ is passive,
 - __asymptotically stable__ if $\Sigma$ is output strictly passive ($s = u^\top y - \delta \lVert y \rVert^2, \; \delta > 0$).
 :::
-
-
-## Passive System Example
-<!-- ###################################################################### -->
-
-:::: {.columns}
-
-::: {.column width="30%"}
-![](contents/assets/passive-system-example.png)
-:::
-
-::: {.column width="70%"}
-
-<br/> 
-
-Kirchoff's law
-
-$$
-\begin{aligned}
-v &= Ri + \frac{1}{C} \int_{0}^{t} i(\tau) \, \text{d}\tau + L \frac{\text{d} i}{\text{d} t} \\
-vi - Ri^2 &= \frac{\text{d}}{\text{d} t} \left( 
-  \underbrace{\frac{1}{2C} \left( \int_{0}^{t} i(\tau)\, \text{d} \tau \right)^2}_{\mathcal{V}} + 
-  \underbrace{\frac{1}{2} Li^2}_{\mathcal{T}}  
-\right)
-\end{aligned}
-$$
-:::
-
-::::
-
-Let $H = \mathcal{V} + \mathcal{T}$, integrate to obtain
-
-$$
-\underbrace{H(t)}_{\textrm{available}} -
-\underbrace{H(0)}_{\textrm{initial}} 
-= 
-\underbrace{\int_{0}^{t} v(\tau)i(\tau)\, \text{d} \tau}_{\textrm{supplied}} - 
-\underbrace{\int_{0}^{t} Ri^2(\tau)\, \text{d} \tau}_{\textrm{dissipated}}
-<
-\int_{0}^{t} v(\tau) i(\tau) \, \text{d} \tau
-$$
 
 
 ## Simple Pendulum {auto-animate="false" auto-animate-easing="ease"}
@@ -259,7 +204,7 @@ $$
 $$
 :::
 
-- Parameterize $H_d$ by a neural network $H_d^\theta$, 
+- Parameterize $H_d$ by a neural network $H_d^\theta$
 - Desired performance characterized by $\ell$ observed from trajectory $\phi$
-- Approximate solutions to the PDEs found via stochastic gradient descent.
+- Approximate solutions to the PDEs found via stochastic gradient descent
 

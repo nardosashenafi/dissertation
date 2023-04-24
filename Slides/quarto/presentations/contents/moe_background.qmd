@@ -1,121 +1,7 @@
 # Switching Control with Deep-net Mixture of Experts
 
 # Background
-* Contact Modeling with Linear Complementarity Formulation  
 * Mixture of Experts 
-
-## Contact Modeling
-
-* **Objective**: accurately model contacts, impacts and Coulomb friction.
-* E.g. Model of bouncing ball
-
-::::{.columns}
-
-:::{.column width=50%}
-
-<br/>
-
-:::{.fragment fragment-index=0}
-\begin{align*}
-  g_N &= y \\
-  \dot{g}_N &= \underbrace{\begin{bmatrix} 0 & 1 \end{bmatrix}}_{W_N} \begin{bmatrix}
-  \dot{x} \\ \dot{y}
-  \end{bmatrix} =: \gamma_N
-\end{align*}
-:::
-
-:::{.fragment fragment-index=1}
-$$
-\gamma_N^+ = -\epsilon_N \gamma_N^-
-$$
-:::
-
-:::{.fragment fragment-index=2}
-* Complementarity Condition
-$$
-0 \leq \xi_N \perp \lambda_N \geq 0
-$$
-:::
-
-:::
-
-:::{.column width=50%}
-:::{.fragment fragment-index=0}
-![](contents/assets/bouncingball.svg){fig-align="center"}
-:::
-
-:::{.fragment fragment-index=1}
-![](contents/assets/bouncingball_resolved.svg){fig-align="center"}
-:::
-
-:::
-::::
-
-
-## Moreau's Time-Stepping {auto-animate="true"}
-
-:::{.fragment fragment-index=0}
-* Check if $g_N \leq 0$ at $t + \frac{\Delta t}{2}$
-* Solve complementarity
-:::
-
-:::{.r-stack}
-
-:::{.fragment .fade-in-then-out fragment-index=0}
-\begin{align*}
-  \begin{bmatrix}
-    m & 0 \\
-    0 & m
-  \end{bmatrix} &(\dot{q}^+ - \dot{q}^-) - W_N \lambda_N - \begin{bmatrix}
-  0 \\ mg
-  \end{bmatrix} \Delta t = 0 
-\end{align*}
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-\begin{align*}
-  \dot{q}^+ &= \begin{bmatrix}
-    m & 0 \\
-    0 & m
-  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
-  0 \\ mg
-  \end{bmatrix} \Delta t \right] + \dot{q}^- 
-\end{align*}
-:::
-
-:::
-
-:::{.r-stack}
-:::{.fragment .fade-in-then-out fragment-index=2}
-\begin{align*}
-  \xi_N = W_N\dot{q}^+ + \epsilon_N W_N \dot{q}^- 
-\end{align*}
-:::
-
-:::{.fragment .fade-in fragment-index=3}
-\begin{align*}
-  \xi_N = W_N\begin{bmatrix}
-    m & 0 \\
-    0 & m
-  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
-  0 \\ mg
-  \end{bmatrix} \Delta t \right] + (1 + \epsilon_N) W_N \dot{q}^-
-\end{align*}
-:::
-
-:::
-
-:::{.fragment .fade-in fragment-index=4}
-Complementarity condition
-  \begin{align*}
-    \xi_N \lambda_N = 0, \;  
-    \xi_N \geq 0, \lambda_N \geq 0
-  \end{align*}
-:::
-
-:::{.fragment .fade-in fragment-index=4}
-* For non-convex optimization, use *Lemke's algorithm*
-:::
 
 ## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
 
@@ -146,7 +32,7 @@ $$
 
 :::{.r-stack}
 
-![](contents/assets/geyser.JPG){.absolute top=100 left=600 .fragment .fade-in-then-out fragment-index=0}
+![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0}
 ![](contents/assets/old_faithful.svg){.absolute top=100 left=600 width="550" height="400" .fragment .fade-in fragment-index=1}
 
 :::
@@ -163,39 +49,4 @@ $$
 $$
 \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)
 $$
-:::
-
-## Generalization of the log likelihood
-
-* The experts can take many forms. The likelihood can be generalized as
-
-:::{.r-stack}
-
-:::{.fragment .fade-in-then-out fragment-index=0}
-$$
-  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N} ( \| F_i(x_j; \theta_i) - y_j \| \; | \; 0, s)  P_i(x_j, \psi),
-$$
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-$$
-  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \right) P_i(x_j, \psi),
-$$
-:::
-:::
-
-:::{.fragment .fade-in fragment-index=2}
-* For gradient-based techniques, we can extract the relevant parts and simplify the likelihood
-$$
-  \ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
-$$
-:::
-
-:::{.fragment .fade-in fragment-index=3}
-:::{.callout-note icon=false}
-## Likelihood
-$$
-\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
-$$
-:::
 :::

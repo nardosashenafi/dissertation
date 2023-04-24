@@ -1,70 +1,4 @@
-# Case Studies
-
-## Stable Switching {auto-animate="true"}
-
-* Given two unstable closed-loop systems
-
-::::{.columns}
-
-:::{.column width=65%}
-
-\begin{align*}
-    \dot{x} = A_1x = \begin{bmatrix} 0 & -1 \\ 2 & 0 \end{bmatrix} x, \; \;
-    \dot{x} = A_2x = \begin{bmatrix} 0 & -2 \\ 1 & 0 \end{bmatrix} x,
-\end{align*}
-find stable switching system that converges to $x^*=(0, 0)$
-
-:::{.fragment fragment-index=1}
-* Maximum number of state partitions set to 4
-:::
-
-:::
-
-:::{.column width=35%}
-
-:::{.fragment fragment-index=0}
-![](contents/assets/unstable_switching.png){.absolute top=20 left=700 width="400" height="400"}
-:::
-
-:::
-::::
-
-:::{.fragment fragment-index=2}
-* The gating network $\mathbf{P}(x | \psi)$ is a fully-connected neural net with 4 outputs
-* There are 4 experts with parameters $\theta_i$ 
-\begin{align*}
-    F_i(\theta_i) = \begin{cases}
-       0, & \theta_i > \frac{1}{2}, \\
-       1, & \theta_i \leq \frac{1}{2},
-    \end{cases}
-\end{align*}
-* **Objective**: learn $(\psi, \theta)$ that minimize the accumulated loss
-:::
-
-
-## Training progress
-
-:::{.r-stack}
-
-:::{.fragment .fade-in-then-out fragment-index=0}
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter0.svg){top=100 left=300 }
-:::
-
-
-:::{.fragment .fade-in-then-out fragment-index=1}
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter200.svg){ top=50 left=300 }
-:::
-
-
-:::{.fragment .fade-in-then-out fragment-index=2}
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/moeSwitchingIter1400.svg){ top=100 left=300 }
-:::
-
-:::{.fragment .fade-in fragment-index=3}
-![&nbsp; Control input (purple $\rightarrow \dot{x} = A_1x$, yellow $\rightarrow \dot{x} = A_2 x$) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition ](contents/assets/switching_results.svg)
-:::
-
-:::
+# Case Study
 
 ## {background-video="contents/assets/cartpole-firefox.mp4" background-size="contain" background-video-muted="true"}
 
@@ -82,7 +16,7 @@ find stable switching system that converges to $x^*=(0, 0)$
 * MOE controller training
     + there are three deep-net experts $F_i(x;\theta_i)$
     + the gating network is also a neural net
-    + running cost is MTL 
+
 :::
 :::
 

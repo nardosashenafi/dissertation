@@ -14,10 +14,7 @@
 :::
 
 :::{.fragment fragment-index=1}
-* *Stochastic models* provide generalized predictions 
-and report the uncertainty in each prediction
-    + The model is given by $F(x;\theta)$ where the parameter $\theta$ is a sample drawn from a distribution
-
+* Bayesian learning provides *stochastic models* that do not overfit on the training data
 :::
 
 :::
@@ -31,119 +28,14 @@ and report the uncertainty in each prediction
 :::
 ::::
 
+
 ## Training Stochastic Models {auto-animate=true}
 
-:::: {.columns}
-
-:::{.column width=60%}
-
-:::{r-vstack}
+<br/>
 
 :::{.r-stack}
-
 :::{.fragment .fade-in-then-out fragment-index=0}
-:::{.callout-important icon=false}
-## Expectation Maximization
-
-$$
-\begin{aligned}
-\underset{P(\theta | \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
-\text{subject to} &&
-& \theta \sim P(\theta | \mathbb{D}), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
-\end{aligned}
-$$
-::: 
-<!-- callout -->
-::: 
-<!-- fragment -->
-
-:::{.fragment .fade-in-then-out fragment-index=1}
-:::{.callout-important icon=false}
-## Expectation Maximization
-
-$$
-\begin{aligned}
-\underset{P(\theta| \mathbb{D})}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
-\text{subject to} &&
-& \theta \sim P(\theta| \mathbb{D}), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
-\end{aligned}
-$$
-::: 
-<!-- callout -->
-::: 
-<!-- fragment -->
-
-:::{.fragment .fade-in fragment-index=2}
-:::{.callout-important icon=false}
-## Expectation Maximization
-
-$$
-\begin{aligned}
-\underset{z}{\text{maximize}} && P(\mathbb{D} | \theta)  &= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
-\text{subject to} &&
-& \theta \sim Q(\theta;z), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
-\end{aligned}
-$$
-::: 
-<!-- callout -->
-::: 
-<!-- fragment -->
-::: 
-<!-- r-stack -->
-
-
-::: 
-<!-- r-vstack -->
-::: 
-<!-- column -->
-
-:::{.column width=40%}
-
-![](contents/assets/handwritten_images.png){.absolute top=50 left=750 width="350" height="200"}
-
-
-::: 
-<!-- column -->
-:::: 
-
-:::: {.columns}
-
-:::{.column width=60%}
-:::{.fragment .fade-in fragment-index=3}
-![](contents/assets/overfitting.svg){.absolute top=150 left=0 width="650" height="650"}
-::: 
-<!-- fragment -->
-:::
-
-:::{.column width=40%}
-
-:::{.fragment .fade-in fragment-index=3}
-:::{.incremental}
-* Expectation maximization is prone to overfitting
-    + Reduces accuracy of predictions
-    + Reports near-zero prediction uncertainty (*overconfident*)
-* **Solution**: enforce variance on the posterior 
-::: 
-<!--incremental -->
-
-::: 
-<!-- fragment -->
-:::
-
-::::
-
-## Bias-Variance Trade-Off {auto-animate=true}
-
-
-<br/>
-
-* Prior distribution plays the role of a *regularization term*
-
-:::{.fragment .fade-in fragment-index=0}
-:::{.callout-important icon=false}
+:::{.callout-important icon=false }
 ## Bayesian Inference
 
 $$
@@ -151,46 +43,37 @@ $$
 \underset{z}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
 \text{subject to} &&
 & \theta \sim Q(\theta;z), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
 \end{aligned}
 $$
 ::: 
 <!-- callout -->
 :::
-<!-- fragment -->
 
-:::{.fragment fragment-index=1}
-
-* Prior distribution can be
-    + *Informed*: allows us to inject prior knowledge
-    + *Uninformed*: starts randomly but every so often gets updated by the posterior
-
-:::
-
-## Estimating Posterior Distribution {auto-animate=true}
-
-<br/>
-
+:::{ .fragment .fade-in fragment-index=1}
 :::{.callout-important icon=false}
 ## Bayesian Inference
 
 $$
 \begin{aligned}
-\underset{z}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\underset{z}{\text{maximize}} &&& \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2), \\
 \text{subject to} &&
 & \theta \sim Q(\theta;z), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
 \end{aligned}
 $$
 ::: 
 <!-- callout -->
+:::
+:::
 
+:::{.fragment fragment-index=2}
 * **Variational Inference**: approximates the posterior $P(\theta | \mathbb{D})$ with a pre-selected distribution $Q(\theta; z)$
 * **Objective**: collect $N_\theta$ samples from the current posterior $Q(\theta; z)$ and maximize <span style="font-variant:small-caps;">Elbo</span> 
 $$
   \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right].
 $$
-
+:::
 
 ## Robustness via Bayesian Learning 
 
