@@ -16,18 +16,18 @@
 :::{.fragment .fade-in fragment-index=2}
 :::: {.columns}
 :::{.column  width="60%"}
-![Walking machines](contents/assets/walking_model.png){fig-align="center" width="400" height="200"}
+![Walking machines](contents/assets/walking_model.png){fig-align="center" width="500" height="300"}
 :::
 :::{.column  width="0%"}
 :::
 :::{.column  width="40%"}
-![Manipulators](contents/assets/manipulator.jpg){fig-align="center" width="200" height="200"}
+![Manipulators](contents/assets/manipulator.jpg){fig-align="center" width="300" height="300"}
 :::
 ::::
 :::
 
 
-## 1. Motivation 
+## 1. Mode Changes
 <!-- ###################################################################### -->
 
 :::: {.columns}
@@ -42,7 +42,6 @@
 :::{.fragment fragment-index=1}
 * Switching control does not scale well
     + E.g. Cooperative manipulation
-    + $k$ contacts can have upto $2^k$ contact combinations
 * It is difficult to parameterize the switching condition 
 :::
 :::
@@ -117,7 +116,7 @@ Stability guarantees?
 
 :::: {.fragment  fragment-index=1}
 ::: {layout="[100,-5,60]" layout-valign="center"}
-Neural Passivity-based Control
+Bayesian Neural Passivity-based Control
 ![](contents/assets/pbc-ml-outline.svg)
 
 Strengths
@@ -125,25 +124,8 @@ Strengths
 Stability guarantees \
 Closed-form policy \
 Need to solve PDEs
+Reasons about model uncertainties \
 
-Weaknesses
-: 
-Model uncertainties \
-
-:::
-::::
-
-## 2. Proposed Method
-
-:::: {.r-vstack}
-:::{.fragment  fragment-index=0}
-Bayesian Neural Passivity-based Control
-![](contents/assets/pbc-ml-outline.svg){.absolute top=0 left=250 width="500" height="400"}
-:::
-
-::: {.fragment  fragment-index=1}
-<!-- Bayesian Neural Passivity-based Control -->
-![](contents/assets/regular-vs-bayesian.svg){.absolute top=200 left=150 width="700" height="600"}
 :::
 ::::
 

@@ -7,37 +7,25 @@
 \begin{align*}
   \begin{gathered}
     0 \leq 
-    \begin{pmatrix}
-      \xi_N(q, \dot{q}) \\
-      \xi_T(q, \dot{q})
-    \end{pmatrix} 
+      \xi_N(q, \dot{q}) 
     \perp
-      \begin{pmatrix}
-        \lambda_N  \\
-        \lambda_T
-      \end{pmatrix} \geq 0, \\
-  % \end{eqnarray}
-  % \begin{eqnarray}
-    \begin{pmatrix}
-      \xi_N(q, \dot{q}) \\
-      \xi_T(q, \dot{q})
-    \end{pmatrix} :=
-      \begin{pmatrix}
-        \gamma_N^+ + \epsilon_N \gamma_N^-  \\
-        \gamma_T^+ + \epsilon_T \gamma_T^-
-      \end{pmatrix},
+        \lambda_N  \geq 0, \\
+      \xi_N(q, \dot{q})  :=
+        \gamma_N^+ + \epsilon_N \gamma_N^- ,
   \end{gathered}
 \end{align*}
 
 :::{.fragment fragment-index=0}
-<!-- ::: {.callout} -->
+::::{.columns}
 
-| Scenario | $g_N$ | $\gamma_N^-$ | $\gamma_N^+$ | $\xi_N$ | $\lambda_N$|
-|:-----:|:---:|:---:|:---:|:---:|:---:|
-| No contact | $g_N \leq 0$ | $\gamma_N > 0$ | $\gamma_N$ | $(I_k +\epsilon_N)\gamma_N$ | $0$ |
-| Contact or impact | $g_N \leq 0$ | $\gamma_N \leq 0$ | $- \epsilon_N \gamma_N$ | $0$ | $\lambda_N \geq 0$ |
+:::{.column width=50%}
+![](contents/assets/unilateral_primitive.svg){width="500" heigth="500"}
+:::
 
-<!-- ::: -->
+:::{.column width=50%}
+![](contents/assets/tangential_to_complementarity.svg)
+:::
+::::
 :::
 
 ## Linear Complementarity Problem (LCP)
@@ -132,15 +120,19 @@
 
 ## Uncertainty in Predictions
 
-* The uncertainty associated with each prediction is given by~\cite{jospin2020hands}
+
+* The uncertainty associated with each prediction is given by
+
+:::{.callout-note icon="false"}
+## Uncertainty in predictions
 \begin{align*}
-  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta;z)} \| F(x; \theta) - \hat{F}(x)|\^2.
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta;z)} \| F(x; \theta) - \hat{F}(x)\| ^2.
 \end{align*}
 where $\hat{F}(x)$ is the marginalized prediction given by
 \begin{align*}
   \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta;z)} F(x; \theta),
 \end{align*} 
-
+:::
 
 ## Bias-Variance Trade-Off {auto-animate=true}
 

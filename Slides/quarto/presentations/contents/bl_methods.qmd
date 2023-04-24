@@ -23,7 +23,7 @@ $$
   0 \\ \Omega
 \end{bmatrix} u^{\theta}
 \\
-&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
+&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)
 \end{aligned}
 $$
 :::
@@ -47,7 +47,7 @@ $$
     0 \\ \Omega
     \end{bmatrix} u^{\theta}
     \\
-    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)\\
+    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)\\
     && \theta &\sim Q(\theta; z)
 \end{aligned} 
 $$
@@ -63,7 +63,7 @@ $$
     \text{subject to} &&
     \dd x &= \left(
         \begin{bmatrix}\phantom{-}\nabla_p H \\-\nabla_q H \end{bmatrix} + \begin{bmatrix} 0 \\ \Omega(q) \end{bmatrix} u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, \\
-    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)\\
+    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)\\
     && \theta &\sim Q(\theta; z) \\
     && p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p)
 \end{aligned} 
@@ -93,12 +93,13 @@ $$
 * Generate trajectories $\phi(x_0, u, T)$ using current parameters
 \begin{gather*}
 \theta \sim Q(\theta; z) \\
-u^\theta = - \Omega^{\dagger}\nabla_q H_d^{\theta}  - K_D \Omega^\top \nabla_p H_d^{\theta} 
+u^\theta = \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
 \end{gather*}
 * Assign a running cost $\ell$ to the trajectories based on performance
 \begin{gather*}
 J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ], \\
-\mathcal{L}(J,z) = \ln(P(J \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) 
+P(J | \theta)  = \mathcal{N}(J | \; 0, s), \\
+\mathcal{L}(J,z) = \ln(P(J \mid \theta)P(\theta)) - \ln(Q(\theta;z)) 
 \end{gather*}
 * Update parameters $z$ to maximize <span style="font-variant:small-caps;">Elbo</span>
 \begin{align*}
@@ -152,7 +153,7 @@ H(x^+) \leq H(x^-)
     & & & J(\phi, u) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[\ell(\phi(x_0, u^\theta, T), u^\theta)], \\
     \textrm{subject to}
     & & M(q) &\dd \dot{q} + h(q, \dot{q}, \theta)\dd t - \dd R  = 0,\\
-    & & u^{\theta} &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d), \\
+    & & u^{\theta} &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta), \\
     & & p_s &\sim \mathbb{U}(p_{min}, p_{max}), \\
     & & \theta &\sim Q(\theta; z).
 \end{aligned}

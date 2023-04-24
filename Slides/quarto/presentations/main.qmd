@@ -58,4 +58,4 @@ format:
 
 <!-- # :grey_question: Q&A -->
 
-<!-- {{< include contents/_appendix.qmd >}} -->
+{{< include contents/_appendix.qmd >}}

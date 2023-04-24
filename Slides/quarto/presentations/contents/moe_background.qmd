@@ -120,7 +120,7 @@ Complementarity condition
 ## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
 
 
-* **Objective**: learn two expert Gaussian models to predict duration given waiting time
+* **Objective**: learn two expert Gaussian models to predict duration given waiting time from dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
 
 ::::{.columns}
 
@@ -128,30 +128,37 @@ Complementarity condition
 
 :::{.column  width="50%"}
 
-:::{.fragment .fade-in fragment-index=0}
+:::{.fragment .fade-in fragment-index=2}
 * The experts are chosen as
 $$
 F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 $$
 :::
-:::{.fragment .fade-in fragment-index=1}
+:::{.fragment .fade-in fragment-index=3}
 
 * The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
 :::
-:::{.fragment .fade-in fragment-index=2}
-* Learn the parameters $\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}$ and $\psi$ from dataset
-$\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
-:::
+
 :::
 
 
 :::{.column  width="50%"}
-![](contents/assets/old_faithful.png){.absolute top=100 left=600 width="550" height="400"}
+
+:::{.r-stack}
+
+![](contents/assets/geyser.JPG){.absolute top=100 left=600 .fragment .fade-in-then-out fragment-index=0}
+![](contents/assets/old_faithful.svg){.absolute top=100 left=600 width="550" height="400" .fragment .fade-in fragment-index=1}
+
+:::
 :::
 
 ::::
 
-:::{.fragment .fade-in fragment-index=3}
+:::{.fragment .fade-in fragment-index=4}
+* Learn the parameters $\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}$ and $\psi$ 
+:::
+
+:::{.fragment .fade-in fragment-index=5}
 * *Expectation Maximization*: maximizes log likelihood
 $$
 \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)

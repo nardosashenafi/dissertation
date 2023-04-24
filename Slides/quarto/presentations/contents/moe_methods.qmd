@@ -96,7 +96,7 @@ $$
 
 :::{.column width="60%"}
 
-2. Minimum Loss Trajectory (MTL):
+2. Minimum Trajectory Loss (MTL):
 
 * Accumulated loss may not reflect desired behavior. E.g. Simple pendulum
 
@@ -139,7 +139,7 @@ $$
 
 ![](contents/assets/neuralpbc/033.svg){.fragment}
 
-<!-- ![](contents/assets/neuralpbc/000.svg)
+![](contents/assets/neuralpbc/000.svg)
 
 ![](contents/assets/neuralpbc/001.svg){.fragment}
 
@@ -189,6 +189,6 @@ $$
 
 ![](contents/assets/neuralpbc/032.svg){.fragment}
 
-![](contents/assets/neuralpbc/033.svg){.fragment} -->
+![](contents/assets/neuralpbc/033.svg){.fragment}
 
 ::::
