@@ -38,8 +38,8 @@ Arash Komaee, Ph.D.
 ::: {.fragment .fade-in-then-semi-out fragment-index=0}
 ### <span style="font-variant:small-caps;">Published</span>
 * ***CCTA 2021***: Cooperative Manipulation
-* ***ACC 2022***: Bayesian NeuralPBC
-* ***L-CSS 2022***: Bayesian NeuralPBC
+* ***ACC 2022***: Bayesian <span style="font-variant:small-caps;">NeuralPbc</span>
+* ***L-CSS 2022***: Bayesian <span style="font-variant:small-caps;">NeuralPbc</span>
     + ***CDC 2022***
 * ***Arxiv 2022***: Control Design via Bayesian Inference: Theoretical Justification of Robustness
 <!-- ::: -->
@@ -49,8 +49,8 @@ Arash Komaee, Ph.D.
 <!-- ::: {.column width="35%"}  -->
 ::: {.fragment .fade-in fragment-index=1}
 ### <span style="font-variant:small-caps;">Upcoming Submissions</span>
-* Mixture of Experts
-* Bayesian NeuralPBC on Rimless Wheel
+* Control of Hybrid Dynamical Systems via Deep-net Mixture of Experts
+* Data Driven Passivity-Based Control of the Rimless Wheel in Uncertain Terrains
 :::
 <!-- ::: -->
 <!-- ::::  -->
