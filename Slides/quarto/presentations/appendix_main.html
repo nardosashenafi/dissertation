@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="appendix_main_files/libs/clipboard/clipboard.min.js"></script>
+<script src="appendix_main_files/libs/quarto-html/tabby.min.js"></script>
+<script src="appendix_main_files/libs/quarto-html/popper.min.js"></script>
+<script src="appendix_main_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="appendix_main_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="appendix_main_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="appendix_main_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="appendix_main_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.3.326">
+
+  <meta name="author" content="Nardos Ashenafi">
+  <title>Robust Control of Contact-Rich Robots via Neural Bayesian Inference</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="appendix_main_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="appendix_main_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="appendix_main_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link rel="stylesheet" href="styles.css">
+  <link href="appendix_main_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="appendix_main_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="appendix_main_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="appendix_main_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="appendix_main_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="appendix_main_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+
+<section id="robust-control-of-contact-rich-robots-via-neural-bayesian-inference" class="slide level2 center smaller">
+<h2>Robust Control of Contact-Rich Robots via Neural Bayesian Inference</h2>
+<!-- ###################################################################### -->
+<hr>
+<p><em>Doctoral Dissertation Defense</em></p>
+<p><br></p>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 62.5%;justify-content: center;">
+<p><strong>Candidate</strong>: <br> Nardos Ashenafi<span class="emoji" data-emoji="mortar_board">🎓</span> <br> Electrical and Computer Engineering Department <br> Boise State University, Boise, Idaho, USA</p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 37.5%;justify-content: center;">
+<p><strong>Supervisory Committee</strong>: <br> Aykut Satici, Ph.D.&nbsp;<br> John Chiasson, Ph.D.&nbsp;<br> Kurtis Cantley, Ph.D.&nbsp;<br> Hao Chen, Ph.D.&nbsp;<br> Arash Komaee, Ph.D.&nbsp;</p>
+</div>
+</div>
+</div>
+</section>
+<section id="publications-and-contributions" class="slide level2">
+<h2>Publications and Contributions</h2>
+<p><br></p>
+<!-- :::: {.columns}
+::: {.column width="65%"} -->
+<div class="fragment fade-in-then-semi-out" data-fragment-index="0">
+<!-- -->
+<h3 id="published"><span class="smallcaps">Published</span></h3>
+<ul>
+<li><strong><em>CCTA 2021</em></strong>: Cooperative Manipulation</li>
+<li><strong><em>ACC 2022</em></strong>: Bayesian NeuralPBC</li>
+<li><strong><em>L-CSS 2022</em></strong>: Bayesian NeuralPBC
+<ul>
+<li><strong><em>CDC 2022</em></strong></li>
+</ul></li>
+<li><strong><em>Arxiv 2022</em></strong>: Control Design via Bayesian Inference: Theoretical Justification of Robustness <!-- ::: --></li>
+</ul>
+</div>
+<!-- ::: {.column width="35%"}  -->
+<div class="fragment fade-in" data-fragment-index="1">
+<!-- -->
+<h3 id="upcoming-submissions"><span class="smallcaps">Upcoming Submissions</span></h3>
+<ul>
+<li>Mixture of Experts</li>
+<li>Bayesian NeuralPBC on Rimless Wheel</li>
+</ul>
+</div>
+<!-- ::: -->
+<!-- ::::  -->
+</section>
+<section>
+<section id="appendix" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Appendix</h1>
+
+</section>
+<section id="contact-modeling" class="slide level2">
+<h2>Contact Modeling</h2>
+<ul>
+<li><strong>Objective</strong>: accurately model contacts, impacts and Coulomb friction.</li>
+<li>E.g. Model of bouncing ball</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><br></p>
+<div class="fragment" data-fragment-index="0">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>g</mi><mi>N</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>y</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mover><mi>g</mi><mo accent="true">̇</mo></mover><mi>N</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><munder><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo accent="true">⏟</mo></munder><msub><mi>W</mi><mi>N</mi></msub></munder><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mover><mi>x</mi><mo accent="true">̇</mo></mover></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mover><mi>y</mi><mo accent="true">̇</mo></mover></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mo>:</mo><msub><mi>γ</mi><mi>N</mi></msub></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  g_N &amp;= y \\
+  \dot{g}_N &amp;= \underbrace{\begin{bmatrix} 0 &amp; 1 \end{bmatrix}}_{W_N} \begin{bmatrix}
+  \dot{x} \\ \dot{y}
+  \end{bmatrix} =: \gamma_N
+\end{align*}</annotation></semantics></math></p>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>γ</mi><mi>N</mi><mo>+</mo></msubsup><mo>=</mo><mo>−</mo><msub><mi>ϵ</mi><mi>N</mi></msub><msubsup><mi>γ</mi><mi>N</mi><mo>−</mo></msubsup></mrow><annotation encoding="application/x-tex">
+\gamma_N^+ = -\epsilon_N \gamma_N^-
+</annotation></semantics></math></p>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Complementarity Condition <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mo>≤</mo><msub><mi>ξ</mi><mi>N</mi></msub><mo>⊥</mo><msub><mi>λ</mi><mi>N</mi></msub><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">
+0 \leq \xi_N \perp \lambda_N \geq 0
+</annotation></semantics></math></li>
+</ul>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment" data-fragment-index="0">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/bouncingball.svg"></p>
+</figure>
+</div>
+</div>
+<div class="fragment" data-fragment-index="1">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/bouncingball_resolved.svg"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="moreaus-time-stepping" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Moreau’s Time-Stepping</h2>
+<div class="fragment" data-fragment-index="0">
+<ul>
+<li>Check if <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>N</mi></msub><mo>≤</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">g_N \leq 0</annotation></semantics></math> at <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mfrac><mrow><mi>Δ</mi><mi>t</mi></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">t + \frac{\Delta t}{2}</annotation></semantics></math></li>
+<li>Solve complementarity</li>
+</ul>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mo stretchy="true" form="prefix">(</mo><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>+</mo></msup><mo>−</mo><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>−</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>W</mi><mi>N</mi></msub><msub><mi>λ</mi><mi>N</mi></msub><mo>−</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi><mi>g</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>Δ</mi><mi>t</mi><mo>=</mo><mn>0</mn></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix} &amp;(\dot{q}^+ - \dot{q}^-) - W_N \lambda_N - \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t = 0 
+\end{align*}</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>+</mo></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>W</mi><mi>N</mi></msub><msub><mi>λ</mi><mi>N</mi></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi><mi>g</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>Δ</mi><mi>t</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>−</mo></msup></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \dot{q}^+ &amp;= \begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + \dot{q}^- 
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ξ</mi><mi>N</mi></msub><mo>=</mo><msub><mi>W</mi><mi>N</mi></msub><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>+</mo></msup><mo>+</mo><msub><mi>ϵ</mi><mi>N</mi></msub><msub><mi>W</mi><mi>N</mi></msub><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>−</mo></msup></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \xi_N = W_N\dot{q}^+ + \epsilon_N W_N \dot{q}^- 
+\end{align*}</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ξ</mi><mi>N</mi></msub><mo>=</mo><msub><mi>W</mi><mi>N</mi></msub><msup><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>m</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>W</mi><mi>N</mi></msub><msub><mi>λ</mi><mi>N</mi></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>m</mi><mi>g</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>Δ</mi><mi>t</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><msub><mi>ϵ</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>W</mi><mi>N</mi></msub><msup><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>−</mo></msup></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \xi_N = W_N\begin{bmatrix}
+    m &amp; 0 \\
+    0 &amp; m
+  \end{bmatrix}^{-1} \left[W_N \lambda_N + \begin{bmatrix}
+  0 \\ mg
+  \end{bmatrix} \Delta t \right] + (1 + \epsilon_N) W_N \dot{q}^-
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="4">
+<p>Complementarity condition <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ξ</mi><mi>N</mi></msub><msub><mi>λ</mi><mi>N</mi></msub><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>ξ</mi><mi>N</mi></msub><mo>≥</mo><mn>0</mn><mo>,</mo><msub><mi>λ</mi><mi>N</mi></msub><mo>≥</mo><mn>0</mn></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+    \xi_N \lambda_N = 0, \;  
+    \xi_N \geq 0, \lambda_N \geq 0
+  \end{align*}</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="4">
+<ul>
+<li>For non-convex optimization, use <em>Lemke’s algorithm</em></li>
+</ul>
+</div>
+</section>
+<section id="complementarity-formulation" class="slide level2">
+<h2>Complementarity Formulation</h2>
+<ul>
+<li>For potential contacts with gaps <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>N</mi></msub><mo>≤</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">g_N \leq 0</annotation></semantics></math>, the following holds.</li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn><mo>≤</mo><msub><mi>ξ</mi><mi>N</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>⊥</mo><msub><mi>λ</mi><mi>N</mi></msub><mo>≥</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>N</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>:=</mo><msubsup><mi>γ</mi><mi>N</mi><mo>+</mo></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>N</mi></msub><msubsup><mi>γ</mi><mi>N</mi><mo>−</mo></msubsup><mo>,</mo></mtd></mtr></mtable></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \begin{gathered}
+    0 \leq 
+      \xi_N(q, \dot{q}) 
+    \perp
+        \lambda_N  \geq 0, \\
+      \xi_N(q, \dot{q})  :=
+        \gamma_N^+ + \epsilon_N \gamma_N^- ,
+  \end{gathered}
+\end{align*}</annotation></semantics></math></p>
+<div class="fragment" data-fragment-index="0">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="contents/assets/unilateral_primitive.svg" data-heigth="500" width="500"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="contents/assets/tangential_to_complementarity.svg"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="linear-complementarity-problem-lcp" class="slide level2">
+<h2>Linear Complementarity Problem (LCP)</h2>
+<p><br></p>
+<ul>
+<li><p>Objective: pose the complementarity formulation as quadratic function over the contact forces</p></li>
+<li><p>Define <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>λ</mi><mi>R</mi></msub><mo>:=</mo><mi>μ</mi><msub><mi>λ</mi><mi>N</mi></msub><mo>+</mo><msub><mi>λ</mi><mi>T</mi></msub><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>λ</mi><mi>L</mi></msub><mo>:=</mo><mi>μ</mi><msub><mi>λ</mi><mi>N</mi></msub><mo>−</mo><msub><mi>λ</mi><mi>T</mi></msub><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+\lambda_R := \mu \lambda_N + \lambda_T, \\
+\lambda_L := \mu \lambda_N - \lambda_T, 
+\end{align*}</annotation></semantics></math></p></li>
+<li><p>Corresponding complementarity is defined <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn><mo>≤</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>R</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>L</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>⊥</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mn>0</mn><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation*}
+\begin{gathered}
+  0 \leq 
+  \begin{pmatrix}
+    \xi_R(q, \dot{q}) \\
+    \xi_L(q, \dot{q})
+  \end{pmatrix} 
+  \perp
+    \begin{pmatrix}
+      \lambda_R  \\
+      \lambda_L
+    \end{pmatrix} \geq 0,
+  \end{gathered}
+\end{equation*}</annotation></semantics></math></p></li>
+<li><p>These definitions help express <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ξ</mi><mi>N</mi></msub><mo>,</mo><msub><mi>ξ</mi><mi>R</mi></msub><mo>,</mo><msub><mi>ξ</mi><mi>L</mi></msub></mrow><annotation encoding="application/x-tex">\xi_N, \xi_R, \xi_L</annotation></semantics></math> as affine functions of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>N</mi></msub><mo>,</mo><msub><mi>λ</mi><mi>R</mi></msub><mo>,</mo><msub><mi>λ</mi><mi>L</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_N, \lambda_R, \lambda_L</annotation></semantics></math></p></li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>N</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>A</mi><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>N</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>b</mi><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \begin{pmatrix}
+    \xi_N \\
+    \xi_R \\
+    \lambda_L
+  \end{pmatrix} =
+      A
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b, 
+\end{align*}</annotation></semantics></math></p>
+</section>
+<section id="lcp" class="slide level2">
+<h2>LCP</h2>
+<ul>
+<li>We substitute the affine functions into the complementarity formulation</li>
+</ul>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn><mo>≤</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>N</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>R</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>L</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>⊥</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>N</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mn>0</mn><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation*}
+  \begin{gathered}
+    0 \leq 
+    \begin{pmatrix}
+      \xi_N(q, \dot{q}) \\
+      \xi_R(q, \dot{q}) \\
+      \xi_L(q, \dot{q})
+    \end{pmatrix} 
+    \perp
+      \begin{pmatrix}
+        \lambda_N  \\
+        \lambda_R  \\
+        \lambda_L
+      \end{pmatrix} \geq 0,
+    \end{gathered}
+\end{equation*}</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mn>0</mn><mo>≤</mo><mrow><mo stretchy="true" form="prefix">[</mo><mi>A</mi><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>N</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>b</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>⊥</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>N</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>λ</mi><mi>R</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ξ</mi><mi>L</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mn>0</mn></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+    0 \leq 
+    \left[ A \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} + b \right]
+    \perp
+    \begin{pmatrix}
+      \lambda_N \\
+      \lambda_R \\
+      \xi_L
+    \end{pmatrix} \geq 0
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="2">
+<ul>
+<li>The LCP can be posed as a feasibility problem and solved for <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>N</mi></msub><mo>,</mo><msub><mi>λ</mi><mi>R</mi></msub><mo>,</mo><msub><mi>ξ</mi><mi>L</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_N, \lambda_R, \xi_L</annotation></semantics></math></li>
+<li>In the presence of friction, the LCP is a non-convex optimization problem</li>
+<li>We use pivotting (basis-exchange) technique called Lemke’s algorithm to solve the LCP</li>
+</ul>
+</div>
+</section>
+<section id="generalization-of-the-log-likelihood" class="slide level2">
+<h2>Generalization of the log likelihood</h2>
+<ul>
+<li>The experts can take many forms. The likelihood can be generalized as</li>
+</ul>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mo stretchy="false" form="prefix">{</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo>ln</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">∥</mo><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.278em"></mspace><mn>0</mn><mo>,</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N} ( \| F_i(x_j; \theta_i) - y_j \| \; | \; 0, s)  P_i(x_j, \psi),
+</annotation></semantics></math></p>
+</div>
+<div class="fragment fade-in" data-fragment-index="1">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mo stretchy="false" form="prefix">{</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo>ln</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mfrac><mn>1</mn><msqrt><mrow><mn>2</mn><mi>π</mi><msup><mi>s</mi><mn>2</mn></msup></mrow></msqrt></mfrac><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><mrow><mo stretchy="false" form="postfix">∥</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup></mrow><msup><mi>s</mi><mn>2</mn></msup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{ \|F_i(x_j; \theta_i) - y_j \|^2}{s^2} \right) P_i(x_j, \psi),
+</annotation></semantics></math></p>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="2">
+<ul>
+<li>For gradient-based techniques, we can extract the relevant parts and simplify the likelihood <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mo stretchy="false" form="prefix">{</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mo>∝</mo><mi>𝕃</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mo>−</mo><mo stretchy="false" form="postfix">∥</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+</annotation></semantics></math></li>
+</ul>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Likelihood</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝕃</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>F</mi></msub></munderover><mo>−</mo><mo stretchy="false" form="postfix">∥</mo><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\mathbb{L}(\mathbb{D} | \theta, \psi) = \sum_{j=1}^{N} \sum_{i=1}^{N_F} - \| F_i(x_j; \theta_i) - y_j \|^2 P_i(x_j | \psi). 
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="performance-objective" class="slide level2">
+<h2>Performance Objective</h2>
+<p><br></p>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ol start="2" type="1">
+<li>Minimum Trajectory Loss (MTL):</li>
+</ol>
+<ul>
+<li>Accumulated loss may not reflect desired behavior. E.g. Simple pendulum</li>
+</ul>
+<div class="fragment" data-fragment-index="0">
+<ul>
+<li>Simple pendulum needs to pump slowly, which would accumulate large cost</li>
+</ul>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="fragment" data-fragment-index="0">
+<div class="quarto-figure quarto-figure-right">
+<figure>
+<p><img data-src="contents/assets/mtl.svg"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>MTL encourages trajectories to <em>eventually</em> lead to a minimum cost</li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><munder><mtext mathvariant="normal">inf</mtext><mi>t</mi></munder><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">{</mo><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>:</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>∈</mo><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo>,</mo><mi>u</mi><mo>,</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>𝕃</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>−</mo><mfrac><mrow><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>t</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mi>C</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></munderover><msub><mi>P</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+    \begin{gathered}
+        t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \}  \\
+        \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
+    \end{gathered} 
+\end{align*}</annotation></semantics></math></p>
+</div>
+</section>
+<section id="stable-switching" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Stable Switching</h2>
+<ul>
+<li>Given two unstable closed-loop systems</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:65%;">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mo>−</mo><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>x</mi><mo>,</mo><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mo>−</mo><mn>2</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>x</mi><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+    \dot{x} = A_1x = \begin{bmatrix} 0 &amp; -1 \\ 2 &amp; 0 \end{bmatrix} x, \; \;
+    \dot{x} = A_2x = \begin{bmatrix} 0 &amp; -2 \\ 1 &amp; 0 \end{bmatrix} x,
+\end{align*}</annotation></semantics></math> find stable switching system that converges to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo>*</mo></msup><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">x^*=(0, 0)</annotation></semantics></math></p>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Maximum number of state partitions set to 4</li>
+</ul>
+</div>
+</div><div class="column" style="width:35%;">
+<div class="fragment" data-fragment-index="0">
+<p><img data-src="contents/assets/unstable_switching.png" class="absolute" style="top: 20px; left: 700px; width: 400px; height: 400px; "></p>
+</div>
+</div>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>The gating network <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐏</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{P}(x | \psi)</annotation></semantics></math> is a fully-connected neural net with 4 outputs</li>
+<li>There are 4 experts with parameters <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>F</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><msub><mi>θ</mi><mi>i</mi></msub><mo>&gt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>1</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><msub><mi>θ</mi><mi>i</mi></msub><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mtd></mtr></mtable></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  F_i(\theta_i) = \begin{cases}
+     0, &amp; \theta_i &gt; \frac{1}{2}, \\
+     1, &amp; \theta_i \leq \frac{1}{2},
+  \end{cases}
+\end{align*}</annotation></semantics></math></li>
+<li><strong>Objective</strong>: learn <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>ψ</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\psi, \theta)</annotation></semantics></math> that minimize the accumulated loss</li>
+</ul>
+</div>
+</section>
+<section id="training-progress" class="slide level2">
+<h2>Training progress</h2>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/moeSwitchingIter0.svg" data-top="100" data-left="300"></p>
+<p></p><figcaption>&nbsp; Control input (purple <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_1x</annotation></semantics></math>, yellow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_2 x</annotation></semantics></math>) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/moeSwitchingIter200.svg" data-top="50" data-left="300"></p>
+<p></p><figcaption>&nbsp; Control input (purple <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_1x</annotation></semantics></math>, yellow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_2 x</annotation></semantics></math>) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/moeSwitchingIter1400.svg" data-top="100" data-left="300"></p>
+<p></p><figcaption>&nbsp; Control input (purple <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_1x</annotation></semantics></math>, yellow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_2 x</annotation></semantics></math>) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="fragment fade-in" data-fragment-index="3">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/switching_results.svg"></p>
+<p></p><figcaption>&nbsp; Control input (purple <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_1x</annotation></semantics></math>, yellow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><msub><mi>A</mi><mn>2</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">\rightarrow \dot{x} = A_2 x</annotation></semantics></math>) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; State partition</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="passive-system-example" class="slide level2">
+<h2>Passive System Example</h2>
+<!-- ###################################################################### -->
+<div class="columns">
+<div class="column" style="width:30%;">
+<p><img data-src="contents/assets/passive-system-example.png"></p>
+</div><div class="column" style="width:70%;">
+<p><br></p>
+<p>Kirchoff’s law</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>v</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>R</mi><mi>i</mi><mo>+</mo><mfrac><mn>1</mn><mi>C</mi></mfrac><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mtext mathvariant="normal">d</mtext><mi>τ</mi><mo>+</mo><mi>L</mi><mfrac><mrow><mtext mathvariant="normal">d</mtext><mi>i</mi></mrow><mrow><mtext mathvariant="normal">d</mtext><mi>t</mi></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>v</mi><mi>i</mi><mo>−</mo><mi>R</mi><msup><mi>i</mi><mn>2</mn></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mtext mathvariant="normal">d</mtext><mrow><mtext mathvariant="normal">d</mtext><mi>t</mi></mrow></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><munder><munder><mrow><mfrac><mn>1</mn><mrow><mn>2</mn><mi>C</mi></mrow></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mtext mathvariant="normal">d</mtext><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><mo accent="true">⏟</mo></munder><mi>𝒱</mi></munder><mo>+</mo><munder><munder><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>L</mi><msup><mi>i</mi><mn>2</mn></msup></mrow><mo accent="true">⏟</mo></munder><mi>𝒯</mi></munder><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+v &amp;= Ri + \frac{1}{C} \int_{0}^{t} i(\tau) \, \text{d}\tau + L \frac{\text{d} i}{\text{d} t} \\
+vi - Ri^2 &amp;= \frac{\text{d}}{\text{d} t} \left( 
+  \underbrace{\frac{1}{2C} \left( \int_{0}^{t} i(\tau)\, \text{d} \tau \right)^2}_{\mathcal{V}} + 
+  \underbrace{\frac{1}{2} Li^2}_{\mathcal{T}}  
+\right)
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+<p>Let <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo>=</mo><mi>𝒱</mi><mo>+</mo><mi>𝒯</mi></mrow><annotation encoding="application/x-tex">H = \mathcal{V} + \mathcal{T}</annotation></semantics></math>, integrate to obtain</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mrow><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">available</mtext></munder><mo>−</mo><munder><munder><mrow><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">initial</mtext></munder><mo>=</mo><munder><munder><mrow><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>v</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mtext mathvariant="normal">d</mtext><mi>τ</mi></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">supplied</mtext></munder><mo>−</mo><munder><munder><mrow><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>R</mi><msup><mi>i</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mtext mathvariant="normal">d</mtext><mi>τ</mi></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">dissipated</mtext></munder><mo>&lt;</mo><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>v</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mtext mathvariant="normal">d</mtext><mi>τ</mi></mrow><annotation encoding="application/x-tex">
+\underbrace{H(t)}_{\textrm{available}} -
+\underbrace{H(0)}_{\textrm{initial}} 
+= 
+\underbrace{\int_{0}^{t} v(\tau)i(\tau)\, \text{d} \tau}_{\textrm{supplied}} - 
+\underbrace{\int_{0}^{t} Ri^2(\tau)\, \text{d} \tau}_{\textrm{dissipated}}
+&lt;
+\int_{0}^{t} v(\tau) i(\tau) \, \text{d} \tau
+</annotation></semantics></math></p>
+</section>
+<section id="uncertainty-in-predictions" class="slide level2">
+<h2>Uncertainty in Predictions</h2>
+<ul>
+<li>The uncertainty associated with each prediction is given by</li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Uncertainty in predictions</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>Σ</mi><mrow><mi>F</mi><mo>∣</mo><mi>x</mi><mo>,</mo><mi>𝔻</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>N</mi><mi>θ</mi></msub><mo>−</mo><mn>1</mn></mrow></mfrac><munder><mo>∑</mo><mrow><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>F</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \Sigma_{F \mid x,\mathbb{D}} = \frac{1}{N_{\theta}-1} \sum_{\theta \sim P(\theta;z)} \| F(x; \theta) - \hat{F}(x)\| ^2.
+\end{align*}</annotation></semantics></math> where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>F</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{F}(x)</annotation></semantics></math> is the marginalized prediction given by <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mover><mi>F</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msub><mi>N</mi><mi>θ</mi></msub></mfrac><munder><mo>∑</mo><mrow><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+  \hat{F}(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta;z)} F(x; \theta),
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</section>
+<section id="training-stochastic-models" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Training Stochastic Models</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="{r-vstack}">
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Expectation Maximization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">∥</mo><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.278em"></mspace><mn>0</mn><mo>,</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &amp;&amp; P(\mathbb{D} | \theta)  &amp;= \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim P(\theta | \mathbb{D}), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Expectation Maximization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mfrac><mn>1</mn><msqrt><mrow><mn>2</mn><mi>π</mi><msup><mi>s</mi><mn>2</mn></msup></mrow></msqrt></mfrac><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta| \mathbb{D})}{\text{maximize}} &amp;&amp; P(\mathbb{D} | \theta)  &amp;= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim P(\theta| \mathbb{D}), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment fade-in" data-fragment-index="2">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Expectation Maximization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mi>z</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mfrac><mn>1</mn><msqrt><mrow><mn>2</mn><mi>π</mi><msup><mi>s</mi><mn>2</mn></msup></mrow></msqrt></mfrac><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msup><mi>s</mi><mn>2</mn></msup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{z}{\text{maximize}} &amp;&amp; P(\mathbb{D} | \theta)  &amp;= \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi s^2}}\exp(-\frac{1}{2s^2}\| F(x_j; \theta) -  y_j \|^2), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim Q(\theta;z), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+</div>
+<!-- r-stack -->
+</div>
+<!-- r-vstack -->
+</div><!-- column --><div class="column" style="width:40%;">
+<p><img data-src="contents/assets/handwritten_images.png" class="absolute" style="top: 50px; left: 750px; width: 350px; height: 200px; "></p>
+</div><!-- column -->
+</div>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="fragment fade-in" data-fragment-index="3">
+<p><img data-src="contents/assets/overfitting.svg" class="absolute" style="top: 150px; left: 0px; width: 650px; height: 650px; "></p>
+</div>
+<!-- fragment -->
+</div><div class="column" style="width:40%;">
+<div class="fragment fade-in" data-fragment-index="3">
+<div>
+<ul>
+<li class="fragment">Expectation maximization is prone to overfitting
+<ul>
+<li class="fragment">Reduces accuracy of predictions</li>
+<li class="fragment">Reports near-zero prediction uncertainty (<em>overconfident</em>)</li>
+</ul></li>
+<li class="fragment"><strong>Solution</strong>: enforce variance on the posterior</li>
+</ul>
+</div>
+<!--incremental -->
+</div>
+<!-- fragment -->
+</div>
+</div>
+</section>
+<section id="bias-variance-trade-off" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Bias-Variance Trade-Off</h2>
+<p><br></p>
+<ul>
+<li>Prior distribution plays the role of a <em>regularization term</em></li>
+</ul>
+<div class="fragment fade-in" data-fragment-index="0">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Bayesian Inference</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mi>z</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{z}{\text{maximize}} &amp;&amp;&amp; P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim Q(\theta;z), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Prior distribution can be
+<ul>
+<li><em>Informed</em>: allows us to inject prior knowledge</li>
+<li><em>Uninformed</em>: starts randomly but every so often gets updated by the posterior</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="bias-variance-trade-off-1" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Bias-Variance Trade-Off</h2>
+<p><br></p>
+<ul>
+<li>Prior distribution plays the role of a <em>regularization term</em></li>
+</ul>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Bayesian Inference</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &amp;&amp;&amp; P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim P(\theta | \mathbb{D}), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<div class="callout callout-warning no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Regularization via Prior Distribution</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">∥</mo><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.278em"></mspace><mn>0</mn><mo>,</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">∥</mo><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.278em"></mspace><mn>0</mn><mo>,</mo><msub><mi>s</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2)
+</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mfrac><mn>1</mn><mrow><mn>2</mn><mi>π</mi><msub><mi>s</mi><mn>1</mn></msub><msub><mi>s</mi><mn>2</mn></msub></mrow></mfrac><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msubsup><mi>s</mi><mn>1</mn><mn>2</mn></msubsup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msubsup><mi>s</mi><mn>2</mn><mn>2</mn></msubsup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+P(\mathbb{D} | \theta) P(\theta) =  \prod_{j=1}^{N} \frac{1}{2 \pi s_1s_2}\exp(-\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2)\exp(-\frac{1}{2s_2^2}\| \theta - \theta_0 \|^2)
+</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>ln</mo><mfrac><mi>N</mi><mrow><mn>2</mn><mi>π</mi><msub><mi>s</mi><mn>1</mn></msub><msub><mi>s</mi><mn>2</mn></msub></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msubsup><mi>s</mi><mn>1</mn><mn>2</mn></msubsup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>j</mi></msub><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>y</mi><mi>j</mi></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msubsup><mi>s</mi><mn>2</mn><mn>2</mn></msubsup></mrow></mfrac><mo stretchy="false" form="postfix">∥</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">
+\ln P(\mathbb{D} | \theta) P(\theta) = \ln{\frac{N}{2 \pi s_1s_2}} + \sum_{j=1}^{N} -\frac{1}{2s_1^2}\| F(x_j; \theta) -  y_j \|^2 - \frac{1}{2s_2^2}\| \theta - \theta_0 \|^2
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+<div class="fragment fade-in" data-fragment-index="2">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Bayesian Inference</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &amp;&amp;&amp; P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim P(\theta | \mathbb{D}), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+</div>
+<!-- fragment -->
+</div>
+<!-- r-stack-->
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li>Prior distribution can be
+<ul>
+<li><em>Informed</em>: allows us to inject prior knowledge</li>
+<li><em>Uninformed</em>: starts randomly but every so often gets updated by the posterior</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="estimating-posterior-distribution" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Estimating Posterior Distribution</h2>
+<p><br></p>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Bayesian Inference</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">maximize</mtext><mi>z</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mi>θ</mi><mo>∼</mo><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>𝔻</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\underset{z}{\text{maximize}} &amp;&amp;&amp; P(\mathbb{D} | \theta) P(\theta), \\
+\text{subject to} &amp;&amp;
+&amp; \theta \sim Q(\theta;z), \\
+&amp;&amp; \mathbb{D} &amp;= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<!-- callout -->
+<ul>
+<li><strong>Variational Inference</strong>: approximates the posterior <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(\theta | \mathbb{D})</annotation></semantics></math> with a pre-selected distribution <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Q(\theta; z)</annotation></semantics></math></li>
+<li><strong>Objective</strong>: collect <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>θ</mi></msub><annotation encoding="application/x-tex">N_\theta</annotation></semantics></math> samples from the current posterior <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Q(\theta; z)</annotation></semantics></math> and maximize <span class="smallcaps">Elbo</span> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℒ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>θ</mi><mo>∼</mo><mi>Q</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo>∣</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>Q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right].
+</annotation></semantics></math></li>
+</ul>
+</section>
+<section id="bias-variance-tradeoff" class="slide level2">
+<h2>Bias-Variance Tradeoff</h2>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Bias-Variance Tradeoff</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>sin</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝒟</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub><mo>,</mo><msub><mi>ϵ</mi><mi>i</mi></msub><mo>∼</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mi>δ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>y</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>y</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>𝒟</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝔼</mi><mi>𝒟</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><munder><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝔼</mi><mi>𝒟</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>h</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo accent="true">⏟</mo></munder><msup><mtext mathvariant="normal">bias</mtext><mn>2</mn></msup></munder><mo>+</mo><munder><munder><mrow><msub><mi>𝔼</mi><mi>𝒟</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><msub><mi>𝔼</mi><mi>𝒟</mi></msub><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">variance</mtext></munder></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+h(x) &amp;= \sin(x) \\
+\mathcal{D} &amp;= {h(x)+\epsilon_i, \epsilon_i \sim \mathcal{N}(0, \delta)} \\
+y &amp;= y(x; \mathcal{D}) \\
+\mathbb{E}_{\mathcal{D}}[(y-h)^2] &amp;= {\underbrace{(\mathbb{E}_{\mathcal{D}}[y-h])^2}_{\text{bias}^2}} + {\underbrace{\mathbb{E}_{\mathcal{D}}[y - \mathbb{E}_{\mathcal{D}}(y)^2]}_{\text{variance}}}
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<p>*Finding deterministic solution under noise has low bias and high variance (overfits)</p>
+</section>
+<section id="bayesian-learning" class="slide level2 smaller">
+<h2>Bayesian Learning</h2>
+<!-- ###################################################################### -->
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>∣</mo><mi>𝒟</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mover><mover><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏞</mo></mover><mtext mathvariant="normal">likelihood</mtext></mover><mover><mover><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏞</mo></mover><mtext mathvariant="normal">prior</mtext></mover></mrow><munder><munder><mrow><msub><mo>∫</mo><mi>θ</mi></msub><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo>∣</mo><msup><mi>θ</mi><mi>′</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mi>′</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><msup><mi>θ</mi><mi>′</mi></msup></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">evidence</mtext></munder></mfrac><munder><munder><mrow><mo>≈</mo><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">VI</mtext></munder><mi>.</mi></mrow><annotation encoding="application/x-tex">
+p(\theta \mid \mathcal{D}) = \frac{\overbrace{p(\mathcal{D} \mid
+\theta)}^{\text{likelihood}}\overbrace{p(\theta)}^{\text{prior}}}
+{\underbrace{\int_\theta p(\mathcal{D} \mid \theta^\prime)p(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} \underbrace{\approx q(\theta;
+z)}_{\text{VI}}.
+</annotation></semantics></math></p>
+<div class="fragment semi-fade-out" data-fragment-index="1">
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/pbc-outline.svg"></p>
+<p></p><figcaption>Show ELBO convergence.</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>KL-divergence and ELBO</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>D</mi><mtext mathvariant="normal">KL</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>θ</mi><mo>∼</mo><mi>q</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>log</mo><mfrac><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>∣</mo><mi>𝒟</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>𝔼</mi><mrow><mi>θ</mi><mo>∼</mo><mi>q</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>log</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>ℒ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>θ</mi><mo>∼</mo><mi>q</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒟</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>log</mo><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>;</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+D_{\text{KL}} &amp;= \mathbb{E}_{\theta \sim q}\left[ \log \frac{q(\theta;
+z)}{p(\theta \mid \mathcal{D})}\right] \\
+&amp;= \log p(\mathcal{D}) - \mathbb{E}_{\theta \sim q}\left[ \log
+\frac{p(\mathcal{D} \mid \theta) p(\theta)}{q(\theta; z)} \right] \\
+\mathcal{L}(\mathcal{D}; z) &amp;= \mathbb{E}_{\theta \sim q}\left[ \log
+p(\mathcal{D} \mid \theta) p(\theta) - \log q(\theta; z) \right]
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment" data-fragment-index="1">
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="contents/assets/pbc-outline.svg"></p>
+<p></p><figcaption>Show prob. distribution</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="callout callout-tip no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Prediction through marginalization</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mover><mi>m</mi><mo accent="true">̂</mo></mover></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mrow><mi>θ</mi><mo>∼</mo><mi>q</mi></mrow></munder><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\hat{m} &amp;= \frac{1}{N}\sum_{\theta \sim q} m(x, \theta).
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="neuralidapbc-main-problem" class="slide level2 smaller" data-visibility="uncounted">
+<h2><span class="smallcaps">NeuralIdaPbc</span> Main Problem</h2>
+<!-- ###################################################################### -->
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">minimize</mtext><mi>θ</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>J</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">∥</mo><msup><mi>G</mi><mi>⊥</mi></msup><mrow><mo stretchy="true" form="prefix">{</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msubsup><mi>M</mi><mi>d</mi><mi>θ</mi></msubsup><msup><mi>M</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>∇</mi><mi>q</mi></msub><msubsup><mi>H</mi><mi>d</mi><mi>θ</mi></msubsup><mo>+</mo><msubsup><mi>J</mi><mn>2</mn><mi>θ</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>M</mi><mi>d</mi><mi>θ</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>p</mi><mo stretchy="true" form="postfix">}</mo></mrow><mo stretchy="true" form="postfix">∥</mo></mrow><mn>2</mn></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msubsup><mi>H</mi><mi>d</mi><mi>θ</mi></msubsup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>p</mi><mi>⊤</mi></msup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>M</mi><mi>d</mi><mi>θ</mi></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>p</mi><mo>+</mo><msubsup><mi>V</mi><mi>d</mi><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msubsup><mi>M</mi><mi>d</mi><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>M</mi><mi>d</mi><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mo>≻</mo><mn>0</mn></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msubsup><mi>J</mi><mn>2</mn><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>J</mi><mn>2</mn><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msup><mi>q</mi><mo>⋆</mo></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mrow><mo>arg</mo><mo>min</mo></mrow><mi>q</mi></munder><mspace width="0.167em"></mspace><msubsup><mi>V</mi><mi>d</mi><mi>θ</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned} \underset{\theta}{\text{minimize}} &amp;&amp; J(\theta) &amp;= \left\lVert G^{\bot} \left\{ \nabla_{q} H - M_{d}^{\theta}M^{-1} \nabla_{q} H_{d}^{\theta} + J_{2}^{\theta} \left(M_{d}^{\theta}\right)^{-1} p \right\} \right\rVert^2  \\ \text{subject to}  &amp;&amp; H_d^{\theta} &amp;= \frac{1}{2} p^{\top} \left( M_{d}^{\theta} \right)^{-1} p + V_{d}^{\theta}(q) \\ &amp;&amp; M_d^{\theta}(q) &amp;= \left(M_d^{\theta}(q)\right)^\top \succ 0 \\ &amp;&amp; J_{2}^{\theta}(q,p) &amp;= -\left(J_{2}^{\theta}(q,p)\right)^\top \\ &amp;&amp; q^\star &amp;= \underset{q}{\arg \min} \, V_{d}^{\theta} (q) \end{aligned}</annotation></semantics></math></p>
+<div class="fragment">
+<div class="columns">
+<div class="column" style="width:49%;">
+<div class="callout callout-tip no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong><span class="smallcaps">NeuralIdaPbc</span></strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Solve nonlinear PDEs using neural networks and SoS polynomials</li>
+<li>Surrogates of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>M</mi><mi>d</mi></msub><annotation encoding="application/x-tex">M_d</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>J</mi><mn>2</mn></msub><annotation encoding="application/x-tex">J_2</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>V</mi><mi>d</mi></msub><annotation encoding="application/x-tex">V_d</annotation></semantics></math> are constrained <em>by construction</em></li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column" style="width:49%;">
+<div class="callout callout-tip no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong><span class="smallcaps">Pinn</span></strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Solve nonlinear PDEs using neural networks</li>
+<li>Solution surrogates are constrained via penalty term in loss function</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="theoretical-justification-of-robustness" class="title-slide slide level1 center">
+<h1>Theoretical Justification of Robustness</h1>
+
+</section>
+<section id="optimal-control-under-uncertainty" class="slide level2">
+<h2>Optimal Control under Uncertainty</h2>
+<p><br></p>
+<div class="fragment" data-fragment-index="0">
+<div class="callout callout-warning no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Optimal Control for a Linear System</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Σ</mi><mo>:</mo><mspace width="1.0em"></mspace><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mover><mi>x</mi><mo accent="true">̇</mo></mover></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>p</mi><mi>s</mi></msub><mi>x</mi><mo>+</mo><mi>u</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>u</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>θ</mi><mi>x</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mn>1</mn><mi>.</mi></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">
+\Sigma: \quad
+\begin{cases}
+  \dot{x} &amp;= p_s x + u, \\
+  u(x) &amp;= \theta x, \\
+  x(0) &amp;= 1.
+\end{cases}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>s</mi></msub><mo>+</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>t</mi></mrow></msup></mrow><annotation encoding="application/x-tex">
+  x(t) = e^{(p_s+\theta)t}
+</annotation></semantics></math></p>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p>Performance Index: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝒥</mi><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mi>T</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>c</mi><mi>x</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>r</mi><mi>u</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">
+\mathcal{J} = \int_0^T \left( \frac{1}{2}cx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt
+</annotation></semantics></math></p>
+</div>
+<p><br></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment" data-fragment-index="2">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝒥</mi><mi>∞</mi></msub><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mfrac><mrow><mi>c</mi><mo>+</mo><mi>r</mi><msup><mi>θ</mi><mn>2</mn></msup></mrow><mrow><msub><mi>p</mi><mi>s</mi></msub><mo>+</mo><mi>θ</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\mathcal{J}_\infty = -\frac{1}{4}\frac{c+r\theta^2}{p_s+\theta}
+</annotation></semantics></math></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment" data-fragment-index="3">
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mo>⋆</mo></msup><mo>=</mo><mo>−</mo><msub><mi>p</mi><mi>s</mi></msub><mo>−</mo><msqrt><mrow><msubsup><mi>p</mi><mi>s</mi><mn>2</mn></msubsup><mo>+</mo><mfrac><mi>c</mi><mi>r</mi></mfrac></mrow></msqrt></mrow><annotation encoding="application/x-tex">\theta^\star = -p_s -\sqrt{p_s^2+\frac{c}{r}}</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</section>
+<section id="optimal-control-under-uncertainty-1" class="slide level2">
+<h2>Optimal Control under Uncertainty</h2>
+<div class="fragment" data-fragment-index="0">
+<p>Parameter uncertainty: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>s</mi></msub><mo>∼</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>s</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_s \sim \mathcal{N}(\hat{p}_s, \sigma_p)</annotation></semantics></math>.</p>
+<div class="fragment quarto-layout-panel" data-fragment-index="0" data-id="opt-sol">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 30.3%;justify-content: center;">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Deterministic</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>:=</mo><mo>−</mo><msub><mi>p</mi><mi>s</mi></msub><mo>−</mo><msqrt><mrow><msubsup><mi>p</mi><mi>s</mi><mn>2</mn></msubsup><mo>+</mo><mfrac><mi>c</mi><mi>r</mi></mfrac></mrow></msqrt></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msup><mi>θ</mi><mo>⋆</mo></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+g(p_s) &amp;:= -p_s -\sqrt{p_s^2+\frac{c}{r}} \\
+\theta^\star &amp;= g(\hat{p}_s)
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 3.0%;justify-content: center;">
+<p>&nbsp;</p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 66.7%;justify-content: center;">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Probabilistic</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>f</mi><msup><mi>θ</mi><mo>⋆</mo></msup></msub><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mo>⋆</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>f</mi><mi>p</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mo>⋆</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><mi>d</mi><mrow><mi>d</mi><mi>θ</mi></mrow></mfrac><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mo>⋆</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>σ</mi><mi>p</mi></msub><msqrt><mrow><mn>2</mn><mi>π</mi></mrow></msqrt></mrow></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mspace width="0.222em"></mspace><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mi>c</mi><mrow><mi>r</mi><msup><msup><mi>θ</mi><mo>⋆</mo></msup><mn>2</mn></msup></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">{</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><msubsup><mi>σ</mi><mi>p</mi><mn>2</mn></msubsup></mrow></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>c</mi><mrow><mn>2</mn><mi>r</mi><msup><mi>θ</mi><mo>⋆</mo></msup></mrow></mfrac><mo>−</mo><mfrac><msup><mi>θ</mi><mo>⋆</mo></msup><mn>2</mn></mfrac><mo>−</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">}</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+f_{\theta^\star}(\theta^\star) &amp;= f_p\left(g^{-1}(\theta^\star)\right)
+        \left| \frac{d}{d\theta}g^{-1}(\theta^\star) \right|, \\ 
+&amp;= \frac{1}{\sigma_p \sqrt{2\pi}}\left( \
+\frac{1}{2}\left(1+\frac{c}{r{\theta^\star}^2}\right) \right) \exp{\left\{ -\frac{1}{2\sigma_p^2}\left( \frac{c}{2r\theta^\star} -
+\frac{\theta^\star}{2} - \hat{p}_s  \right)^2  \right\} }
+\end{aligned}
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mo>,</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>100</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(c, r) = (100, 1)</annotation></semantics></math></p>
+</div>
+<div class="r-stack">
+<p><img data-src="contents/assets/optimal-dist_1.svg" class="fragment absolute" style="top: 250px; right: 250px; width: 700px; height: 600px; " data-fragment-index="1"></p>
+<p><img data-src="contents/assets/optimal-dist_2.svg" class="fragment absolute" style="top: 250px; right: 250px; width: 700px; height: 600px; " data-fragment-index="2"></p>
+<p><img data-src="contents/assets/optimal-dist_3.svg" class="fragment absolute" style="top: 250px; right: 250px; width: 700px; height: 600px; " data-fragment-index="3"></p>
+</div>
+</section>
+<section id="system-parameter-and-measurement-uncertainties" class="slide level2">
+<h2>System Parameter and Measurement Uncertainties</h2>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 30.3%;justify-content: center;">
+<div class="callout callout-warning no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Model of measurement noise</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Σ</mi><mo>:</mo><mspace width="1.0em"></mspace><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>ⅆ</mi><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>s</mi></msub><mo>+</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.278em"></mspace><mi>ⅆ</mi><mi>t</mi><mo>+</mo><mi>θ</mi><mi>σ</mi><mspace width="0.278em"></mspace><mi>ⅆ</mi><msub><mi>W</mi><mi>t</mi></msub><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn><mo>,</mo></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">
+\Sigma: \quad
+  \begin{cases} 
+    \dd x(t) = (p_s+\theta)x(t) \; \dd t + \theta\sigma \; \dd W_t, \\ x(0) = 1,
+  \end{cases} 
+</annotation></semantics></math> <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>s</mi></msub><mo>+</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>t</mi></mrow></msup><mo>+</mo><mi>θ</mi><mi>σ</mi><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><msup><mi>e</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>s</mi></msub><mo>+</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>−</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup><mi>d</mi><msub><mi>W</mi><mi>s</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+ x(t) = e^{(p_s+\theta)t} + \theta\sigma \int_0^t e^{(p_s+\theta)(t-s)}dW_s.
+</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 3.0%;justify-content: center;">
+<p>&nbsp;</p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 66.7%;justify-content: center;">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Performance Index</strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>𝒥</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mi>T</mi></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>c</mi><mi>x</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>r</mi><mi>u</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>t</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mo>,</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>T</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>s</mi></msub><mo>=</mo><mn>3</mn><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+\mathcal{J} &amp;= \int_0^T \left( \frac{1}{2}cx(t)^2 + \frac{1}{2}ru(t)^2  \right)dt,\\
+(c, r) &amp;= (1, 1), \\
+T &amp;= \hat{p}_s = 3. 
+\end{align*}</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math> Wiener process, measurement error given by <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{N}(x, \sigma)</annotation></semantics></math></li>
+<li>Left figure: optimal parameter <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\theta^*</annotation></semantics></math>, Right: minimal cost <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝒥</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><msub><mi>𝔼</mi><msub><mi>p</mi><mi>s</mi></msub></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>𝔼</mi><mi>W</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝒥</mi><mo>∣</mo><msub><mi>p</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}[\mathcal{J}] = \mathbb{E}_{p_s}\left[\mathbb{E}_W\left[\mathcal{J} \mid p_s \right]\right]</annotation></semantics></math> <img data-src="contents/assets/measurement_noise.svg" class="absolute" style="top: 370px; left: 50px; width: 1000px; height: 1000px; "></li>
+</ul>
+<!-- {{< include contents/_neuralpbc.qmd >}} -->
+<!-- {{< include contents/_background_idapbc.qmd >}} -->
+<!-- {{< include contents/_neuralidapbc.qmd >}} -->
+<!-- # :grey_question: Q&A -->
+<div class="footer footer-default">
+
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="appendix_main_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="appendix_main_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="reveal-plugins/animate/plugin.js"></script>
+  <script src="reveal-plugins/animate/svg.min.js"></script>
+  
+
+  <script src="appendix_main_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="appendix_main_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': false,
+'previewLinksAuto': true,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":false},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

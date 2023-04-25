@@ -35,8 +35,8 @@ for all $x(t_0) = x_0$, all input $u$, and all $t_1 \geq t_0$
 $$
 \Sigma: \quad
 \begin{cases}
-  \dot{x} &= f(x,u), && f(0,0) = 0, \\
-  y &= g(x,u), && g(0,0) = 0,
+  \dot{x} &= f(x,u) && f(0,0) = 0, \\
+  y &= g(x,u) && g(0,0) = 0.
 \end{cases}
 $$
 
@@ -197,9 +197,9 @@ $$
 \begin{bmatrix} \nabla_q H \\ \nabla_p H \end{bmatrix} + 
 \begin{bmatrix}
   0 \\ \Omega
-\end{bmatrix} u^{\theta}
+\end{bmatrix} u^{\theta},
 \\
-&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
+&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d).
 \end{aligned}
 $$
 :::

@@ -11,7 +11,7 @@
 * E.g. Room temperature control, contact-rich robots
 :::
 :::{.fragment .fade-in fragment-index=3}
-* We tackle two main challenges in the control of contact-rich robots.
+* We tackle two main challenges in the control of contact-rich robots
 :::
 :::{.fragment .fade-in fragment-index=2}
 :::: {.columns}

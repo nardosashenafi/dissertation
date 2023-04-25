@@ -21,9 +21,9 @@ $$
 \begin{bmatrix} \nabla_q H \\ \nabla_p H \end{bmatrix} + 
 \begin{bmatrix}
   0 \\ \Omega
-\end{bmatrix} u^{\theta}
+\end{bmatrix} u^{\theta},
 \\
-&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)
+&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta).
 \end{aligned}
 $$
 :::
@@ -45,10 +45,10 @@ $$
     \begin{bmatrix} \nabla_q H \\ \nabla_p H \end{bmatrix} + 
     \begin{bmatrix}
     0 \\ \Omega
-    \end{bmatrix} u^{\theta}
+    \end{bmatrix} u^{\theta},
     \\
-    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)\\
-    && \theta &\sim Q(\theta; z)
+    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta),\\
+    && \theta &\sim Q(\theta; z).
 \end{aligned} 
 $$
 :::
@@ -63,9 +63,9 @@ $$
     \text{subject to} &&
     \dd x &= \left(
         \begin{bmatrix}\phantom{-}\nabla_p H \\-\nabla_q H \end{bmatrix} + \begin{bmatrix} 0 \\ \Omega(q) \end{bmatrix} u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, \\
-    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta)\\
-    && \theta &\sim Q(\theta; z) \\
-    && p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p)
+    && u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta),\\
+    && \theta &\sim Q(\theta; z), \\
+    && p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p).
 \end{aligned} 
 $$
 :::
@@ -97,8 +97,8 @@ u^\theta = \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
 \end{gather*}
 * Assign a running cost $\ell$ to the trajectories based on performance
 \begin{gather*}
-J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ], \\
-P(J | \theta)  = \mathcal{N}(J | \; 0, s), \\
+J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ] \\
+P(J | \theta)  = \mathcal{N}(J | \; 0, s) \\
 \mathcal{L}(J,z) = \ln(P(J \mid \theta)P(\theta)) - \ln(Q(\theta;z)) 
 \end{gather*}
 * Update parameters $z$ to maximize <span style="font-variant:small-caps;">Elbo</span>
@@ -123,7 +123,7 @@ $$
 :::{.callout-important icon="false"}
 ## Passive Hybrid System
 \begin{gather*}
-H\left(  x(t_1) \right) \leq  H\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t, \\
+H\left(  x(t_1) \right) \leq  H\left(  x(t_0) \right) + \int_{t_0}^{t_1} s(u(t), y(t)) \, \text{d}t \\
 H(x^+) \leq H(x^-)
 \end{gather*}
 :::

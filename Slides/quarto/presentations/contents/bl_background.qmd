@@ -40,10 +40,10 @@
 
 $$
 \begin{aligned}
-\underset{z}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} &&& P(\mathbb{D} | \theta) P(\theta), \\
 \text{subject to} &&
-& \theta \sim Q(\theta;z), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
 \end{aligned}
 $$
 ::: 
@@ -56,10 +56,10 @@ $$
 
 $$
 \begin{aligned}
-\underset{z}{\text{maximize}} &&& \prod_{j=1}^{N} \mathcal{N}(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2), \\
+\underset{P(\theta | \mathbb{D})}{\text{maximize}} && \prod_{j=1}^{N} \mathcal{N}&(\| F(x_j; \theta) -  y_j \| \; | \; 0, s_1) \mathcal{N}(\| \theta - \theta_0 \| \; | \; 0, s_2), \\
 \text{subject to} &&
-& \theta \sim Q(\theta;z), \\
-&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}
+& \theta \sim P(\theta | \mathbb{D}), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
 \end{aligned}
 $$
 ::: 
@@ -71,7 +71,7 @@ $$
 * **Variational Inference**: approximates the posterior $P(\theta | \mathbb{D})$ with a pre-selected distribution $Q(\theta; z)$
 * **Objective**: collect $N_\theta$ samples from the current posterior $Q(\theta; z)$ and maximize <span style="font-variant:small-caps;">Elbo</span> 
 $$
-  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right].
+  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right]
 $$
 :::
 

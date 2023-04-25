@@ -27,13 +27,13 @@
 
 ::::
 
-## {background-video="contents/assets/4_rings_hardware.mp4" background-size="contain" background-video-muted="true"}
+## {background-video="contents/assets/4_rings_hardware.mp4" background-size="contain" background-video-muted="true" background-video-loop="true"}
 
 ## Rimless Wheel
 
 ![](contents/assets/rimlesswheel.svg){width=70% fig-align="center"}
 
-* Performance objective: achieve hip speed $x_c^* = 1$m/s
+* Performance objective: achieve hip speed $\dot{x}_c^* = 1$m/s
 \begin{align*}
     J_T = \sum_{t=0}^{T} \| \dot{x}_c^* - \dot{x}_c(t; \theta) \|
 \end{align*}
@@ -43,7 +43,7 @@ p_s \sim \mathbb{U}(0 \textrm{cm}, 2\textrm{cm})
 $$
 
 
-## {background-video="contents/assets/rw_uneven_success.mp4" background-size="contain" background-video-muted="true"}
+## {background-video="contents/assets/rw_uneven_success.mp4" background-size="contain" background-video-muted="true" background-video-loop="true"}
 
 
 ## Deterministic vs Bayesian

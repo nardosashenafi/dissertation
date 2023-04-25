@@ -1,0 +1,47 @@
+---
+pagetitle: "Robust Control of Contact-Rich Robots via Neural Bayesian Inference"
+author-meta: "Nardos Ashenafi"
+institute: "Boise State University"
+from: markdown+emoji
+format:
+  revealjs: 
+    css: styles.css
+    html-math-method: mathml
+    controls: true
+    smaller: false
+    slide-number: true
+    # footer: "Robust Control of Contact-Rich Robots via Neural Bayesian Inference"
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    theme: [white, custom.scss]
+    standalone: false
+    self-contained: false
+    reveal-jsscripts:
+      - reveal-plugins/animate/plugin.js
+      - reveal-plugins/animate/svg.min.js
+    plugins:
+      - RevealAnimate
+    # header-includes:
+    #   - | 
+    #     ```{=latex}
+    #     \usepackage{algorithm2e}
+    #     ```
+      # - \usepackage[noend]{algpseudocode}
+---
+
+{{< include contents/frontmatter.qmd >}}
+
+{{< include contents/_appendix.qmd >}}
+
+{{< include contents/bl_justification.qmd >}}
+
+<!-- {{< include contents/_neuralpbc.qmd >}} -->
+
+<!-- {{< include contents/_background_idapbc.qmd >}} -->
+
+<!-- {{< include contents/_neuralidapbc.qmd >}} -->
+
+<!-- # :grey_question: Q&A -->
+
+

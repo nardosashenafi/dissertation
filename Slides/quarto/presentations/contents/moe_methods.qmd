@@ -80,7 +80,7 @@ $$
 
 :::{.fragment .fade-in fragment-index=2}
 $$
-\ln \{P(\phi | \theta, \psi) \} = \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{\ell (x(t+\Delta t), F_i )^2}{s^2} \right) P_i(x(t), \psi)
+\ln \{P(\phi | \theta, \psi) \} = \sum_{t=0}^{T} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \left( -\frac{1}{2}\frac{\ell (x(t+\Delta t), F_i )^2}{s^2} \right) P_i(x(t), \psi)
 $$
 
 :::

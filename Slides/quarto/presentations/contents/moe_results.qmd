@@ -1,6 +1,7 @@
 # Case Study
 
-## {background-video="contents/assets/cartpole-firefox.mp4" background-size="contain" background-video-muted="true"}
+## {background-video="contents/assets/cartpole-firefox.mp4" background-size="contain" background-video-muted="true"
+background-video-loop="true"}
 
 
 ## Cartpole with wall barriers
@@ -36,7 +37,8 @@
 
 
 
-## {background-video="contents/assets/cartpole_hardware.mp4" background-size="contain" background-video-muted="true"}
+## {background-video="contents/assets/cartpole_hardware.mp4" background-size="contain" background-video-muted="true"
+background-video-loop="true"}
 
 ## Results 
 

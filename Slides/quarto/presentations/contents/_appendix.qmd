@@ -681,17 +681,17 @@ y &= y(x; \mathcal{D}) \\
 \end{aligned}
 $$
 :::
-*Finding deterministic solution under noise has low bias and high variance (overfits)
+* Finding deterministic solution under noise has low bias and high variance (overfits)
 
 ## Bayesian Learning {.smaller}
 <!-- ###################################################################### -->
 
 
 $$
-p(\theta \mid \mathcal{D}) = \frac{\overbrace{p(\mathcal{D} \mid
+P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
 \theta)}^{\text{likelihood}}\overbrace{p(\theta)}^{\text{prior}}}
-{\underbrace{\int_\theta p(\mathcal{D} \mid \theta^\prime)p(\theta^\prime)
-d\theta^\prime}_{\text{evidence}}} \underbrace{\approx q(\theta;
+{\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
+d\theta^\prime}_{\text{evidence}}} \underbrace{\approx Q(\theta;
 z)}_{\text{VI}}.
 $$
 
@@ -703,12 +703,12 @@ $$
 ## KL-divergence and ELBO
 $$
 \begin{aligned}
-D_{\text{KL}} &= \mathbb{E}_{\theta \sim q}\left[ \log \frac{q(\theta;
-z)}{p(\theta \mid \mathcal{D})}\right] \\
-&= \log p(\mathcal{D}) - \mathbb{E}_{\theta \sim q}\left[ \log
-\frac{p(\mathcal{D} \mid \theta) p(\theta)}{q(\theta; z)} \right] \\
-\mathcal{L}(\mathcal{D}; z) &= \mathbb{E}_{\theta \sim q}\left[ \log
-p(\mathcal{D} \mid \theta) p(\theta) - \log q(\theta; z) \right]
+D_{\text{KL}} &= \mathbb{E}_{\theta \sim Q}\left[ \log \frac{Q(\theta;
+z)}{P(\theta \mid \mathbb{D})}\right] \\
+&= \log P(\mathbb{D}) - \mathbb{E}_{\theta \sim Q}\left[ \log
+\frac{P(\mathbb{D} \mid \theta) P(\theta)}{Q(\theta; z)} \right] \\
+\mathcal{L}(\mathbb{D}; z) &= \mathbb{E}_{\theta \sim Q}\left[ \log
+P(\mathbb{D} \mid \theta) P(\theta) - \log Q(\theta; z) \right]
 \end{aligned}
 $$
 :::
@@ -724,7 +724,7 @@ $$
 ## Prediction through marginalization
 $$
 \begin{aligned}
-\hat{m} &= \frac{1}{N}\sum_{\theta \sim q} m(x, \theta).
+\hat{F}(x) &= \frac{1}{N}\sum_{\theta \sim Q} F(x; \theta).
 \end{aligned}
 $$
 :::
