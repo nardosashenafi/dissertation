@@ -3,7 +3,7 @@
 # Background
 * Mixture of Experts 
 
-## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
+## Mixture of Experts (MOE): Old Faithful {.smaller auto-animate="true"}
 
 
 * **Objective**: learn two expert Gaussian models to predict duration given waiting time from dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
@@ -19,10 +19,12 @@
 $$
 F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 $$
+    + Prediction is a weighted-average of experts
 :::
 :::{.fragment .fade-in fragment-index=3}
 
 * The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
+    + Divides the input space into partitions
 :::
 
 :::
@@ -30,12 +32,12 @@ $$
 
 :::{.column  width="50%"}
 
-:::{.r-stack}
+<!-- :::{.r-stack}
 
-![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0}
-![](contents/assets/old_faithful.svg){.absolute top=100 left=600 width="550" height="400" .fragment .fade-in fragment-index=1}
+![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0} -->
+![](contents/assets/old_faithful.svg){.absolute top=100 left=600 width="550" height="400" .fragment .fade-in fragment-index=0}
 
-:::
+<!-- ::: -->
 :::
 
 ::::

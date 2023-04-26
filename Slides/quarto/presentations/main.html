@@ -371,7 +371,7 @@
 <h3 id="upcoming-submissions"><span class="smallcaps">Upcoming Submissions</span></h3>
 <ul>
 <li>Control of Hybrid Dynamical Systems via Deep-net Mixture of Experts</li>
-<li>Data Driven Passivity-Based Control of the Rimless Wheel in Uncertain Terrains</li>
+<li>Data Driven Passivity-Based Control of the Rimless Wheel on Uneven Terrain</li>
 </ul>
 </div>
 <!-- ::: -->
@@ -524,7 +524,7 @@ Reasons about model uncertainties<br>
 <li>Mixture of Experts</li>
 </ul>
 </section>
-<section id="mixture-of-experts-moe-old-faithful" class="slide level2" data-auto-animate="true">
+<section id="mixture-of-experts-moe-old-faithful" class="slide level2 smaller" data-auto-animate="true">
 <h2 data-id="quarto-animate-title">Mixture of Experts (MOE): Old Faithful</h2>
 <ul>
 <li><strong>Objective</strong>: learn two expert Gaussian models to predict duration given waiting time from dataset <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔻</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}</annotation></semantics></math></li>
@@ -535,18 +535,26 @@ Reasons about model uncertainties<br>
 <ul>
 <li>The experts are chosen as <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>𝒩</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>𝒩</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">
 F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
-</annotation></semantics></math></li>
+</annotation></semantics></math>
+<ul>
+<li>Prediction is a weighted-average of experts</li>
+</ul></li>
 </ul>
 </div>
 <div class="fragment fade-in" data-fragment-index="3">
 <ul>
-<li>The gating network is a neural net <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐏</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>P</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>P</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]</annotation></semantics></math></li>
+<li>The gating network is a neural net <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐏</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>P</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>P</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]</annotation></semantics></math>
+<ul>
+<li>Divides the input space into partitions</li>
+</ul></li>
 </ul>
 </div>
 </div><div class="column" style="width:50%;">
-<div class="r-stack">
-<p><img data-src="contents/assets/geyser.JPG" class="absolute fragment fade-in-then-out" style="top: 100px; left: 700px; " data-fragment-index="0"> <img data-src="contents/assets/old_faithful.svg" class="absolute fragment fade-in" style="top: 100px; left: 600px; width: 550px; height: 400px; " data-fragment-index="1"></p>
-</div>
+<!-- :::{.r-stack}
+
+![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0} -->
+<p><img data-src="contents/assets/old_faithful.svg" class="absolute fragment fade-in" style="top: 100px; left: 600px; width: 550px; height: 400px; " data-fragment-index="0"></p>
+<!-- ::: -->
 </div>
 </div>
 <div class="fragment fade-in" data-fragment-index="4">
@@ -572,7 +580,7 @@ F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 <p><br></p>
 <div class="fragment" data-fragment-index="0">
 <ul>
-<li><strong>Objective</strong>: learn contact-aware mixture of expert controller and a gating network</li>
+<li><strong>Objective</strong>: learn contact-aware mixture of experts controller and a gating network</li>
 </ul>
 </div>
 <div class="fragment" data-fragment-index="1">
@@ -894,45 +902,8 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 </div>
 </div>
 </section>
-<section id="neuralpbc" class="slide level2" data-visibility="uncounted">
+<section id="neuralpbc" class="slide level2">
 <h2><span class="smallcaps">NeuralPbc</span></h2>
-<!-- ###################################################################### -->
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-center">
-<div class="quarto-layout-cell" style="flex-basis: 60.6%;justify-content: center;">
-<p><img data-src="contents/assets/pbc-outline-cross.svg"></p>
-</div>
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 3.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 36.4%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-</div>
-</div>
-<div class="fragment" data-fragment-index="1">
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-center">
-<div class="quarto-layout-cell" style="flex-basis: 60.6%;justify-content: center;">
-<p><img data-src="contents/assets/pbc-ml-outline.svg"></p>
-</div>
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 3.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 36.4%;justify-content: center;">
-<ul>
-<li>Systematic approach</li>
-<li>Performance objective included</li>
-<li>Stability is <em>intrinsic</em></li>
-<li><em>Lacks model uncertainty considerations</em></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="neuralpbc-problem-statement" class="slide level2">
-<h2><span class="smallcaps">NeuralPbc</span> Problem Statement</h2>
 <!-- ###################################################################### -->
 <p><br></p>
 <div class="callout callout-tip no-icon callout-titled callout-style-default">

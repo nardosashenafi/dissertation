@@ -487,7 +487,7 @@ divergence or equivalently maximize the evidence lower bound
 given by
 \begin{align}
   \begin{split}
-  \mathcal{L}(\mathbb{D},z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(\mathbb{D} \mid \theta;z)P(\theta)) - \log(Q(\theta;z)) \right].
+  \mathcal{L}(\mathbb{D},z) &= \mathbb{E}_{\theta \sim Q} \left[\log(P(\mathbb{D} \mid \theta)P(\theta)) - \log(Q(\theta;z)) \right].
   \end{split}
   \label{eq:elbo}
 \end{align}
@@ -497,7 +497,7 @@ given by
   For continuous posterior distribution, the \textsc{Elbo} given in
   equation~\eqref{eq:elbo} is redefined using differential entropy, which
   expresses the prior and posterior in terms of their probability density
-  functions. In this case, the likelihood $P(\theta \mid \mathbb{D};z)$ is also
+  functions. In this case, the likelihood $P(\mathbb{D} \mid \theta)$ is also
   a probability density function and the \textsc{Elbo} is not bounded by zero.
 \end{rem}
 

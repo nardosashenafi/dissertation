@@ -1,11 +1,11 @@
 # Mixture of Experts Controller
 
-## Mixture of Experts Controller
+## Mixture of Experts Controller 
 
 <br/>
 
 :::{.fragment fragment-index=0}
-* **Objective**: learn contact-aware mixture of expert controller and a gating network 
+* **Objective**: learn contact-aware mixture of experts controller and a gating network 
 :::
 
 :::{.fragment fragment-index=1}

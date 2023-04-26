@@ -152,31 +152,7 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 
 ::::
 
-
-## <span style="font-variant:small-caps;">NeuralPbc</span> {visibility="uncounted"}
-<!-- ###################################################################### -->
-
-::: {layout="[100,-5,60]" layout-valign="center"}
-![](contents/assets/pbc-outline-cross.svg)
-
-&nbsp;
-
-:::
-
-
-:::: {.fragment fragment-index=1}
-::: {layout="[100,-5,60]" layout-valign="center"}
-![](contents/assets/pbc-ml-outline.svg)
-
-* Systematic approach
-* Performance objective included
-* Stability is _intrinsic_
-* *Lacks model uncertainty considerations*
-:::
-::::
-
-
-## <span style="font-variant:small-caps;">NeuralPbc</span> Problem Statement
+## <span style="font-variant:small-caps;">NeuralPbc</span> 
 <!-- ###################################################################### -->
 
 <br/>

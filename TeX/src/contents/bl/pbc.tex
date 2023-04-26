@@ -583,7 +583,7 @@ auto-differentiation techniques.
         \algrenewcommand\algorithmicindent{1.1em} % Change indent back to default
         \While{$i < $ \texttt{maximum iteration}}
         \State $J \gets 0$\Comment{Batch loss}
-        \For{$(x_0) \sim \mathcal {D}_N$}
+        \For{$(x_0) \in \mathcal {D}_N$}
             \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ \Comment{Batch loss}
         \EndFor
