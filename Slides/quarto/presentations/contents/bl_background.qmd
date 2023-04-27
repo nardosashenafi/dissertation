@@ -28,6 +28,37 @@
 :::
 ::::
 
+## Robustness via Bayesian Learning 
+
+::::{.columns}
+:::{.column width=50%}
+
+<br/>
+<br/>
+
+:::{.incremental}
+* <span style="font-variant:small-caps;">NeuralPbc</span> assumes a nominal model $\dot{x} = f(x, u)$
+* The trained controller must not overfit on the observations generated from the nominal model
+
+:::
+:::
+
+:::{.column width=50%}
+
+![](contents/assets/regular-vs-bayesian.svg){.absolute width="600" heigth="600"}
+
+:::
+<!-- column -->
+
+::::
+
+:::{.fragment fragment-index=0}
+:::{.incremental}
+* **Our method**: $H_d$ is a Bayesian neural network
+    + achieves the performance objective $\ell$ for samples $\theta \sim Q(\theta; z)$
+    + searches for ensemble of parameters that meet the desired performance 
+:::
+:::
 
 ## Training Stochastic Models {auto-animate=true}
 
@@ -75,34 +106,3 @@ $$
 $$
 :::
 
-## Robustness via Bayesian Learning 
-
-::::{.columns}
-:::{.column width=50%}
-
-<br/>
-<br/>
-
-:::{.incremental}
-* <span style="font-variant:small-caps;">NeuralPbc</span> assumes a nominal model $\dot{x} = f(x, u)$
-* The trained controller must not overfit on the observations generated from the nominal model
-
-:::
-:::
-
-:::{.column width=50%}
-
-![](contents/assets/regular-vs-bayesian.svg){.absolute width="600" heigth="600"}
-
-:::
-<!-- column -->
-
-::::
-
-:::{.fragment fragment-index=0}
-:::{.incremental}
-* **Our method**: $H_d$ is a Bayesian neural network
-    + achieves the performance objective $\ell$ for samples $\theta \sim Q(\theta; z)$
-    + searches for ensemble of parameters that meet the desired performance 
-:::
-:::

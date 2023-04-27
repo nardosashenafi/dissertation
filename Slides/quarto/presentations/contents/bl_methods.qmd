@@ -83,29 +83,6 @@ $$
 :::
 
 
-## Training Procedure
-
-<br/>
-
-::: {.incremental}
-* Start from initial parameters $z$
-* Sample initial states $x_0 \in \mathcal{D}_N$ 
-* Generate trajectories $\phi(x_0, u, T)$ using current parameters
-\begin{gather*}
-\theta \sim Q(\theta; z) \\
-u^\theta = \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d)
-\end{gather*}
-* Assign a running cost $\ell$ to the trajectories based on performance
-\begin{gather*}
-J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ] \\
-P(J | \theta)  = \mathcal{N}(J | \; 0, s) \\
-\mathcal{L}(J,z) = \ln(P(J \mid \theta)P(\theta)) - \ln(Q(\theta;z)) 
-\end{gather*}
-* Update parameters $z$ to maximize <span style="font-variant:small-caps;">Elbo</span>
-\begin{align*}
-z \leftarrow z + \alpha_i \frac{\partial \mathcal{L}}{\partial z}
-\end{align*}
-:::
 
 ## <span style="font-variant:small-caps;">NeuralPbc</span>: Hybrid System
 
