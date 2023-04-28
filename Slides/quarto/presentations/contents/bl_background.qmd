@@ -15,6 +15,7 @@
 
 :::{.fragment fragment-index=1}
 * Bayesian learning provides *stochastic models* that do not overfit on the training data
+    + *Stochastic model*: $F(x;\theta), \theta \sim P(\theta | \mathbb{D})$
 :::
 
 :::
@@ -55,7 +56,7 @@
 :::{.fragment fragment-index=0}
 :::{.incremental}
 * **Our method**: $H_d$ is a Bayesian neural network
-    + achieves the performance objective $\ell$ for samples $\theta \sim Q(\theta; z)$
+    + achieves the performance objective $J$ for samples $\theta \sim P(\theta | J)$
     + searches for ensemble of parameters that meet the desired performance 
 :::
 :::
@@ -81,7 +82,7 @@ $$
 <!-- callout -->
 :::
 
-:::{ .fragment .fade-in fragment-index=1}
+:::{ .fragment .fade-in-then-out fragment-index=1}
 :::{.callout-important icon=false}
 ## Bayesian Inference
 
@@ -96,13 +97,29 @@ $$
 ::: 
 <!-- callout -->
 :::
+
+:::{ .fragment .fade-in fragment-index=2}
+:::{.callout-important icon=false}
+## Bayesian Inference
+
+$$
+\begin{aligned}
+\underset{z}{\text{maximize}} && \mathcal{L}(\mathbb{D},z) &= \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta)P(\theta)) - \ln(Q(\theta;z)) \right], \\
+\text{subject to} &&
+& \theta \sim Q(\theta;z), \\
+&& \mathbb{D} &= \{(x_1, y_1), \dots, (x_N, y_N) \}.
+\end{aligned}
+$$
+::: 
+<!-- callout -->
+:::
 :::
 
 :::{.fragment fragment-index=2}
 * **Variational Inference**: approximates the posterior $P(\theta | \mathbb{D})$ with a pre-selected distribution $Q(\theta; z)$
 * **Objective**: collect $N_\theta$ samples from the current posterior $Q(\theta; z)$ and maximize <span style="font-variant:small-caps;">Elbo</span> 
 $$
-  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta;z)P(\theta)) - \ln(Q(\theta;z)) \right]
+  \mathcal{L}(\mathbb{D},z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(\mathbb{D} \mid \theta)P(\theta)) - \ln(Q(\theta;z)) \right]
 $$
 :::
 

@@ -2,6 +2,8 @@
 
 ## Bayesian <span style="font-variant:small-caps;">NeuralPbc</span>
 
+<br/>
+
 :::{.r-stack}
 
 :::{.fragment .fade-in-then-out fragment-index=0}
@@ -54,7 +56,18 @@ $$
 :::
 :::
 
-:::{.fragment .fade-in fragment-index=2}
+
+:::
+
+:::{.fragment .fade-in fragment-index=1}
+* The parameter $z$ of the posterior $Q(\theta;z)$ is inferred from running cost $J(\phi, u^\theta)$
+* $H_d^\theta$ is a Bayesian neural network (BNN)
+:::
+
+## Uncertainty Modeling
+
+* We provide more structure to the variance of the Bayesian controllers
+
 ::: {.callout-note icon="false"}
 ## Bayesian <span style="font-variant:small-caps;">NeuralPbc</span> Optimization Problem 
 $$
@@ -69,19 +82,12 @@ $$
 \end{aligned} 
 $$
 :::
-:::
+* **Objective**: maximize <span style="font-variant:small-caps;">Elbo</span> 
 
-:::
-
-:::{.fragment .fade-in fragment-index=1}
-* The parameter $z$ of the posterior $Q(\theta;z)$ is inferred from running cost $J(\phi, u^\theta)$
-* $H_d^\theta$ is a Bayesian neural network (BNN)
-:::
-
-:::{.fragment .fade-in fragment-index=2}
-* We provide more structure to the variance of the Bayesian controllers
-:::
-
+\begin{gather*}
+  \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\ln(P(J \mid \theta)P(\theta)) - \ln(Q(\theta;z)) \right] \\ 
+  P(J | \theta) = \mathcal{N}(J \; | \; 0, s).
+\end{gather*}
 
 
 ## <span style="font-variant:small-caps;">NeuralPbc</span>: Hybrid System

@@ -3,16 +3,16 @@
 # Background
 * Mixture of Experts 
 
-## Mixture of Experts (MOE): Old Faithful {.smaller auto-animate="true"}
+## Mixture of Experts (MOE): Old Faithful {auto-animate="true"}
 
 
-* **Objective**: learn two expert Gaussian models to predict duration given waiting time from dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
+* **Objective**: learn two expert Gaussian models that represent dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N) \}$
 
 ::::{.columns}
 
 <!-- :::{.r-stack} -->
 
-:::{.column  width="50%"}
+:::{.column  width="60%"}
 
 :::{.fragment .fade-in fragment-index=2}
 * The experts are chosen as
@@ -30,7 +30,7 @@ $$
 :::
 
 
-:::{.column  width="50%"}
+:::{.column  width="40%"}
 
 <!-- :::{.r-stack}
 
@@ -42,11 +42,8 @@ $$
 
 ::::
 
-:::{.fragment .fade-in fragment-index=4}
-* Learn the parameters $\theta = \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}$ and $\psi$ 
-:::
 
-:::{.fragment .fade-in fragment-index=5}
+:::{.fragment .fade-in fragment-index=4}
 * *Expectation Maximization*: maximizes log likelihood
 $$
 \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi \sigma_i^2}} \exp \left( -\frac{1}{2}\frac{(y_j - \mu_i)^2}{\sigma_i^2} \right) P_i(x_j, \psi)

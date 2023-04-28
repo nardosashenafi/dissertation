@@ -128,6 +128,8 @@ Choose $u = u_{es} + u_{di}$ that transforms system into a passive one with $x^\
 
 $\Omega u_{es} = \nabla_q H  - \nabla_q H_d , \quad \Omega u_{di} = -\Omega K_D \Omega^\top \nabla_p H_d$
 
+PDE: $\Omega^\perp (\nabla_q H  - \nabla_q H_d) = 0$
+
 $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
 \begin{bmatrix} \phantom{-}0 & 1 \\ -1 & -\Omega K_D \Omega^\top \end{bmatrix} 
@@ -175,7 +177,7 @@ $$
   0 \\ \Omega
 \end{bmatrix} u^{\theta},
 \\
-&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d).
+&& u^\theta &= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d^\theta).
 \end{aligned}
 $$
 :::
