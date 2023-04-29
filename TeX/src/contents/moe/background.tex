@@ -111,7 +111,7 @@ model~\cite{glocker2005formulation}
   \begin{gathered}
     M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0, \\
     h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), \\
-    \dd R = W_N \dot{\lambda}_N \dd t + W_T \dot{\lambda}_T \dd t
+    \dd R = W_N^\top \dot{\lambda}_N \dd t + W_T^\top \dot{\lambda}_T \dd t
   \end{gathered}
   \label{eq:hybrid_dynamics}
 \end{equation}
@@ -334,8 +334,8 @@ refer the reader to~\cite{glocker2005formulation} for detailed derivation of the
 forms of $A$ and $b$, and present the results as
 \begin{gather*}
     A = \begin{bmatrix}
-      W_N M^{-1} (W_N - W_T \mu) & W_N M^{-1} W_N & 0  \\
-      W_T M^{-1} (W_N - W_T \mu) & W_T M^{-1} W_T & I_k  \\
+      W_N M^{-1} (W_N^\top - W_T^\top \mu) & W_N M^{-1} W_T^\top & 0  \\
+      W_T M^{-1} (W_N^\top - W_T^\top \mu) & W_T M^{-1} W_T^\top & I_k  \\
       2\mu & -I_k & 0
     \end{bmatrix}, \;  b = \begin{bmatrix}
       W_N M^{-1} h \Delta t + (I_k+\epsilon_N) \gamma_N\\
@@ -401,7 +401,7 @@ We substitute the contact forces $\lambda_N, \lambda_T$ provided by Lemke's
 algorithm into the equations of motion~\eqref{eq:hybrid_dynamics} to compute the
 post-impact velocities as follows:
 \begin{align*}
-  \dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)
+  \dot{q}(t+\Delta t) = M^{-1}(W_T^\top \lambda_T + W_N^\top \lambda_N + h\Delta t) + \dot{q}(t)
 \end{align*}
 %
 This procedure is repeated for time horizon $T$.
@@ -420,7 +420,7 @@ This procedure is repeated for time horizon $T$.
             \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
             % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
             \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
-            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$\Comment{Apply contact forces}
+            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T^\top \lambda_T + W_N^\top \lambda_N + h\Delta t) + \dot{q}(t)$\Comment{Apply contact forces}
             \State $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
             \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
           \EndFor
