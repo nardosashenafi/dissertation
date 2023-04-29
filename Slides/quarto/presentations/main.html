@@ -533,13 +533,22 @@ Reasons about model uncertainties<br>
 <!-- :::{.r-stack} --><div class="column" style="width:60%;">
 <div class="fragment fade-in" data-fragment-index="2">
 <ul>
-<li>The experts are chosen as <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>𝒩</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>𝒩</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">
-F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
-</annotation></semantics></math>
+<li>The experts are chosen as <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>;</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>𝒩</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>𝒩</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>θ</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>,</mo><msub><mi>σ</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+F(x;\theta) &amp;= \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\} \\
+\theta &amp;= \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}
+\end{align*}</annotation></semantics></math>
 <ul>
 <li>Prediction is a weighted-average of experts</li>
 </ul></li>
 </ul>
+</div>
+</div><div class="column" style="width:40%;">
+<!-- :::{.r-stack}
+
+![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0} -->
+<p><img data-src="contents/assets/old_faithful.svg" class="absolute fragment fade-in" style="top: 75px; left: 600px; width: 550px; height: 400px; " data-fragment-index="0"></p>
+<!-- ::: -->
+</div>
 </div>
 <div class="fragment fade-in" data-fragment-index="3">
 <ul>
@@ -548,14 +557,6 @@ F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
 <li>Divides the input space into partitions</li>
 </ul></li>
 </ul>
-</div>
-</div><div class="column" style="width:40%;">
-<!-- :::{.r-stack}
-
-![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0} -->
-<p><img data-src="contents/assets/old_faithful.svg" class="absolute fragment fade-in" style="top: 100px; left: 600px; width: 550px; height: 400px; " data-fragment-index="0"></p>
-<!-- ::: -->
-</div>
 </div>
 <div class="fragment fade-in" data-fragment-index="4">
 <ul>
@@ -868,7 +869,6 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 <section id="simple-pendulum-1" class="slide level2" data-auto-animate="false" data-auto-animate-easing="ease">
 <h2 data-id="quarto-animate-title">Simple Pendulum</h2>
 <!-- ###################################################################### -->
-<p><br></p>
 <div class="callout callout-tip no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -877,7 +877,6 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 <div class="callout-content">
 <p>Choose <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>=</mo><msub><mi>u</mi><mrow><mi>e</mi><mi>s</mi></mrow></msub><mo>+</mo><msub><mi>u</mi><mrow><mi>d</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">u = u_{es} + u_{di}</annotation></semantics></math> that transforms system into a passive one with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo>⋆</mo></msup><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>q</mi><mo>⋆</mo></msup><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">x^\star = (q^\star, 0)</annotation></semantics></math></p>
 <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Ω</mi><msub><mi>u</mi><mrow><mi>e</mi><mi>s</mi></mrow></msub><mo>=</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub><mo>,</mo><mspace width="1.0em"></mspace><mi>Ω</mi><msub><mi>u</mi><mrow><mi>d</mi><mi>i</mi></mrow></msub><mo>=</mo><mo>−</mo><mi>Ω</mi><msub><mi>K</mi><mi>D</mi></msub><msup><mi>Ω</mi><mi>⊤</mi></msup><msub><mi>∇</mi><mi>p</mi></msub><msub><mi>H</mi><mi>d</mi></msub></mrow><annotation encoding="application/x-tex">\Omega u_{es} = \nabla_q H - \nabla_q H_d , \quad \Omega u_{di} = -\Omega K_D \Omega^\top \nabla_p H_d</annotation></semantics></math></p>
-<p>PDE: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>Ω</mi><mo>⊥</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\Omega^\perp (\nabla_q H - \nabla_q H_d) = 0</annotation></semantics></math></p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mover><mi>q</mi><mo accent="true">̇</mo></mover></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mover><mi>p</mi><mo accent="true">̇</mo></mover></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mphantom><mo>−</mo></mphantom><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mo>−</mo><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mo>−</mo><mi>Ω</mi><msub><mi>K</mi><mi>D</mi></msub><msup><mi>Ω</mi><mi>⊤</mi></msup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>∇</mi><mi>p</mi></msub><msub><mi>H</mi><mi>d</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mspace width="2.0em"></mspace><mi>y</mi><mo>=</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover></mrow><annotation encoding="application/x-tex">
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
 \begin{bmatrix} \phantom{-}0 &amp; 1 \\ -1 &amp; -\Omega K_D \Omega^\top \end{bmatrix} 
@@ -893,6 +892,20 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 </div>
 <div class="fragment fade-up">
 <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><menclose notation="box"><mrow><mi>u</mi><mo>=</mo><mo>−</mo><mi>m</mi><mi>g</mi><mi>l</mi><mo>sin</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>K</mi><mi>P</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>−</mo><msup><mi>q</mi><mo>⋆</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>K</mi><mi>D</mi></msub><mover><mi>q</mi><mo accent="true">̇</mo></mover></mrow></menclose><annotation encoding="application/x-tex">\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}</annotation></semantics></math></p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment fade-up">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Constraint on <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mi>d</mi></msub><annotation encoding="application/x-tex">H_d</annotation></semantics></math></strong></p>
+</div>
+<div class="callout-content">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msup><mi>Ω</mi><mo>⊥</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+\Omega^\perp (\nabla_q H  - \nabla_q H_d) = 0
+\end{align*}</annotation></semantics></math></p>
 </div>
 </div>
 </div>
@@ -970,7 +983,7 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 <h2>Robustness via Bayesian Learning</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><br> <br></p>
+<p><br></p>
 <div>
 <ul>
 <li class="fragment"><span class="smallcaps">NeuralPbc</span> assumes a nominal model <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>x</mi><mo accent="true">̇</mo></mover><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\dot{x} = f(x, u)</annotation></semantics></math></li>
@@ -986,8 +999,13 @@ u^{\top} y \geq \dot{H} = \frac{\partial H}{\partial x} f(x,u), \\
 <ul>
 <li class="fragment"><strong>Our method</strong>: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mi>d</mi></msub><annotation encoding="application/x-tex">H_d</annotation></semantics></math> is a Bayesian neural network
 <ul>
-<li class="fragment">achieves the performance objective <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>J</mi><annotation encoding="application/x-tex">J</annotation></semantics></math> for samples <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>J</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta \sim P(\theta | J)</annotation></semantics></math></li>
-<li class="fragment">searches for ensemble of parameters that meet the desired performance</li>
+<li class="fragment">achieves the performance objective for samples <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>∼</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="false" form="prefix">|</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta \sim P(\theta | \mathbb{D})</annotation></semantics></math></li>
+<li class="fragment">searches for ensemble of parameters that meet the desired performance <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>∣</mo><mi>𝔻</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mover><mover><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏞</mo></mover><mtext mathvariant="normal">likelihood</mtext></mover><mover><mover><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mo accent="true">⏞</mo></mover><mtext mathvariant="normal">prior</mtext></mover></mrow><munder><munder><mrow><msub><mo>∫</mo><mi>θ</mi></msub><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝔻</mi><mo>∣</mo><msup><mi>θ</mi><mi>′</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mi>′</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><msup><mi>θ</mi><mi>′</mi></msup></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">evidence</mtext></munder></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+  P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
+  \theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
+  {\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
+  d\theta^\prime}_{\text{evidence}}}.
+</annotation></semantics></math></li>
 </ul></li>
 </ul>
 </div>
@@ -1223,9 +1241,9 @@ H(x^+) \leq H(x^-)
 <p><strong><span class="smallcaps">NeuralPbc</span> for contact-rich system</strong></p>
 </div>
 <div class="callout-content">
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">minimize</mtext><mi>θ</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo>,</mo><msup><mi>u</mi><mi>θ</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mi>ⅆ</mi><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>+</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>ⅆ</mi><mi>t</mi><mo>−</mo><mi>ⅆ</mi><mi>R</mi><mo>=</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msup><mi>u</mi><mi>θ</mi></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mi>Ω</mi><mo>†</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mtext mathvariant="normal">minimize</mtext><mi>θ</mi></munder></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>J</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo>,</mo><msup><mi>u</mi><mi>θ</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>∈</mo><msub><mi>𝒟</mi><mi>N</mi></msub></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo>,</mo><mi>u</mi><mo>,</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">subject to</mtext></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><mi>M</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mi>ⅆ</mi><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>+</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo>,</mo><mover><mi>q</mi><mo accent="true">̇</mo></mover><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>ⅆ</mi><mi>t</mi><mo>−</mo><mi>ⅆ</mi><mi>R</mi><mo>=</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"></mtd><mtd columnalign="right" style="text-align: right"><msup><mi>u</mi><mi>θ</mi></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mi>Ω</mi><mo>†</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>∇</mi><mi>q</mi></msub><mi>H</mi><mo>−</mo><msub><mi>∇</mi><mi>q</mi></msub><msub><mi>H</mi><mi>d</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
     \underset{\theta}{\textrm{minimize}} 
-    &amp; &amp; &amp;\ell \left(\phi,u^{\theta}\right)  , \\%
+    &amp; &amp; J(\phi, u^\theta) &amp;= \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ], \\%
     \textrm{subject to}
     &amp; &amp; M(q) &amp;\dd \dot{q} + h(q, \dot{q}, \theta)\dd t - \dd R  = 0,\\%
     &amp; &amp; u^{\theta} &amp;= \Omega^{\dagger}(\nabla_q H  - \nabla_q H_d).%

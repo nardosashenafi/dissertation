@@ -35,7 +35,6 @@
 :::{.column width=50%}
 
 <br/>
-<br/>
 
 :::{.incremental}
 * <span style="font-variant:small-caps;">NeuralPbc</span> assumes a nominal model $\dot{x} = f(x, u)$
@@ -56,8 +55,14 @@
 :::{.fragment fragment-index=0}
 :::{.incremental}
 * **Our method**: $H_d$ is a Bayesian neural network
-    + achieves the performance objective $J$ for samples $\theta \sim P(\theta | J)$
+    + achieves the performance objective for samples $\theta \sim P(\theta | \mathbb{D})$
     + searches for ensemble of parameters that meet the desired performance 
+  $$
+    P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
+    \theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
+    {\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
+    d\theta^\prime}_{\text{evidence}}}.
+  $$
 :::
 :::
 

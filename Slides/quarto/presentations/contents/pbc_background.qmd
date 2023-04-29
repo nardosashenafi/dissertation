@@ -118,8 +118,6 @@ $$
 ##  Simple Pendulum  {auto-animate="false" auto-animate-easing="ease"}
 <!-- ###################################################################### -->
 
-<br/> 
-
 :::: {.callout-tip icon="false"}
 
 ## Control Synthesis via PBC
@@ -127,8 +125,6 @@ $$
 Choose $u = u_{es} + u_{di}$ that transforms system into a passive one with $x^\star =  (q^\star, 0)$
 
 $\Omega u_{es} = \nabla_q H  - \nabla_q H_d , \quad \Omega u_{di} = -\Omega K_D \Omega^\top \nabla_p H_d$
-
-PDE: $\Omega^\perp (\nabla_q H  - \nabla_q H_d) = 0$
 
 $$
 \begin{bmatrix} \dot{q} \\ \dot{p} \end{bmatrix} = 
@@ -153,6 +149,16 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 :::
 
 ::::
+
+::: {.fragment .fade-up}
+::::{.callout-note icon="false"}
+## Constraint on $H_d$ 
+
+\begin{align*}
+\Omega^\perp (\nabla_q H  - \nabla_q H_d) = 0
+\end{align*}
+::::
+:::
 
 ## <span style="font-variant:small-caps;">NeuralPbc</span> 
 <!-- ###################################################################### -->

@@ -130,16 +130,9 @@ Complementarity condition
 \end{align*}
 
 :::{.fragment fragment-index=0}
-::::{.columns}
 
-:::{.column width=50%}
-![](contents/assets/unilateral_primitive.svg){width="500" heigth="500"}
-:::
+![](contents/assets/tangential_complementarity_labelled.png)
 
-:::{.column width=50%}
-![](contents/assets/tangential_to_complementarity.svg)
-:::
-::::
 :::
 
 ## Linear Complementarity Problem (LCP)
@@ -689,7 +682,7 @@ $$
 
 $$
 P(\theta \mid \mathbb{D}) = \frac{\overbrace{P(\mathbb{D} \mid
-\theta)}^{\text{likelihood}}\overbrace{p(\theta)}^{\text{prior}}}
+\theta)}^{\text{likelihood}}\overbrace{P(\theta)}^{\text{prior}}}
 {\underbrace{\int_\theta P(\mathbb{D} \mid \theta^\prime)P(\theta^\prime)
 d\theta^\prime}_{\text{evidence}}} \underbrace{\approx Q(\theta;
 z)}_{\text{VI}}.
@@ -697,7 +690,7 @@ $$
 
 :::: {.fragment .semi-fade-out fragment-index=1}
 ::: {layout="[1,1]" layout-valign="center"}
-![Show ELBO convergence.](contents/assets/pbc-outline.svg){width=200%}
+![](contents/assets/pbc-outline.svg){width=200%}
 
 ::: {.callout-important icon=false}
 ## KL-divergence and ELBO
@@ -718,7 +711,7 @@ $$
 
 :::: {.fragment fragment-index=1}
 ::: {layout="[1,1]" layout-valign="center"}
-![Show prob. distribution](contents/assets/pbc-outline.svg){width=100%}
+![](contents/assets/pbc-outline.svg){width=100%}
 
 ::: {.callout-tip icon=false}
 ## Prediction through marginalization
@@ -760,7 +753,7 @@ z \leftarrow z + \alpha_i \frac{\partial \mathcal{L}}{\partial z}
 ## <span style="font-variant:small-caps;">NeuralIdaPbc</span> Main Problem {.smaller visibility="uncounted"}
 <!-- ###################################################################### -->
 
-$$\begin{aligned} \underset{\theta}{\text{minimize}} && J(\theta) &= \left\lVert G^{\bot} \left\{ \nabla_{q} H - M_{d}^{\theta}M^{-1} \nabla_{q} H_{d}^{\theta} + J_{2}^{\theta} \left(M_{d}^{\theta}\right)^{-1} p \right\} \right\rVert^2  \\ \text{subject to}  && H_d^{\theta} &= \frac{1}{2} p^{\top} \left( M_{d}^{\theta} \right)^{-1} p + V_{d}^{\theta}(q) \\ && M_d^{\theta}(q) &= \left(M_d^{\theta}(q)\right)^\top \succ 0 \\ && J_{2}^{\theta}(q,p) &= -\left(J_{2}^{\theta}(q,p)\right)^\top \\ && q^\star &= \underset{q}{\arg \min} \, V_{d}^{\theta} (q) \end{aligned}$$
+$$\begin{aligned} \underset{\theta}{\text{minimize}} && J(\theta) &= \left\lVert \Omega^{\bot} \left\{ \nabla_{q} H - M_{d}^{\theta}M^{-1} \nabla_{q} H_{d}^{\theta} + J_{2}^{\theta} \left(M_{d}^{\theta}\right)^{-1} p \right\} \right\rVert^2  \\ \text{subject to}  && H_d^{\theta} &= \frac{1}{2} p^{\top} \left( M_{d}^{\theta} \right)^{-1} p + V_{d}^{\theta}(q) \\ && M_d^{\theta}(q) &= \left(M_d^{\theta}(q)\right)^\top \succ 0 \\ && J_{2}^{\theta}(q,p) &= -\left(J_{2}^{\theta}(q,p)\right)^\top \\ && q^\star &= \underset{q}{\arg \min} \, V_{d}^{\theta} (q) \end{aligned}$$
 
 ::::: {.fragment}
 :::: {.columns}

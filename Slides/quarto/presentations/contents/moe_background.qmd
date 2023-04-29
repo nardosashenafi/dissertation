@@ -16,16 +16,13 @@
 
 :::{.fragment .fade-in fragment-index=2}
 * The experts are chosen as
-$$
-F(x;\theta) = \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\}
-$$
+\begin{align*}
+F(x;\theta) &= \{\mathcal{N}_1(\mu_1, \sigma_1), \mathcal{N}_2(\mu_2, \sigma_2)\} \\
+\theta &= \{(\mu_1, \sigma_1), (\mu_2, \sigma_2) \}
+\end{align*}
     + Prediction is a weighted-average of experts
 :::
-:::{.fragment .fade-in fragment-index=3}
 
-* The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
-    + Divides the input space into partitions
-:::
 
 :::
 
@@ -35,13 +32,18 @@ $$
 <!-- :::{.r-stack}
 
 ![](contents/assets/geyser.JPG){.absolute top=100 left=700 .fragment .fade-in-then-out fragment-index=0} -->
-![](contents/assets/old_faithful.svg){.absolute top=100 left=600 width="550" height="400" .fragment .fade-in fragment-index=0}
+![](contents/assets/old_faithful.svg){.absolute top=75 left=600 width="550" height="400" .fragment .fade-in fragment-index=0}
 
 <!-- ::: -->
 :::
 
 ::::
 
+:::{.fragment .fade-in fragment-index=3}
+
+* The gating network is a neural net $\mathbf{P}(x | \psi) = [P_1(x | \psi), P_2(x | \psi) ]$
+    + Divides the input space into partitions
+:::
 
 :::{.fragment .fade-in fragment-index=4}
 * *Expectation Maximization*: maximizes log likelihood
