@@ -45,7 +45,7 @@
 
 :::{.column width=50%}
 
-![](contents/assets/regular-vs-bayesian.svg){.absolute width="600" heigth="600"}
+![](contents/assets/regular-vs-bayesian.svg){.absolute width="575" heigth="575"}
 
 :::
 <!-- column -->
