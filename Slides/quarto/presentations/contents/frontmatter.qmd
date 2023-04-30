@@ -49,8 +49,8 @@ Arash Komaee, Ph.D.
 <!-- ::: {.column width="35%"}  -->
 ::: {.fragment .fade-in fragment-index=1}
 ### <span style="font-variant:small-caps;">Upcoming Submissions</span>
-* Control of Hybrid Dynamical Systems via Deep-net Mixture of Experts
-* Data Driven Passivity-Based Control of the Rimless Wheel on Uneven Terrain
+* ***TACON 2023***: Control of Hybrid Dynamical Systems via Deep-net Mixture of Experts
+* ***IJRR 2023***: Data Driven Passivity-Based Control of the Rimless Wheel on Uneven Terrain
 :::
 <!-- ::: -->
 <!-- ::::  -->
