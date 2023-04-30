@@ -78,4 +78,17 @@ J_T &= \sum_{t=0}^{T} \| \dot{x}_c^* - \dot{x}_c(t; \theta) \|
     + multi-modal controller in uncertain environment
 :::
 
+## Acknowledgments 
+
+![](contents/assets/acknowledgment1.jpg){.absolute top=50 left=10 width="300"}
+
+
+![](contents/assets/acknowledgment2.JPG){.absolute top=400 left=10 width="300" }
+
+![](contents/assets/acknowledgment3.JPG){.absolute top=200 left=300 width="400" }
+
+![](contents/assets/acknowledgment4.JPG){.absolute top=400 left=700 width="300" }
+
+![](contents/assets/acknowledgment5.JPG){.absolute top=50 left=700 width="300"}
+
 # Q&A

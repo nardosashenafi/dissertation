@@ -157,6 +157,7 @@ $\boxed{u = -mgl\sin(q) - K_P(q - q^\star) - K_D \dot{q}}$
 \begin{align*}
 \Omega^\perp (\nabla_q H  - \nabla_q H_d) = 0
 \end{align*}
+where $\Omega^\perp \Omega = 0$.
 ::::
 :::
 
