@@ -89,9 +89,6 @@ $$
 ## State Sampling 
 
 **Objective**: meet performance for various initial states
-$$
-J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u, T), u) ]
-$$
 
 :::: {.r-stack}
 
