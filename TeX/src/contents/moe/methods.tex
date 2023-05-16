@@ -124,12 +124,12 @@ We present two viable choices for the running cost function.
             \State $\mathbb{L} \leftarrow 0$
             % \algrenewcommand\algorithmicindent{0em} % No indent
                 \For{$t = 0:\Delta t:T$}     
-                \For{$i=1:N_F$}\Comment{Evaluate performance of each expert}
-                    \State $x_i(t+\Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_j))$\Comment{Algorithm~\eqref{algo:moreau}}
-                    \State $\mathbb{L} \leftarrow \mathbb{L} - \ell(x_i(t+\Delta t), F_i) \; P_i(x(t) | \psi)$
+                \For{$j=1:N_F$}\Comment{Evaluate performance of each expert}
+                    \State $x_j(t+\Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_j(x(t), \theta_j))$\Comment{Algorithm~\eqref{algo:moreau}}
+                    \State $\mathbb{L} \leftarrow \mathbb{L} - \ell(x_j(t+\Delta t), F_j) \; P_j(x(t) | \psi)$
                 \EndFor
-                \State $j \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
-                \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_j(x(t), \theta_j))$
+                \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+                \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$
                 \EndFor
             \State \textbf{return} $\mathbb{L}$
         \end{algorithmic}
