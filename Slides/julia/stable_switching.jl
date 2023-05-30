@@ -51,33 +51,47 @@ function stable_switching(xi::Vector{T}, ; totalTimeStep = totalTimeStep) where 
 end
 
 
-clf()
+# clf()
 xi = [-5.0f0, -5.0f0]
 
 X1 = integrate(xi, 0.0f0; totalTimeStep = 4400.0f0);
-X2 = integrate(xi, 1.0f0; totalTimeStep = 4400.0f0);
-X12 = stable_switching(xi; totalTimeStep = 3500.0f0);
+X2 = integrate(xi, 1.0f0; totalTimeStep = 4300.0f0);
+X12 = stable_switching(xi; totalTimeStep = 10000.0f0);
 
 
-custom_linewidth = 3
+custom_linewidth = 8
 custom_font = 28
 
-# subplot(1, 2, 1)
-plot(getindex.(X1, 1), getindex.(X1, 2), color="red", linewidth=custom_linewidth, label=L"A_1")
-scatter(X1[end][1], X1[end][2], marker="*" , color="red", s=150)
-plot(getindex.(X2, 1), getindex.(X2, 2), color="blue", "--", linewidth=custom_linewidth, label=L"A_2")
-scatter(X2[end][1], X2[end][2], marker="*", color="blue", s=150)
-legend(loc="upper right", fontsize=22)
-tick_params(axis="both", labelsize=custom_font)
 
-# subplot(1, 2, 2)
+fig, (ax1, ax2) = plt.subplots(figsize=(10, 10), ncols=2, nrows=1)
+
+a1_traj = ax1.plot(getindex.(X1, 1), getindex.(X1, 2), color="red", linewidth=custom_linewidth, label=L"A_1")
+a1_final = ax1.scatter(X1[end][1], X1[end][2], marker="*" , color="red", s=800, label=L"A_1" * " Final state", zorder=4)
+a2_traj = ax1.plot(getindex.(X2, 1), getindex.(X2, 2), color="blue", "--", linewidth=custom_linewidth, label=L"A_2")
+a2_final = ax1.scatter(X2[end][1], X2[end][2], marker="*", color="blue", s=800, label=L"A_2" * " Final state", zorder=4)
+ax1.set_xlabel(L"x_1", fontsize=28)
+ax1.set_ylabel(L"x_2" , fontsize=28)
+ax1.tick_params(axis="both", labelsize=custom_font)
+# handles, labels = ax1.get_legend_handles_labels()
+# fig.legend(handles, labels, loc="upper center", fontsize=22, ncol=4)
+
+
 for i in 1:2:length(X12)
-    plot(getindex.(X12[i], 1), getindex.(X12[i], 2), color="red", linewidth=custom_linewidth)
+    ax2.plot(getindex.(X12[i], 1), getindex.(X12[i], 2), color="red", linewidth=custom_linewidth)
 end
 
 for i in 2:2:length(X12)
-    plot(getindex.(X12[i], 1), getindex.(X12[i], 2), color="blue",  "--", linewidth=custom_linewidth)
+    ax2.plot(getindex.(X12[i], 1), getindex.(X12[i], 2), color="blue",  "--", linewidth=custom_linewidth)
 end
 
-scatter(X12[end][end][1], X12[end][end][2], marker="*", color="black", s=150)
-tick_params(axis="both", labelsize=custom_font)
+a1_a2_final = ax2.scatter(X12[end][end][1], X12[end][end][2], marker="*", color="black", s=600, label="Final state", zorder=4)
+ax2.set_xlabel(L"x_1", fontsize=28)
+ax2.set_ylabel(L"x_2" , fontsize=28)
+ax2.tick_params(axis="both", labelsize=custom_font)
+
+
+handles, labels = ax1.get_legend_handles_labels()
+fig.legend(handles, labels, bbox_to_anchor=(0.7, 0.97), fontsize=22, ncol=4)
+
+handles, labels = ax2.get_legend_handles_labels()
+fig.legend(handles, labels, bbox_to_anchor=(0.9, 0.97), fontsize=22, ncol=1)

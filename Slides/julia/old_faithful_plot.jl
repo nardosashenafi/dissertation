@@ -548,6 +548,6 @@ waiting=[
     74]
 
 PyPlot.scatter(waiting, eruption, color="black")
-xlabel("Waiting time (minutes)", fontsize=28)
-ylabel("Duration (minutes)" , fontsize=28)
+xlabel(L"x", fontsize=28)
+ylabel(L"F(x)" , fontsize=28)
 tick_params(axis="both", labelsize=28)

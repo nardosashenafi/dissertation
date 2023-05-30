@@ -111,9 +111,9 @@ We present two viable choices for the running cost function.
     obtained from the integration and evaluate the running cost $\ell(x_i(\Delta
     t), F_i)$ incurred by each expert.
     %
-    We weigh each running cost $\ell(x_i(\Delta t), F_i)$ by its
-    \textit{responsibility} $P_i(x_0 | \psi)$ and sum the product to get the
-    likelihood.
+    Each running cost $\ell(x_i(\Delta t), F_i)$ is weighed by its
+    \textit{responsibility} $P_i(x_0 | \psi)$ and summed across experts to get
+    the likelihood.
     \begin{algorithm}[tb]
         \setstretch{1.2}
         \caption{Accumulated Loss}
