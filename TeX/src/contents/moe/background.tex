@@ -50,7 +50,6 @@ and post-impact velocity} \normalfont pairs that obey the geometric and
 kinematic constraints during contacts or impacts.
 %
 
-{\color{red}
 %
 The linear complementarity formulation is constructed from kinematic and dynamic
 constraints of contact, which we discuss as follows.
@@ -71,9 +70,10 @@ given by $\gamma_N = \dot{g}_N(q)$ and $\gamma_T$, respectively.
 We can express the relative velocities $\gamma_N$ and $\gamma_T$ in terms of the
 generalized velocities as 
 %
-\begin{align*}
+\begin{align}
   \gamma_N = W_N \dot{q}, \; \gamma_T = W_T \dot{q},
-\end{align*}  
+  \label{eq:gamma}
+\end{align}  
 \noindent where $W_N$ and $W_T$ are the linear mappings from the generalized
 coordinates to the local contact coordinates.
 %
@@ -110,9 +110,8 @@ model~\cite{glocker2005formulation}
 \begin{equation}
   \begin{gathered}
     M(q) \dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0, \\
-    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), \\
-    \dd R = W_N^\top \dot{\lambda}_N \dd t + W_T^\top \dot{\lambda}_T \dd t
-  \end{gathered}
+    h(q, \dot{q}) = C(q, \dot{q})\dot{q} + G(q) - Bu(q, \dot{q}), 
+    \end{gathered}
   \label{eq:hybrid_dynamics}
 \end{equation}
 %
@@ -120,10 +119,30 @@ model~\cite{glocker2005formulation}
 mass matrix, $C \in \mathbb{R}^{m \times m}$ holds the Coriolis and centripetal
 terms, and $G \in \mathbb{R}^{m}$ is the gravitational term. The matrix $B \in
 \mathbb{R}^{m \times n}$ maps the input $u \in \mathcal{U} \subset
-\mathbb{R}^{n}$ to the generalized coordinates and $\dd R$ captures the effects
-of contact forces and Coulomb friction exerted on the system.  The dynamic
-constraint in~\eqref{eq:hybrid_dynamics} characterizes how the local contact
-forces affect the dynamics of the overall system.
+\mathbb{R}^{n}$ to the generalized coordinates.
+%
+The force measure $\dd R$ contains the contact forces as 
+\begin{align*}
+    \dd R = W_N \dd \lambda_N + W_T \dd \lambda_T ,
+\end{align*}
+\noindent where $W_N$ and $W_T$ are the projection matrices that map the effect
+of the normal and tangential contact forces, respectively, to the generalized
+coordinates.
+%
+The vectors $\dd \lambda_N$ and $\dd \lambda_T$
+consist of the normal and tangential contact impulse measures, respectively.
+%
+In the presence of impacts, we integrate the contact measures over a singleton
+time $t$ as $\int_{\{t\}} (\dd \lambda_N , \dd \lambda_T) = (\lambda_N(t),
+\lambda_T(t))$ in order to obtain the impulsive contact forces.
+%
+In the case of persisting contact forces, the contact impulse measures evaluate
+to $(\dd \lambda_N, \dd \lambda_T) = (\dot{\lambda}_N, \dot{\lambda}_T)$, where
+$\dot{\lambda}_N$ and $\dot{\lambda}_T$ hold the normal and the tangential contact
+forces, respectively.
+%
+The dynamic constraint in~\eqref{eq:hybrid_dynamics} characterizes how the
+local contact forces affect the dynamics of the overall system.
 \begin{rem}
   Unlike the classical second order equations of motion $M(q) \ddot{q} + h(q,
   \dot{q}) = 0$, the measure differential inclusion
@@ -188,7 +207,7 @@ both positive, hence $\xi_N^\top \lambda_N = 0$ must always hold.
 %
 This concept is summarized as shown in Table~\ref{tab:complementarity}.
 
-\begin{table}
+\begin{table}[tb]
   \centering
   \caption{Linear Complementarity Formulation: Possible contact scenarios}
   \begin{tabular}{|c|c|c|c|c|c|}
@@ -202,44 +221,72 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
   \label{tab:complementarity}
 \end{table}
 
-\begin{figure}
+\begin{figure}[b]
   \centering
   \begin{tikzpicture}
       \node [](image) at (0,0) {
-          \includegraphics[width=0.8\textwidth]{unilateral_primitive.eps}
+          \includegraphics[width=0.6\textwidth]{unilateral_primitive.eps}
       };
-      \node[] at (-3.4, 2.5) {\small $\lambda_N$};
-      \node[] at (-1.1, -0.3) {\small $\xi_N$};
-      \node[] at (4.6, 2.5) {\small $\lambda_T$};
-      \node[] at (6.2, -0.3) {\small $\xi_T$};
-      \node[] at (4.8, 1.3) {\small $\mu \lambda_N$};
-      \node[] at (3.7, -1.3) {\small $-\mu \lambda_N$};
+      \node[] at (-2.3, 2.0) {\small $\lambda_N$};
+      \node[] at (-1.0, -0.3) {\small $\xi_N$};
+      \node[] at (3.6, 2.0) {\small $\lambda_T$};
+      \node[] at (5.0, -0.3) {\small $\xi_T$};
+      \node[] at (3.8, 1.2) {\small $\mu \lambda_N$};
+      \node[] at (2.5, -1.0) {\small $-\mu \lambda_N$};
       % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
   \end{tikzpicture}
   \caption{Left: Complementarity condition for normal contact forces. Right: Characteristics of Coulomb friction as a function of $\xi_T$}
   \label{fig:unilateral_primitive}
 \end{figure}
-
+%
 \begin{figure}
   \centering
   \begin{tikzpicture}
       \node [](image) at (0,0) {
-          \includegraphics[width=1.0\textwidth]{tangential_to_complementary.eps}
+          \includegraphics[width=0.9\textwidth]{tangential_to_complementary.eps}
       };
-      \node[] at (-5.6, 2.0) {\small $\lambda_T$};
-      \node[] at (-4.0, -0.3) {\small $\xi_T$};
-      \node[] at (0.5, 2.5) {\small $\lambda_T$};
+      \node[] at (-5.1, 1.8) {\small $\lambda_T$};
+      \node[] at (-4.0, -0.4) {\small $\xi_T$};
+      \node[] at (0.2, 2.0) {\small $\lambda_T$};
       \node[] at (-1.9, -0.3) {\small $\xi_L$};
       \node[] at (1.9, -0.3) {\small $\xi_R$};
-      \node[] at (4.3, 2.0) {\small $\lambda_L = \mu \lambda_N - \lambda_T$};
-      \node[] at (7.6, 1.0) {\small $\lambda_R = \mu \lambda_N + \lambda_T$};
-      \node[] at (4.2, -0.3) {\small $\xi_L$};
-      \node[] at (7.8, -0.3) {\small $\xi_R$};
+      \node[] at (3.8, 2.0) {\small $\lambda_L = \mu \lambda_N - \lambda_T$};
+      \node[] at (7.0, 2.0) {\small $\lambda_R = \mu \lambda_N + \lambda_T$};
+      \node[] at (3.8, -0.3) {\small $\xi_L$};
+      \node[] at (7.6, -0.3) {\small $\xi_R$};
       % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
   \end{tikzpicture}
   \caption{Construction of complementarity condition for Coulomb friction}
   \label{fig:tangential_to_complementarity}
 \end{figure}
+
+From \eqref{eq:gamma} and~\eqref{eq:hybrid_dynamics}, we can express $\xi_N$
+as 
+\begin{align*}
+  \xi_N &= W_N^\top \dot{q}^+ + \epsilon_N W_N^\top \dot{q}^-, \\
+  &= W_N^\top M^{-1}[-h \Delta t + W_N \lambda_N] + (1 + \epsilon_N)W_N^\top \dot{q}^-, \\
+  &= \underbrace{W_N^\top M^{-1}W_N}_{A_N} \lambda_N \underbrace{-W_N^\top M^{-1}h \Delta t + (1 + \epsilon_N) W_N^\top \dot{q}^-}_{b_N}, \\
+  &= A_N \lambda_N + b_N,
+\end{align*}
+\noindent where $\dot{q}^-$ and $\dot{q}^+$ represent the pre- and post-impact
+velocities of the system, and $\Delta t$ is the integration time-step for the
+discretization of~\eqref{eq:hybrid_dynamics}.
+%
+Notice that $\xi_N$ is a linear function of the contact forces $\lambda_N$,
+which allows us to pose the search for $\lambda_N$ as the following quadratic
+optimization problem:
+\begin{equation}
+  \begin{aligned}
+      \underset{\lambda_N}{\textrm{minimize}} 
+      & & &(A_N \lambda_N + b_N)^\top \lambda_N, \\%
+      \textrm{subject to}
+      & & &A_N \lambda_N + b_N \geq 0, \lambda_N \geq 0.
+  \end{aligned}
+  \label{eq:lcp}
+\end{equation}
+\noindent If the linear complementarity problem (LCP) in~\eqref{eq:lcp} has a
+feasible solution, the objective function evaluates to zero.
+
 
 With this understanding in mind, we extend the complementarity condition
 in~\eqref{eq:complementarity} to a system with normal and tangential contact
@@ -405,7 +452,7 @@ post-impact velocities as follows:
 \end{align*}
 %
 This procedure is repeated for time horizon $T$.
-}
+
 \begin{algorithm}[tb]
   \setstretch{1.2}
     \caption{Moreau's Time Stepping Algorithm}
@@ -432,134 +479,150 @@ This procedure is repeated for time horizon $T$.
 \subsection{Mixture of Expert Models}
 \label{ssec:mixture_of_experts}
 
-The mixture of experts (MOE) architecture is primarily used to learn an ensemble
-of expert models that best fit high variance or multi-modal datasets.
-%
-Suppose we are trying to model the source of the dataset shown on the left of
-Figure~\ref{fig:gaussian_moe}.
-%
-A single Gaussian distribution provides a poor fit to the multi-modal data.
-%
-MOE framework allows us to fit multiple uni-modal distributions as shown on
-the right of Figure~\ref{fig:gaussian_moe}.
-%
-This technique uses a gating network to divide the input space $x \in
-\mathcal{X} \subset \mathbb{R}^{2m}$ into state partitions within which a single
-expert is active.
-%
-The objective is to learn the expert models and the gating network that
-best fit the dataset.
-%
 
-The expert models and the gating networks can take several forms. 
+The mixture of experts (MoE) framework is a technique primarily used to learn an
+ensemble of regression models (experts) that best fit high variance or
+multi-modal datasets, such as the one shown in
+Figure~\ref{one_model}~\cite{bishop2006pattern}.
 %
-Gaussian process experts and gating networks are commonly used in the MOE
-framework to find a multi-modal probabilistic model from a small amount of
-data~\cite{bishop2006pattern}.
+This technique provides a way to train several specialized expert models
+simultaneously, where each expert is well curated for a cluster of datasets as
+seen in Figure~\ref{moes}.
 %
-However, as the observations from the dataset grow large, the Gaussian process
-experts impose large computational and memory
-overhead~\cite{harkonen2022mixtures}.
+The MoE architecture uses a routing function called a \textit{gating network} to
+allocate the appropriate local expert for each input
+data~\cite{harkonen2022mixtures}.
 %
-Moreover, Gaussian gating networks can only provide a quadratic parameterization
-of the boundaries of the state partitions.
-%
-Hence, we leverage the universal approximation capabilities of neural networks
-for both the experts and the gating network.
+The objective is to learn the parameters of each local experts and the gating
+network to best fit the dataset.
 %
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{gaussian_moe.png}
-  \caption{Left: Fit with one Gaussian distribution. Right: Fit with Gaussian
-  mixture of 2 experts~\cite{mcgonagle_dobre_pilling}}
-  \label{fig:gaussian_moe}
+  \includegraphics[width=\linewidth]{moe_background.eps}
+  \subfloat[\label{one_model}Multi-modal dataset fit with one model]{\hspace{0.5\linewidth}} 
+  \subfloat[\label{moes}Multi-modal dataset fit
+  with MoE]{\hspace{0.5\linewidth}} \caption{Comparison of multi-modal dataset
+  fit with one regression model and MoE }{\hspace{0.5\linewidth}}
+  \label{fig:oldfaithful}
 \end{figure}
 
-Let $F(x)$ denote a collection of $N_F$ expert models $F(x) = \{F_1(x),
-\dots, F_{N_{F}}(x)\}$, whose parameters are given by the set
-$\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
+Let $F(x; \theta)$ denote a collection of $N_F$ expert models $F(x;\theta) :=
+\{F_1(x; \theta_1), \dots, \\ F_{N_{F}}(x; \theta_{N_F})\}$, whose parameters
+are given by the set $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
-% Henceforth, we assume that the number of state partitions is the same as the
-% number of available expert controller.
+The gating network is responsible for dividing the input space $\mathcal{X}
+\subset \mathbb{R}^m$ into \textit{state partitions}, and assigning local expert
+models capable of providing specialized predictions for each partition.
 %
-The gating network $\mathbf{P}(x| \psi) := (P_1(x| \psi), \\ \dots, P_{N_F}(x|
-\psi))$ is a collection of probabilities, where $P_i(x | \psi)$ denotes the
-probability of state $x$ belonging to state partition $i \in \{1, \dots, N_F \}$. 
+% The task of the gating network can be viewed as dividing the input space
+% $\mathcal{X}$ into \textit{state partitions} within which a local expert is
+% active. 
 %
-We parameterize the gating network with a neural network $\mathbf{P}(x| \psi) :
+We represent the gating network with the discrete probability distribution
+$\mathbf{P}(x| \psi) := (P_1(x| \psi), \dots, P_{N_F}(x| \psi))$, where $P_i(x |
+\psi)$ denotes the probability of state $x$ belonging to the state partition
+$\mathcal{X}^i \subset \mathcal{X}$ with the index $i \in \{1, \dots, N_F \}$. 
+%
+% The gating network behaves as a routing function that assigns
+% a local expert model capable of providing specialized predictions for states
+% within the partition $\mathcal{X}' \subset \mathcal{X}$ of the input space
+% $\mathcal{X} \subset \mathbb{R}^{2m}$. 
+%
+%
+In the standard MoE framework~\cite{jordan1994hierarchical}, the prediction
+$u(x)$ of the MoE is given by
+\begin{align}
+  u(x) &= \sum_{i=1}^{N_F}F_i(x; \theta_i)P_i(x | \psi),
+  \label{eq:weighted_sum}
+\end{align}
+%
+which requires evaluating all the experts for each input $x$.
+%
+We can reduce the computation cost of~\eqref{eq:weighted_sum} by utilizing the
+output of the single best expert as determined by the gating
+network\cite{chen2022towards}
+\begin{equation}
+    u(x) = \{ F_a(x; \theta_a) \; | \; a = \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \} \}.
+  \label{eq:best_expert_prediction}
+\end{equation}
+%
+% which allows us to achieve comparably accurate predictions
+% to~\eqref{eq:weighted_sum} with minimal computation cost\cite{chen2022towards}.
+% Compared to the prediction in~\eqref{eq:weighted_sum}, the outputs from the
+% single best expert provide specialized predictions capable of exhibiting
+% discontinuous outputs at the boundaries of the state partitions.
+
+\textbf{Model Structure}: The expert models and the gating network can take
+several forms. 
+%
+Gaussian process (GP) models are commonly used in the MoE framework to infer a
+multi-modal probabilistic model from a small amount of
+data~\cite{harkonen2022mixtures}.
+%
+Despite the expressive power and tractability of GP experts, the inference
+procedure requires repeated matrix inversions that scale cubically with the size
+of the dataset~\cite{zhang2019embarrassingly}.  
+%
+% In various literature, the gating network is constructed from linear combination
+% of Gaussian kernels\cite{harkonen2022mixtures} or a Dirichlet
+% distribution\cite{rasmussen2001infinite}. 
+% %
+% Moreover, Gaussian gating networks can only provide a quadratic parameterization
+% of the boundaries of the state partitions.
+%
+In order to circumvent the large computational and memory overhead while also
+preserving the expressive power of GP experts, we leverage the universal
+approximation capabilities of neural networks for both the experts and the
+gating network.
+%
+For regression problems that require the flexibility of nonlinear models, the
+experts can be given by deep neural-nets with point-estimate parameters, which
+can be extended to probabilistic models with the use of Bayesian neural
+networks, whose weights and biases are given by probability
+distributions~\cite{jospin2020hands}.
+%
+Similarly, the gating network can be given by a neural network $\mathbf{P}(x| \psi) :
 \mathcal{X} \rightarrow \mathbb{R}^{N_F}$ with parameters $\psi$, and the output
 corresponds to the vector $[P_1(x| \psi), \dots, P_{N_F}(x| \psi)]$.
 %
-We use a \textsc{Softmax} activation function on the last layer to ensure that the
-probabilities $P_i(x | \psi)$ over all state partitions $i$ sum to one.
+In order to ensure that the probabilities $P_i(x | \psi)$ over all state
+partitions $i$ sum to one, we use the \textsc{Softmax} activation
+function~\cite{sharma2017activation} on the last layer of the gating network.
 %
-The objective is to learn the decision parameters $(\psi, \theta)$ from observed
-data.
+% The objective is to learn the decision parameters $(\psi, \theta)$ from observed
+% data.
 
-We use a categorical probability distribution to sample a state partition based
-on the outputs of the gating network as follows~\cite{harkonen2022mixtures} 
+\textbf{Training}: Given the training dataset $\mathbb{D} = \{(x_1, y_1), \dots,
+(x_N, y_N)\}$ with $N$ input state-label pairs, we can use gradient-based
+techniques to find the optimal parameters $(\psi, \theta)$ that best fit
+the dataset~\cite{chen2022towards}.
+%
+In such techniques, we construct the cost function we wish to minimize as
 \begin{align}
-  i | x, \psi \sim \text{Categorical}(\mathbf{P}(x| \psi)). 
-  \label{eq:gating_categorical}
-\end{align}
-%
-% The prediction from the mixture of experts $F(x; \theta)$ is given by the linear
-% combination over the \it{responsibility} \normalfont of each state partition.
-%
-% \begin{align*}
-%   F(x; \theta) &= \sum_{i=1}^{N_F}F_i(x; \theta_i)P_i(x | \psi).
-% \end{align*}
-A single expert is active in each state partition hence the prediction $u(x;
-\theta)$ at input state $x$ is given by 
-\begin{align*}
-  a &= \underset{i}{\textrm{argmax}} \{ P_i(x | \psi) \},\\
-  u(x; \theta) &= F_a(x; \theta_a).
-\end{align*}
-
-
-There are several techniques to learn the parameters of the
-expert models and the gating network. A common approach is \it{expectation
-maximization} \normalfont (EM).
-%
-In this technique, we first compose the expectation over the log likelihood
-as~\cite{bishop2006pattern}   
-\begin{align}
-  \ln \{P(\mathbb{D} | \theta, \psi)\} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \mathcal{N}( \norm{F_i(x_j; \theta_i) - y_j}{} \; | \; 0,s) P_i(x_j, \psi) ,
-  \label{eq:original_normal_likelihood}
-\end{align}
-where $\mathcal{N}$ is the Gaussian distribution with mean zero and standard
-deviation $s$. The dataset $\mathbb{D} = \{(x_1, y_1), \dots, (x_N, y_N)\}$ is a
-collection of $N$ training observations, and $\norm{F_i(x_j; \theta_i) - y_j}{}$
-is the error in the prediction made by the expert $i$. 
-% 
-Notice that the likelihood measures how likely the current parameters $(\psi,
-\theta)$ are to generate the sampled data $\mathbb{D}$. 
-%
-The goal is to maximize the likelihood and consequently minimize prediction
-error.
-%
-The likelihood~\eqref{eq:original_normal_likelihood} is maximum when the
-parameter $\theta_i$ has the lowest prediction error and the highest probability
-of getting selected by the gating network.
-%
-The standard EM approach evaluates~\eqref{eq:original_normal_likelihood} and uses
-gradient-based techniques to iteratively update the parameters $(\psi, \theta)$.
-%
-To do so, we can expand the likelihood as 
-\begin{align*}
-  \ln \{P(\mathbb{D} | \theta, \psi) \} = \sum_{j=1}^{N} \ln \sum_{i=1}^{N_F} \frac{1}{\sqrt{2 \pi s^2}} \exp \Biggl( -\frac{1}{2}\frac{\norm{F_i(x_j; \theta_i) - y_j}{}^2}{s^2} \Biggr) P_i(x_j, \psi),
-\end{align*}
-\noindent and extract the relevant parts of the likelihood in order to
-define a simplified form given by
-\begin{equation}
-  \ln \{P(\mathbb{D} | \theta, \psi) \} \propto \mathbb{L}(\mathbb{D} | \theta, \psi) :=  \sum_{j=1}^{N} \sum_{i=1}^{N_F} -\norm{F_i(x_j; \theta_i) - y_j}{}^2 P_i(x_j | \psi). 
+  \mathbb{L}(\mathbb{D})= \sum_{j=1}^{N} \sum_{i=1}^{N_F} \norm{F_i(x_j; \theta_i) - y_j}{} \; P_i(x_j, \psi),
   \label{eq:log_normal_likelihood}
-\end{equation}
+\end{align}
+\noindent where $\norm{F_i(x_j; \theta_i) - y_j}{}$ is the error in the
+prediction made by the expert $i$. 
+% 
+% Notice that the cost function $\mathbb{L}$ measures how likely the current
+% parameters $(\psi, \theta)$ are to generate the sampled data $\mathbb{D}$. 
 %
-Depending on the complexity of the experts and the gating network, we can take
-analytical gradients of $\mathbb{L}$ with respect to the decision parameters
-($\psi, \theta$) or leverage auto-differentiation
-techniques~\cite{revels2016forward}. 
+Notice that the cost function~\eqref{eq:log_normal_likelihood} is minimum
+when the parameter $\theta_i$ has the lowest prediction error and the highest
+probability of getting selected by the gating network.
 %
-The EM framework uses stochastic-gradient descent to iteratively update the
-decision parameters.
+% We evaluate the pertinent gradients of the cost function $\nicefrac{\partial
+% \mathbb{L}}{\partial \psi}, \nicefrac{\partial \mathbb{L}}{\partial \theta}$
+% analytically or via auto-differentiation and update the decision parameters with
+% stochastic gradient descent.
+So long as the complexity of the experts and the cost function allow for the
+pertinent gradients $\nicefrac{\partial \mathbb{L}}{\partial \psi},
+\nicefrac{\partial \mathbb{L}}{\partial \theta}$ to be evaluated, we can
+invoke stochastic gradient descent (SGD) to update the decision parameters as
+follows:
+\begin{align*}
+  \psi \leftarrow \psi - \frac{\partial \mathbb{L}}{\partial \psi}, \\
+  \theta \leftarrow \theta - \frac{\partial \mathbb{L}}{\partial \theta}.
+\end{align*}
+

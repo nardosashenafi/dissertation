@@ -1,61 +1,190 @@
+\section{Motivating Application: \textit{Switching Linear System}}
+\label{sec:motiviational_application}
+
+In the following discussion, we present an example to motivate and lay
+the foundation for the use of MoE in the control design problem. 
+%
+In particular, we propose a data-driven technique to automatically seek
+switching controllers for multi-modal systems.
+%  
+Suppose we have two linear systems of the form 
+\begin{equation}
+    \begin{gathered}
+        \dot{x} = A_1x = \bmat{0 & -1 \\ 2 & 0}x, \\
+        \dot{x} = A_2x = \bmat{0 & -2 \\ 1 & 0}x,
+    \end{gathered}
+    \label{eq:unstable_closedloop}
+\end{equation}
+\noindent where each system is marginally stable as shown in
+Figure~\ref{marginally_stable}.
+%
+Although the individual systems are not asymptotically stable, it is possible to
+find a state-dependent switching rule that makes the resulting switched system
+stable\cite{liberzon2003switching} (Figure~\ref{stable_switching}). 
+%
+We aim to learn a gating network $\mathbf{P}(x|\psi)$ to automatically divide
+the state space into partitions and identify which of the two systems to execute
+in each state partition, with the goal of asymptotically stabilizing the origin.
+%
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{switching_linear.eps}
+    \subfloat[\label{marginally_stable}Two marginally stable closed-loop systems]{\hspace{0.5\linewidth}}
+    \subfloat[\label{stable_switching}Asymptotically stable switching]{\hspace{0.5\linewidth}}
+    \caption{Stable switching between two marginally stable systems }
+    \label{fig:stableSwitching}
+\end{figure}
+
+Akin to the regression problem in Section~\ref{ssec:mixture_of_experts}, the
+training dataset consists of \textit{input state-label} pairs, where the labels are
+the performances of the trajectories generated under the current control law.
+% 
+In the case of the switching-control problem, we generate a trajectory and the
+corresponding performance metric (labels) as follows.
+%
+Starting from some initial state $x(t=0)$, we sample a state partition index $i$
+from the categorical distribution, whose probabilities are provided by the
+gating network:
+\begin{align*}
+    i  \sim \text{Categorical} (\mathbf{P}(x(t)| \psi)).
+\end{align*} 
+Given the partition index $i$, the expert (control law) is given by a sample
+from the Bernoulli probability distribution
+\begin{align}
+    F_i(\theta_i) = \begin{cases}
+       0, & \theta_i > \frac{1}{2}, \\
+       1, & \theta_i \leq \frac{1}{2},
+    \end{cases}
+    \label{eq:bernoulli}
+\end{align}
+\noindent where $F_i = 0$ corresponds to the first dynamics $\dot{x} = A_1 x$
+and $F_i=1$ corresponds to $\dot{x} = A_2x$. The parameter $\theta_i$ of the
+expert is to be learned, and it determines which of the two experts to
+execute in each partition.
+%
+In order to ensure that the parameter $\theta_i$ of the expert serves as the
+probability of the Bernoulli distribution, we use the \textsc{Sigmoid}
+function\cite{sharma2017activation} to limit $\theta_i$ between 0 and 1.
+%
+The next state $x(t+\Delta t)$ in the trajectory is obtained from the following
+integration scheme:
+\begin{align*}
+    x(t + \Delta t) = (1-F_i) A_1 x(t) + F_i A_2 x(t).
+\end{align*}
+%
+We repeat this process to generate a trajectory for the time-horizon $T$.
+%
+The performance of the trajectory generated under the current parameters $(\psi,
+\theta)$ can be quantified by the metric $\ell$ as
+\begin{align*}
+    \ell(x(t + \Delta t)) := \frac{1}{2} \norm{x(t + \Delta t)}{}^2.
+\end{align*}
+In Section~\ref{ssec:performance_objective}, we generalize the performance
+metrics to be applicable to various dynamical systems and discuss how we can
+encode desired characteristics of the controller.
+%
+From the performance metric $\ell$, we can construct the cost function
+$\mathbb{L}$ similar to the standard MoE framework
+in~\eqref{eq:log_normal_likelihood} as
+\begin{align*}
+    \mathbb{L} \Bigl(\{x(0), \dots, x(T)\} \Bigr)= \sum_{t=0}^{T} \sum_{i=1}^{N_F} \ell_i \Bigl(x_i(t + \Delta t) \Bigr) \; P_i \Bigl(x(t), \psi \Bigr) .
+\end{align*}
+\noindent In the upcoming sections, we generalize the MoE control-search
+problem and provide techniques to efficiently learn the optimal decision
+parameters from appropriate cost functions.
+
+
 \section{Mixture of Expert Controller}
 \label{sec:moe_methods}
 
-In this section, we present a data-driven control design framework for hybrid
-dynamical systems. 
+Based on the motivating example provided in
+Section~\ref{sec:motiviational_application}, we present a generalized
+data-driven control design framework for hybrid dynamical systems.
 %
 In this framework, the controller is given by deep-net mixture of experts
 $F(x;\theta)$, and the control switching scheme is governed by the gating
 network $\mathbf{P}(x|\psi)$.
 %
-This technique allows us to observe the effects of contacts from the closed loop
-trajectories  and learn a switching mechanism to best control the hybrid system
-in all modes.
+This technique allows us to observe the effects of mode changes from the
+closed-loop trajectories and learn a switching mechanism to best control the
+hybrid system across modes.
 %
 The objective is to learn the parameters $\theta_i$ of each expert and the
-gating network $\psi$ that can achieve a certain performance objective.
+gating network $\psi$ that can achieve the desired performance.
+
 
 %
-Let $\phi(x_0, u, T)$ denote a closed loop trajectory with initial state $x_0$
-integrated for the time horizon $T$.
+Let $\phi(x_0, u, T)$ denote a closed-loop trajectory generated from a hybrid
+dynamical model starting from initial state $x_0$.
 %
-For every state $x$ in the trajectory, the control law first samples state
-partition (bin) number from the categorical distribution
-in~\eqref{eq:gating_categorical}.
+We represent the dynamics of a hybrid system with the differential
+inclusions\cite{goebel2009hybrid}
+\begin{equation}
+    \begin{cases}
+        \dot{x} \in f(x, u), & x \in C,\\
+        x^+ \in g(x, u), & x \in D,
+    \end{cases}
+    \label{eq:cont_and_guards}
+\end{equation}
+\noindent where $x \in \mathbb{R}^m$ is the state vector, and $u \in
+\mathbb{R}^n$ is the input.
 %
-The control input $u$ at state $x$ is
-\begin{align*}
-    u(x; \psi, \theta) = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}
-\end{align*} 
+The set-valued mappings $f: \mathbb{R}^m \times \mathbb{R}^n \rightarrow
+\mathbb{R}^m$ and $g: \mathbb{R}^m \times \mathbb{R}^n \rightarrow \mathbb{R}^m$
+denote the flow and jump maps, respectively, where $C$ and $D$ are subsets of
+$\mathbb{R}^m$ consisting of the feasible states under the flow and jump
+rules, respectively. 
 %
-Without prior knowledge injected to the gating network, the samples from the
-categorical distribution initially explore the performance of most, if not all,
-of the expert controllers.
+The notation $x^+$ indicates the state resulted by the jump rule $g$.
 %
-We use the running cost $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
+
+
+For every state $x$ in a trajectory, the control law first samples state
+partition index $i$ from a categorical distribution and evaluates the
+corresponding expert as
+\begin{align}
+    u(x; \psi, \theta) = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
+    \label{eq:categorical}
+\end{align} 
+%
+We use the metric $\ell : \mathcal{X} \times \mathcal{U} \rightarrow
 \mathbb{R}$ to measure the performance of the sampled experts, which we discuss
 in depth in Section~\ref{ssec:performance_objective}.
 %
-The running cost plays the role of \it{prediction error} \normalfont in the
-construction of the likelihood as shown in~\eqref{eq:log_normal_likelihood}.
+% The running cost plays the role of \it{prediction error} \normalfont in the
+% construction of the cost function $\mathcal{L}$ as shown
+% in~\eqref{eq:original_normal_likelihood}.
 %
 The goal is to learn the decision parameters $(\psi, \theta)$ that minimize the
-running cost for all initial states in the state space.
+metric $\ell$ for all initial states in the state space.
 %
 We pose the search over the parameters of the experts and the gating network as the following optimization problem.
 \begin{equation}
     \begin{aligned}
         \underset{\psi, \theta}{\textrm{minimize}} 
-        & & & \int_0^T \ell (x(t),u) \dd t , \\%
+        & & &\int_0^T \ell (x(t),u) \dd t , \\%
         \textrm{subject to}
-        & & M(q) &\dd \dot{q} + h(x; \psi, \theta)\dd t - \dd R  = 0,\\%
+        & & &\begin{cases}
+                    \dot{x} \in f(x, u), & x \in C,\\
+                    x^+ \in g(x, u), & x \in D,
+                \end{cases}\\%
         & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
     \end{aligned}
     \label{eq:moe_opt}
 \end{equation}
 %
 In Section~\ref{ssec:training_moe}, we provide a procedure to solve the
-optimization problem~\eqref{eq:moe_opt} through expectation maximization. 
+optimization problem~\eqref{eq:moe_opt} via stochastic gradient descent. 
+\begin{rem}
+    Without prior knowledge injected to the gating network, the samples from the
+    categorical distribution in~\eqref{eq:categorical} initially explore the
+    performance of most, if not all, of the expert controllers.
+    %
+    As the parameters converge to their optimal values, the samples from the
+    categorical distribution correspond to the indices of the single best
+    experts and the control law in~\eqref{eq:categorical} is equivalent
+    to~\eqref{eq:best_expert_prediction}.
+\end{rem}
 
 \subsection{Performance Objective}
 \label{ssec:performance_objective}

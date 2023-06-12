@@ -214,7 +214,7 @@ problem.
                 \State $\nu \sim \mathbb{U}(0, 1)$
                 \State $A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) = \min \Biggl(1, \dfrac{P(\theta^{(\tau + \Delta \tau)}, J^{(\tau + \Delta \tau)})}{P(\theta^{(\tau)}, J^{(\tau)})} \Biggr)$
                 \If {$A(\theta^{(\tau + \Delta \tau)}, \theta^{(\tau)}) \geq \nu$}
-                    \State $\Theta$ \leftarrow \; $\Theta \cup \theta^{(\tau + \Delta \tau)}$ \Comment{Accept sampled parameter}
+                    \State $\Theta \leftarrow \; \Theta \cup \theta^{(\tau + \Delta \tau)}$ \Comment{Accept sampled parameter}
                     \State $\tau = \tau + \Delta \tau$
                     \Else
                     \State $i \leftarrow i + 1$, accepted=false \Comment{Reject sampled parameter}
