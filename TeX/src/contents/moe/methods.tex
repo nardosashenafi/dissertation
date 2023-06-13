@@ -45,9 +45,10 @@ corresponding performance metric (labels) as follows.
 Starting from some initial state $x(t=0)$, we sample a state partition index $i$
 from the categorical distribution, whose probabilities are provided by the
 gating network:
-\begin{align*}
+\begin{align}
     i  \sim \text{Categorical} (\mathbf{P}(x(t)| \psi)).
-\end{align*} 
+    \label{eq:gating_categorical}
+\end{align} 
 Given the partition index $i$, the expert (control law) is given by a sample
 from the Bernoulli probability distribution
 \begin{align}
@@ -94,7 +95,7 @@ problem and provide techniques to efficiently learn the optimal decision
 parameters from appropriate cost functions.
 
 
-\section{Mixture of Expert Controller}
+\section{Mixture of Experts Controller}
 \label{sec:moe_methods}
 
 Based on the motivating example provided in
@@ -117,29 +118,7 @@ gating network $\psi$ that can achieve the desired performance.
 Let $\phi(x_0, u, T)$ denote a closed-loop trajectory generated from a hybrid
 dynamical model starting from initial state $x_0$.
 %
-We represent the dynamics of a hybrid system with the differential
-inclusions\cite{goebel2009hybrid}
-\begin{equation}
-    \begin{cases}
-        \dot{x} \in f(x, u), & x \in C,\\
-        x^+ \in g(x, u), & x \in D,
-    \end{cases}
-    \label{eq:cont_and_guards}
-\end{equation}
-\noindent where $x \in \mathbb{R}^m$ is the state vector, and $u \in
-\mathbb{R}^n$ is the input.
-%
-The set-valued mappings $f: \mathbb{R}^m \times \mathbb{R}^n \rightarrow
-\mathbb{R}^m$ and $g: \mathbb{R}^m \times \mathbb{R}^n \rightarrow \mathbb{R}^m$
-denote the flow and jump maps, respectively, where $C$ and $D$ are subsets of
-$\mathbb{R}^m$ consisting of the feasible states under the flow and jump
-rules, respectively. 
-%
-The notation $x^+$ indicates the state resulted by the jump rule $g$.
-%
-
-
-For every state $x$ in a trajectory, the control law first samples state
+For every state $x$ in a trajectory, the control law first samples a state
 partition index $i$ from a categorical distribution and evaluates the
 corresponding expert as
 \begin{align}
@@ -164,10 +143,7 @@ We pose the search over the parameters of the experts and the gating network as 
         \underset{\psi, \theta}{\textrm{minimize}} 
         & & &\int_0^T \ell (x(t),u) \dd t , \\%
         \textrm{subject to}
-        & & &\begin{cases}
-                    \dot{x} \in f(x, u), & x \in C,\\
-                    x^+ \in g(x, u), & x \in D,
-                \end{cases}\\%
+        & & M(q) &\dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0\\%
         & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
     \end{aligned}
     \label{eq:moe_opt}
@@ -189,11 +165,12 @@ optimization problem~\eqref{eq:moe_opt} via stochastic gradient descent.
 \subsection{Performance Objective}
 \label{ssec:performance_objective}
 %
-We present two viable choices for the running cost function. 
+We present two viable choices for the performance metric $\ell$. 
 \begin{enumerate}
-    \item \textbf{Accumulated loss}: is the total quadratic loss between the desired
-    state $x^*$ and the states generated under the current control law. We also
-    incur a cost on the control authority as follows.
+    \item \textbf{Accumulated cost}: is the total quadratic loss between the
+    desired state $x^*$ and the states generated under the current control law.
+    We can also enforce control saturations for underactuated systems by incurring a
+    cost on the control input as follows:
     \begin{equation}
         \begin{gathered}
             \ell(x, u) = \frac{1}{2}(x - x^*)^\top \mathcal{Q} (x - x^*) + \frac{1}{2} u^\top \mathcal{R} u , 
@@ -207,27 +184,27 @@ We present two viable choices for the running cost function.
     This construction encourages trajectories to reach the desired equilibrium
     with minimum effort and shortest time.
     %
-
-    We modify the likelihood function $\mathbb{L}$ constructed
-    in~\eqref{eq:log_normal_likelihood} to incorporate the accumulated loss
-    $\ell(x, u)$.
-    %
-    The quadratic loss in~\eqref{eq:accumulatedLoss} plays the role of prediction
-    error in the likelihood function.
-    %
-    Similar to the regression problem provided in
-    Section~\ref{ssec:mixture_of_experts}, we want the likelihood to be maximum
-    when the running cost incurred by expert $i$ is low and the responsibility
-    of the expert is high.
-    %
-    We can obtain this characteristics by designing the likelihood as
+    We modify the cost function $\mathbb{L}$ presented
+    in~\eqref{eq:log_normal_likelihood} to incorporate the quadratic loss
+    $\ell(x, u)$ as follows:
     \begin{align}
-        \mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} - \ell \Bigl(x(t+\Delta t), F_i \Bigr) P_i\Bigl(x(t) | \psi \Bigr)  .
+        \mathbb{L}(\phi) = \sum_{t=0}^{T} \sum_{i=1}^{N_F} \ell_i \Bigl(x_i(t+\Delta t), F_i \Bigr) P_i\Bigl(x(t) | \psi \Bigr)  .
         \label{eq:accumulated_likelihood}
     \end{align}
     %
-    Algorithm~\ref{algo:accumulated_loss} outlines how we construct the
-    likelihood from a trajectory.
+    % The quadratic loss in~\eqref{eq:accumulatedLoss} plays the role of prediction
+    % error in~\eqref{eq:original_normal_likelihood}.
+    %
+    Similar to the regression problem provided in
+    Section~\ref{ssec:mixture_of_experts}, the accumulated
+    cost~\eqref{eq:accumulated_likelihood} is minimum when the metric $\ell_i$
+    achieved by expert $i$ is low and the responsibility $P_i(x(t) | \psi)$ of
+    the expert is high.
+    %
+
+    %
+    Algorithm~\eqref{algo:accumulated_loss} outlines how we construct the
+    cost function from a trajectory.
     %
     In this procedure we check the performance of each expert at every
     integration step.
@@ -240,12 +217,12 @@ We present two viable choices for the running cost function.
     obtained from the integration and evaluate the running cost $\ell(x_i(\Delta
     t), F_i)$ incurred by each expert.
     %
-    Each running cost $\ell(x_i(\Delta t), F_i)$ is weighed by its
+    Each performance metric $\ell(x_i(\Delta t), F_i)$ is weighed by its
     \textit{responsibility} $P_i(x_0 | \psi)$ and summed across experts to get
-    the likelihood.
+    the cost function.
     \begin{algorithm}[tb]
         \setstretch{1.2}
-        \caption{Accumulated Loss}
+        \caption{Accumulated Cost}
         \label{algo:accumulated_loss}
         \small
         \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
@@ -264,59 +241,71 @@ We present two viable choices for the running cost function.
         \end{algorithmic}
     \end{algorithm}
     %
-    Notice that by checking the running cost of each expert for every state, the
-    computation of the likelihood is prone to the curse of dimensionality.
+    By checking the performance of each expert for every state, the computation
+    of the cost function is prone to the curse of dimensionality.
     %
-    We minimize the amount of computation needed to compose the likelihood by
+    We minimize the amount of computation needed to compose the cost function by
     selecting one state from the collection $\{ x_i(\Delta t) , i \in \{1,
     \dots N_F \}\}$ to continue the integration.
     %
-    We select the expert responsible for generating the next state $x(\Delta t)$ from the
-    categorical distribution~\eqref{eq:gating_categorical}.
+    We select the expert responsible for generating the next state $x(\Delta t)$
+    from the categorical distribution~\eqref{eq:categorical}.
     %
     This process is repeated for every time step in the trajectory.
     % Notice that for each state $x(t)$, we need to test the performance of each expert. 
     % %
     % For instance, if there are $100$ states in a trajectory and $3$ experts, we need to evaluate $\ell$ $300$ times.
 
-  
-    \item \textbf{Minimum trajectory loss (MTL)}: In some cases,
-    accumulated loss may not reflect the desired behavior of the dynamical
-    systems.
+    \begin{rem}    
+        Notice that the accumulated cost checks the performance of each expert at
+        every state.
+        %
+        When training for few experts, this cost function provides ample
+        exploration, resulting in fast convergence to an optimal control strategy.
+        %
+        However, for numerous experts, the accumulated cost incurs large
+        computational overhead.
+    \end{rem}
+
+    \item \textbf{Minimum trajectory loss (MTL)}: is designed to minimize the
+    computational complexities of the accumulated cost.
     %
-    For instance, suppose we want to swing-up the simple pendulum to the upright
-    equilibrium. 
+    Compared to~\eqref{eq:accumulated_likelihood}, MTL may also better represent
+    the desired behavior of some dynamical systems.
     %
-    For an underactuated pendulum, the controller needs to swing about the
-    downward equilibrium, moving the states closer and further away from the
-    upright.
+    Consider the classical control problem of swinging-up the simple pendulum to
+    the upright equilibrium. 
     %
-    Accumulated loss incurs a lot of cost in such scenarios and the control
-    search would get stuck in local minima.
+    For an underactuated pendulum, a successful controller needs to swing the
+    pendulum clockwise and counterclockwise, passing through the downward
+    equilibrium point multiple times until enough kinetic energy is built up to
+    reach the upward equilibrium.
     %
-    In such cases, a successful loss function encourages trajectories that
-    \it{eventually} \normalfont lead to a minimum cost.
+    Accumulated loss incurs high cost in such scenarios and the control
+    search would get stuck in a local minimum.
     %
-    Hence, we construct the minimum trajectory loss (MTL), which is composed of
-    the lowest cost incurred across the entire trajectory and the
-    responsibilities of the experts that led to the minimum cost.
+    In such cases, a successful cost function encourages trajectories that
+    \textit{eventually} lead to the goal state.
     %
-    The resulting likelihood $\mathbb{L}$ is given by
+    This is achieved by MTL, which is composed of the lowest cost incurred
+    across the entire trajectory and the responsibilities of the experts that
+    led to the minimum cost.
+    %
+    The resulting cost function $\mathbb{L}$ is given by
     \begin{equation}
         \begin{gathered}
-            t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \}  \\
-            \mathbb{L}(\phi) = - \frac{\ell(x(t_{min}), u)}{C} \sum_{t=0}^{t_{min}}P_i(x(t) | \psi) 
+            t_{\text{min}} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi(x_0, u, T) \},  \\
+            \mathbb{L}(\phi) = \frac{\ell(x(t_{\text{min}}), u)}{C} \sum_{t=0}^{t_{\text{min}}}P_i(x(t) | \psi), 
         \end{gathered} 
     \end{equation}
     \noindent where $C > 0$ is a normalization factor.
     %
-    Unlike accumulated loss, MTL does not particularly reward low effort or
-    short time trajectories, but it equally rewards two trajectories
-    as long as they both reach the desired state within the time horizon $T$. 
+    The detailed procedure for the construction of MTL is shown in
+    Algorithm~\eqref{algo:mtl}.
     %
-    Moreover, MTL does not need to evaluate the performance of each expert at
-    every integration step, as shown in Algorithm~\eqref{algo:mtl}; this greatly
-    reduces the computational cost.
+    Unlike the accumulated cost, MTL does not particularly reward low effort or
+    short time trajectories, but it equally rewards two trajectories
+    as long as they both reach the goal state within the time horizon $T$. 
     %
     \begin{algorithm}[tb]
         \setstretch{1.2}
@@ -346,20 +335,16 @@ We intend to find a solution to the optimization problem
 in~\eqref{eq:moe_opt} for all initial states $x_0$ in the
 state space.
 %
-To do so, we generate the running cost $\ell$ from \textit{a batch of initial
-states} and update the parameters $(\psi, \theta)$ \textit{iteratively} via
-stochastic gradient descent.
-%
-We need to collect the batch of initial states in an efficient manner.
-%
-It is computationally expensive to merely discretize the vast state
-space into batches of initial states. 
+To do so, we generate the performance metric $\ell$ from \textit{a batch of
+initial states} and update the parameters $(\psi, \theta)$ \textit{iteratively}
+via stochastic gradient descent (SGD). 
 %
 To efficiently sample the initial states, we use a combination of greedy and
 explorative state sampling techniques.
 %
-Greedy state sampling, commonly known as \textsc{DAgger}, is a technique
-adapted from imitation learning~\cite{ross2011no}.
+An example of greedy state sampling technique, commonly known as \textit{Dataset
+Aggregation} (\textsc{DAgger}), is a technique adapted from imitation
+learning~\cite{ross2011no}.
 %
 This method collects states most visited under the current parameters $(\psi,
 \theta)$ and concentrates on refining the performance of the controller on these
@@ -369,16 +354,21 @@ For instance, suppose we are solving the optimization in~\eqref{eq:moe_opt} to
 obtain a controller that swings up an underactuated simple pendulum to the
 upright.
 % %
-Initially, the parameters $(\psi, \theta)$ may result in a controller that swings the
-pendulum to the downward equilibrium irrespective of where it started.
+Initially, the parameters $(\psi, \theta)$ may result in a controller that
+swings the pendulum to the downward equilibrium irrespective of where it
+started.
 %
 Thus, it is most efficient to first expose the training to the cost incurred by
 visiting the downward equilibrium.
 %
-In this technique, we first sample several initial states randomly and generate
-trajectories using the current parameters.
+In this technique, we first discretize the state space and uniformly sample
+several initial states.
 %
-Then, we randomly select $N_d$ samples from the states visited in the trajectory. 
+Starting from those initial states, we generate trajectories using the current
+parameters.
+%
+In order to improve the controller at the states favored by the current policy,
+we draw $N_d$ initial state samples from the states visited in the trajectories. 
 %
 At first, the $N_d$ samples mostly consist of states near the downward equilibrium.
 %
@@ -390,8 +380,8 @@ parameters.
 
 
 
-The explorative state sampling technique exposes the training to the rewards of approaching and 
-remaining close to $x^*$.
+The explorative state sampling technique exposes the training to the rewards of
+approaching and remaining close to $x^*$.
 %
 It also uses random sampling to explore new control strategies and recover from locally optimal
 solutions.  
@@ -400,55 +390,51 @@ This method collects $N_r$ initial states around the neighborhood of the desired
 equilibrium by drawing samples from the normal distribution $x_0 \sim \mathcal{N}(x^*, \delta)$,
 whose mean is $x^*$ and the standard deviation is a small constant $\delta$.
 %
-The combination of greedy and explorative state sampling techniques helps to
-quickly refine the performance of the current controller and converge to the desired behavior.
-%
-In a single batch training, we compute the running cost as an expectation
+For each parameter update in SGD, we compute the performance metric as an expectation
 over $N_{\mathcal{D}} = N_d+N_r$ samples as follows:
-\begin{align*}
-    J(\phi, u) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \mathbb{L}(\phi(x_0, u, T))]
-\end{align*}
-\noindent where $\mathcal{D}_N$ is a collection of $N_{\mathcal{D}}$ initial state samples.
+\begin{align}
+    J(\phi, u) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \mathbb{L}(\phi(x_0, u, T))],
+    \label{eq:average_cost}
+\end{align}
+\noindent where $\mathcal{D}_N$ is a \textit{replay buffer} consisting of
+$N_{\mathcal{D}}$ initial state samples.
 
-\subsection{Training Mixture of Expert Controller}
+
+\subsection{Training Mixture of Experts Controller}
 \label{ssec:training_moe}
 
 %
 We solve the optimization problem in~\eqref{eq:moe_opt} following the procedure
 outlined in Algorithm~\eqref{algo:moe_training}.
 %
-At the beginning of the training, we add a batch of initial states $x_0$ to the
-collection $\mathcal{D}_N$. These initial states are obtained from the greedy
-and explorative state sampling techniques. 
+At the beginning of the training, we collect $N_{\mathcal{D}}$ initial states
+samples using the greedy and explorative state sampling techniques discussed in
+Section~\ref{ssec:state_sampling} and save them in the replay buffer $\mathcal{D}_N$.
 %
-For every initial state in the batch, we generate a trajectory for time horizon $T$.
+For every initial state in the replay buffer, we generate a trajectory using the
+current decision parameters $(\psi, \theta)$ and assign the cost function
+$\mathbb{L}$.
 %
-The running cost of these trajectories are given by the accumulated cost
-(Algorithm~\eqref{algo:accumulated_loss}) or minimum trajectory loss
-(Algorithm~\eqref{algo:mtl}), depending on the desired closed-loop behavior. 
-%
-We average the running cost of each of the trajectories and perform
-\textit{expectation maximization} with respect to the decision parameters
-$(\psi, \theta)$.
-%
-We invoke a variant of stochastic gradient descent known as
-\textsc{Adam}~\cite{kingma2014adam} to efficiently train the parameters with
-adaptive learning rates $\alpha_i$.
-%
-We leverage auto-differentiation techniques to back-propagate on the gradient of
-the likelihood with respect to the learned parameters.
+The average cost incurred by the current policy is given by $J$
+in~\eqref{eq:average_cost}, from which we compute the pertinent gradients
+$\nicefrac{\partial J}{\partial \psi}, \nicefrac{\partial J}{\partial \theta}$
+via auto-differentiation techniques.
 %
 In particular, we use forward-mode auto-differentiation~\cite{revels2016forward}
 to take the gradient through the trajectory generated from Moreau's integration
 scheme.
 %
 Although not explored in this work, it is possible to design adjoint methods for
-hybrid systems to efficiently back-propagate on the likelihood through
+hybrid systems to efficiently back-propagate on the cost function through
 reverse-mode auto-differentiation techniques.
+%
+We invoke a variant of stochastic gradient descent known as
+\textsc{Adam}~\cite{kingma2014adam} to efficiently update the parameters with
+adaptive learning rates $\alpha$.
 %
 \begin{algorithm}[tb]
     \setstretch{1.2}
-      \caption{Solution to the Optimization Problem~\eqref{eq:moe_opt}}
+      \caption{Solution to the MoE Optimization Problem~\eqref{eq:moe_opt}}
       \label{algo:moe_training}
       \small
       \begin{algorithmic}[1]
@@ -461,14 +447,15 @@ reverse-mode auto-differentiation techniques.
               \State $\mathbb{L}$ = \texttt{Performance objective}($x_0, \psi, \theta$) \Comment{Algorithm~\eqref{algo:accumulated_loss} or~\eqref{algo:mtl}}
               \State $J \gets J + \mathbb{L}/N_{\mathcal{D}}$ 
           \EndFor
-          \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
-          \State $\psi \gets \psi + \alpha_i \nicefrac{\partial J}{\partial \psi}$
+          \State $\theta \gets \theta - \alpha \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
+          \State $\psi \gets \psi - \alpha \nicefrac{\partial J}{\partial \psi}$
           \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
           \State $i \;\:\gets i + 1$
           \EndWhile
           \State \textbf{return} $\theta$
       \end{algorithmic}
-  \end{algorithm}
+\end{algorithm}
+%
 
 \subsection{Back-propagation through Hybrid Dynamics}
 \label{ssec:backprop_hybrid}
@@ -508,7 +495,7 @@ We can expand the gradient further as
 \begin{align*}
     \frac{\partial \ell}{\partial \theta_i} = \frac{\partial \ell}{\partial x_1} \Bigl( \frac{\partial x_1}{\partial u} \frac{\partial u}{\partial \theta_i} + \frac{\partial x_1}{\partial \lambda}\frac{\partial \lambda}{\partial \theta_i}\Bigr),
 \end{align*}
-\noindent where $\lambda$ holds the contact forces.
+\noindent where $\lambda=[\lambda_N, \lambda_T]$ holds the contact forces.
 %
 We can compute the first term from Moreau's integration step as
 \begin{align*}

@@ -1,10 +1,10 @@
 
 \section{Background}
 
-In this section, we provide a brief introduction to contact modeling with the
-linear complementarity formulation.
+In this section, we provide a summary to contact modeling with the linear
+complementarity formulation presented in~\cite{glocker2005formulation}.
 %
-We also present a summary of the mixture of experts architecture and
+We also provide a brief introduction to the mixture of experts architecture and
 its uses in machine learning.
 %
 In Section~\ref{sec:moe_methods}, we utilize the high-fidelity models obtained
@@ -71,7 +71,7 @@ We can express the relative velocities $\gamma_N$ and $\gamma_T$ in terms of the
 generalized velocities as 
 %
 \begin{align}
-  \gamma_N = W_N \dot{q}, \; \gamma_T = W_T \dot{q},
+  \gamma_N = W_N^\top \dot{q}, \; \gamma_T = W_T^\top \dot{q},
   \label{eq:gamma}
 \end{align}  
 \noindent where $W_N$ and $W_T$ are the linear mappings from the generalized
@@ -85,8 +85,8 @@ The pre- and post-impact generalized velocities are denoted by $\dot{q}^-$ and
 $\dot{q}^+$, respectively, and their corresponding relative velocities are given
 by
 \begin{align*}
-  \gamma_N^+ = W_N\dot{q}^+, \; \gamma_T^+ = W_T\dot{q}^-, \\
-  \gamma_N^- = W_N\dot{q}^-, \; \gamma_T^- = W_T\dot{q}^-.
+  \gamma_N^+ = W_N^\top \dot{q}^+, \; \gamma_T^+ = W_T^\top \dot{q}^-, \\
+  \gamma_N^- = W_N^\top \dot{q}^-, \; \gamma_T^- = W_T^\top \dot{q}^-.
 \end{align*}
 %
 The kinematic constraint of contact states that two rigid bodies undergoing
@@ -205,8 +205,9 @@ zero.
 There exists no scenario when both the contact force $\lambda_N$ and $\xi_N$ are
 both positive, hence $\xi_N^\top \lambda_N = 0$ must always hold.
 %
-This concept is summarized as shown in Table~\ref{tab:complementarity}.
-
+This concept is summarized in Table~\ref{tab:complementarity}.
+%
+%
 \begin{table}[tb]
   \centering
   \caption{Linear Complementarity Formulation: Possible contact scenarios}
@@ -220,8 +221,8 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
   \end{tabular}
   \label{tab:complementarity}
 \end{table}
-
-\begin{figure}[b]
+%
+\begin{figure}[tb]
   \centering
   \begin{tikzpicture}
       \node [](image) at (0,0) {
@@ -235,11 +236,46 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
       \node[] at (2.5, -1.0) {\small $-\mu \lambda_N$};
       % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
   \end{tikzpicture}
-  \caption{Left: Complementarity condition for normal contact forces. Right: Characteristics of Coulomb friction as a function of $\xi_T$}
+  \subfloat[\label{fig:}Complementarity condition]{\hspace{0.5\linewidth}}
+  \subfloat[\label{fig:coulomb}Coulomb friction as a function of $\xi_T$]{\hspace{0.5\linewidth}}
+  \caption{Relationship between normal and tangential contact forces with $\xi_N$ and $\xi_T$, respectively}
   \label{fig:unilateral_primitive}
 \end{figure}
 %
-\begin{figure}
+
+From the dynamics in~\eqref{eq:hybrid_dynamics}, we can express $\xi_N$ as an
+affine function of the normal contact forces. 
+%
+This allows us to express the complementarity constraint as a quadratic function
+of the contact forces.
+%
+From \eqref{eq:gamma} and~\eqref{eq:hybrid_dynamics}, we can express $\xi_N$
+as 
+\begin{align*}
+  \xi_N &= W_N^\top \dot{q}^+ + \epsilon_N W_N^\top \dot{q}^-, \\
+  &= W_N^\top M^{-1}[-h \Delta t + W_N \lambda_N] + (1 + \epsilon_N)W_N^\top \dot{q}^-, \\
+  &= \underbrace{W_N^\top M^{-1}W_N}_{A_N} \lambda_N \underbrace{-W_N^\top M^{-1}h \Delta t + (1 + \epsilon_N) W_N^\top \dot{q}^-}_{b_N}, \\
+  &= A_N \lambda_N + b_N,
+\end{align*}
+\noindent where $\Delta t$ is the integration time-step for the discretization
+of~\eqref{eq:hybrid_dynamics}.
+%
+Notice that $\xi_N$ is an affine function of the contact forces $\lambda_N$,
+which allows us to pose the search for $\lambda_N$ as the following quadratic
+optimization problem:
+\begin{equation}
+  \begin{aligned}
+      \underset{\lambda_N}{\textrm{minimize}} 
+      & & &(A_N \lambda_N + b_N)^\top \lambda_N, \\%
+      \textrm{subject to}
+      & & &A_N \lambda_N + b_N \geq 0, \lambda_N \geq 0.
+  \end{aligned}
+  \label{eq:lcp}
+\end{equation}
+\noindent If the linear complementarity problem (LCP) in~\eqref{eq:lcp} has a
+feasible solution, the objective function evaluates to zero.
+
+\begin{figure}[tb]
   \centering
   \begin{tikzpicture}
       \node [](image) at (0,0) {
@@ -259,35 +295,7 @@ This concept is summarized as shown in Table~\ref{tab:complementarity}.
   \caption{Construction of complementarity condition for Coulomb friction}
   \label{fig:tangential_to_complementarity}
 \end{figure}
-
-From \eqref{eq:gamma} and~\eqref{eq:hybrid_dynamics}, we can express $\xi_N$
-as 
-\begin{align*}
-  \xi_N &= W_N^\top \dot{q}^+ + \epsilon_N W_N^\top \dot{q}^-, \\
-  &= W_N^\top M^{-1}[-h \Delta t + W_N \lambda_N] + (1 + \epsilon_N)W_N^\top \dot{q}^-, \\
-  &= \underbrace{W_N^\top M^{-1}W_N}_{A_N} \lambda_N \underbrace{-W_N^\top M^{-1}h \Delta t + (1 + \epsilon_N) W_N^\top \dot{q}^-}_{b_N}, \\
-  &= A_N \lambda_N + b_N,
-\end{align*}
-\noindent where $\dot{q}^-$ and $\dot{q}^+$ represent the pre- and post-impact
-velocities of the system, and $\Delta t$ is the integration time-step for the
-discretization of~\eqref{eq:hybrid_dynamics}.
 %
-Notice that $\xi_N$ is a linear function of the contact forces $\lambda_N$,
-which allows us to pose the search for $\lambda_N$ as the following quadratic
-optimization problem:
-\begin{equation}
-  \begin{aligned}
-      \underset{\lambda_N}{\textrm{minimize}} 
-      & & &(A_N \lambda_N + b_N)^\top \lambda_N, \\%
-      \textrm{subject to}
-      & & &A_N \lambda_N + b_N \geq 0, \lambda_N \geq 0.
-  \end{aligned}
-  \label{eq:lcp}
-\end{equation}
-\noindent If the linear complementarity problem (LCP) in~\eqref{eq:lcp} has a
-feasible solution, the objective function evaluates to zero.
-
-
 With this understanding in mind, we extend the complementarity condition
 in~\eqref{eq:complementarity} to a system with normal and tangential contact
 forces.
@@ -381,12 +389,12 @@ refer the reader to~\cite{glocker2005formulation} for detailed derivation of the
 forms of $A$ and $b$, and present the results as
 \begin{gather*}
     A = \begin{bmatrix}
-      W_N M^{-1} (W_N^\top - W_T^\top \mu) & W_N M^{-1} W_T^\top & 0  \\
-      W_T M^{-1} (W_N^\top - W_T^\top \mu) & W_T M^{-1} W_T^\top & I_k  \\
+      W_N^\top M^{-1} (W_N - W_T \mu) & W_N^\top M^{-1} W_T & 0  \\
+      W_T^\top M^{-1} (W_N - W_T \mu) & W_T^\top M^{-1} W_T & I_k  \\
       2\mu & -I_k & 0
     \end{bmatrix}, \;  b = \begin{bmatrix}
-      W_N M^{-1} h \Delta t + (I_k+\epsilon_N) \gamma_N\\
-      W_T M^{-1} h \Delta t + (I_k+\epsilon_T) \gamma_T\\
+      W_N^\top M^{-1} h \Delta t + (I_k+\epsilon_N) \gamma_N\\
+      W_T^\top M^{-1} h \Delta t + (I_k+\epsilon_T) \gamma_T\\
       0
     \end{bmatrix}, 
 \end{gather*}
@@ -414,6 +422,29 @@ the following feasibility problem:
 \noindent which we can solve for $\lambda_N, \lambda_R, \xi_L$ with various
 optimization techniques. 
 
+%
+\begin{algorithm}[tb]
+  \setstretch{1.2}
+    \caption{Moreau's Time Stepping Algorithm}
+    \label{algo:moreau}
+    \small
+    \hspace*{\algorithmicindent} \textbf{Input}: $x(0) = (q(0), \dot{q}(0))$
+    \begin{algorithmic}[1]
+      \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
+        % \algrenewcommand\algorithmicindent{0em} % No indent
+          \For{$t = 0:\Delta t:T$} \Comment{Time stepping}
+            \State $t_M = t + \nicefrac{\Delta t}{2}$
+            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
+            % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
+            \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
+            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)$\Comment{Apply contact forces}
+            \State $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
+            \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
+          \EndFor
+        \State \textbf{return} $\phi$
+    \end{algorithmic}
+\end{algorithm}
+%
 We follow Moreau's time stepping algorithm~\cite{glocker2005formulation}
 outlined in Algorithm~\eqref{algo:moreau} to numerically integrate the
 dynamics~\eqref{eq:hybrid_dynamics}. 
@@ -437,7 +468,7 @@ in~\eqref{eq:feasibility}.
 While the complementarity constraint can be posed as a feasibility problem, the
 presence of Coulomb friction makes it a non-convex optimization problem. 
 %
-We use a pivoting (basis-exchange) technique called Lemke's
+We use a pivoting (basis-exchange) technique called \textit{Lemke's}
 algorithm~\cite{acary2008numerical} to find the solution to the linear
 complementarity problem~\eqref{eq:feasibility}. The fact that Lemke's algorithm
 may be automatically differentiated to provide the gradients of the pertinent
@@ -448,32 +479,10 @@ We substitute the contact forces $\lambda_N, \lambda_T$ provided by Lemke's
 algorithm into the equations of motion~\eqref{eq:hybrid_dynamics} to compute the
 post-impact velocities as follows:
 \begin{align*}
-  \dot{q}(t+\Delta t) = M^{-1}(W_T^\top \lambda_T + W_N^\top \lambda_N + h\Delta t) + \dot{q}(t)
+  \dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)
 \end{align*}
 %
 This procedure is repeated for time horizon $T$.
-
-\begin{algorithm}[tb]
-  \setstretch{1.2}
-    \caption{Moreau's Time Stepping Algorithm}
-    \label{algo:moreau}
-    \small
-    \hspace*{\algorithmicindent} \textbf{Input}: $x(0) = (q(0), \dot{q}(0))$
-    \begin{algorithmic}[1]
-      \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
-        % \algrenewcommand\algorithmicindent{0em} % No indent
-          \For{$t = 0:\Delta t:T$} \Comment{Time stepping}
-            \State $t_M = t + \nicefrac{\Delta t}{2}$
-            \State $q(t_M) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) $\Comment{Half-time step integration}
-            % \State $\mathcal{H} = \{j \;| \; g_{Nj}(q(t_M)) \leq 0, \; 1 \leq j \leq k\}$
-            \State $\lambda_N, \lambda_T \leftarrow \text{Lemke}(q(t_M), \dot{q}(t))$\Comment{Lemke~\cite{acary2008numerical}} 
-            \State $\dot{q}(t+\Delta t) = M^{-1}(W_T^\top \lambda_T + W_N^\top \lambda_N + h\Delta t) + \dot{q}(t)$\Comment{Apply contact forces}
-            \State $q(t + \Delta t) =  q(t_M) +  (\nicefrac{\Delta t}{2})\dot{q}(t+\Delta t)$
-            \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$\Comment{Save trajectory}
-          \EndFor
-        \State \textbf{return} $\phi$
-    \end{algorithmic}
-\end{algorithm}
 %
 
 \subsection{Mixture of Expert Models}
@@ -506,8 +515,8 @@ network to best fit the dataset.
   \label{fig:oldfaithful}
 \end{figure}
 
-Let $F(x; \theta)$ denote a collection of $N_F$ expert models $F(x;\theta) :=
-\{F_1(x; \theta_1), \dots, \\ F_{N_{F}}(x; \theta_{N_F})\}$, whose parameters
+Let $F(x; \theta)$ denote a collection of $N_F$ expert models $F(x;\theta) =
+\{F_1(x; \theta_1), .. , F_{N_{F}}(x; \theta_{N_F})\}$, whose parameters
 are given by the set $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 The gating network is responsible for dividing the input space $\mathcal{X}

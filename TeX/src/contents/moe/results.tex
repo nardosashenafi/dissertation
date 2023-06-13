@@ -1,32 +1,21 @@
 \section{Experimental Results}
 \label{sec:moe_results}
-We demonstrate the efficacy of the mixture of expert controller in simulation
+
+We demonstrate the efficacy of the MoE controller in simulation
 and real-world experiments.
 %
 In the first case study, we learn a gating network that switches between two
-unstable closed-loop systems to result in a piecewise-stable system.
+marginally stable closed-loop systems to result in a
+piecewise-asymptotically-stable system.
 %
 Then, we find switching MoE controller to swing up the classical cartpole
 mechanism enclosed with wall barriers.
 %
 
-\subsection{Stable Switching Between Unstable Systems}
+\subsection{Switching Linear System}
 
-Suppose we have two linear closed-loop systems of the form 
-\begin{equation}
-    \begin{gathered}
-        \dot{x} = A_1x = \bmat{0 & -1 \\ 2 & 0}x, \\
-        \dot{x} = A_2x = \bmat{0 & -2 \\ 1 & 0}x.
-    \end{gathered}
-    \label{eq:unstable_closedloop}
-\end{equation}
-%
-Even if the individual systems are not stable, it is possible to find a
-state-dependent switching rule that makes the resulting switched system
-stable~\cite{liberzon2003switching}. 
-%
 We find the stable switching scheme through the MoE framework discussed in
-Section~\ref{ssec:mixture_of_experts}.
+Section~\ref{sec:motiviational_application}.
 %
 We aim to learn the parameters $\psi$ of the gating network $\mathbf{P}(x|
 \psi)$ and the expert parameters $\theta_i$ such that the switching system
@@ -34,90 +23,37 @@ converges to the desired equilibrium $x^* = (0, 0)$.
 %
 The gating network is a fully-connected neural net with one hidden layer (2 input states 
 $\rightarrow$ 6 neurons $\rightarrow$ 4 outputs) and an \textsc{Elu} activation
-function~\cite{clevert2015fast}.
+function\cite{clevert2015fast}.
 %
 We constrain the maximum number of state partitions to $4$.
 %
 Each state partition has a corresponding controller parameter $\theta_i \in
 \mathbb{R}$. 
 %
-The control law is a sample from the Bernoulli probability distribution
-\begin{align}
-    F_i(\theta_i) = \begin{cases}
-       0, & \theta_i > \frac{1}{2}, \\
-       1, & \theta_i \leq \frac{1}{2},
-    \end{cases}
-    \label{eq:bernoulli}
-\end{align}
-\noindent where $F_i = 0$ corresponds to the first dynamics $\dot{x} = A_1
-x$ and $F_i=1$ corresponds to $\dot{x} = A_2x$.
-%
-We use the \textsc{Sigmoid} activation function to limit $\theta_i$ between 0
-and 1.
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{switching_results.eps}
+    \subfloat[\label{final_switching_control}Control input]{\hspace{0.5\linewidth}} 
+    \subfloat[\label{final_state_partition}State Partition]{\hspace{0.5\linewidth}}
+    \caption{Final stable switching system}
+    \label{fig:final_switching}
+\end{figure}
 
-We generate a trajectory following the procedure in
-Algorithm~\eqref{algo:switching_A1A2}.
-%
-For the initial state $x_0$, we sample a state partition $i$ from the
-categorical distribution~\eqref{eq:gating_categorical}.
-%
-Then, we sample from the Bernoulli distribution $F_i$ in~\eqref{eq:bernoulli} using the
-parameter $\theta_i$ corresponding to the sampled state partition $i$.
-%
-The expert $F_i$ executes one of the two closed loop systems.
-%
-We repeat this process for time horizon $T$.
-
-\begin{algorithm}
-    \setstretch{1.2}
-      \caption{Stable Switching between Unstable Systems}
-      \label{algo:switching_A1A2}
-      \small
-      \hspace*{\algorithmicindent} \textbf{Input}: $x(0)$
-      \begin{algorithmic}[1]
-        \State $\phi \leftarrow  [x(0)]$ \Comment{Initial States}
-          % \algrenewcommand\algorithmicindent{0em} % No indent
-            \For{$t \in 0:\Delta t:T$} 
-              \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
-              \State $F_i \sim \text{Bernoulli} \Bigl(\textrm{Sigmoid}(\theta_i) \Bigr)$      
-              \State $x(t+\Delta t) = (1-F_i)A_1x(t) + F_i \; A_2x(t) $
-              \State $\phi \leftarrow \phi \cup [x(t+\Delta t)]$
-            \EndFor
-          \State \textbf{return} $\phi$
-      \end{algorithmic}
-  \end{algorithm}
-  
-%
-{\color{red} The likelihood in~\eqref{eq:accumulated_likelihood} is used as the
-performance objective with $\mathcal{Q} = 3I_2, \mathcal{R} = 0$, where $I_2$
-is $2 \times 2$ identity matrix.
-%
-We use forward-mode auto-differentiation in combination with a variant of
-stochastic gradient descent known as \textsc{Adam}~\cite{kingma2014adam} to
-compute the gradient $\nicefrac{\partial \mathbb{L}}{\partial \psi},
-\nicefrac{\partial \mathbb{L}}{\partial \theta_i}$ and update the decision
-parameters.
-%
-Notice that when evaluating the gradient of $\nicefrac{\partial
-\mathbb{L}}{\partial \theta_i}$, the derivative $\nicefrac{\partial
-F_i(\theta_i)}{\partial \theta_i}$ is not well-defined.
-%
-Thus, we explicitly introduce the parameter $\theta_i$ into the likelihood
-without disrupting the structure of the original
-likelihood~\eqref{eq:accumulated_likelihood} as follows:
-\begin{align*}
-    \mathbb{L}(\phi) = \sum_{t=0}^{T}  \sum_{i=1}^{N_F} - \Biggl[\theta_i \ell \Bigl(x(t + \Delta t), F_i(\theta_i) \Bigr) + (1- \theta_i)\ell \Bigl(x(t + \Delta t), F_i(1-\theta_i) \Bigr) \Biggr] P_i\Bigl(x(t)| \psi \Bigr)  .
-\end{align*}
-}
-
-%
 The response of the learned switching system is shown in
 Figure~\ref{fig:final_switching}.
 %
-The training uses only 3 out of the 4 state partitions available.
+Figure~\ref{final_switching_control} shows the single best expert in each state
+partition, where purple corresponds to $F_i=0$ or $\dot{x} = A_1x$ and yellow
+corresponds to $F_i=1$ or $\dot{x} = A_2x$. The sample trajectory starts at $x_0=[-5,
+-5]$ and successfully converges to the origin shown by the red star.
 %
-The state partition in Figure~\ref{fig:final_switching} matches the analytical
-solution to the stable switching system given as~\cite{liberzon2003switching}
+The state partition index of the single best expert is shown in
+Figure~\ref{final_state_partition}, and it depicts that the training uses only 3
+out of the 4 state partitions available.
+%
+The partitions in Figure~\ref{final_state_partition} matches the analytical
+solution to the successful stable switching system given
+by\cite{liberzon2003switching}
 \begin{equation*}
     \dot{x} = \begin{cases}
         A_1x, \; x_1x_2 \leq 0, \\
@@ -126,31 +62,35 @@ solution to the stable switching system given as~\cite{liberzon2003switching}
 \end{equation*}
 \noindent where $x=[x_1, x_2]$.
 %
+
 The training progress is shown in Figure~\ref{fig:switching_training}.
 %
 The three rows in the figure depict the performance of the training after 0, 200
 and 1400 parameter updates, respectively.
 %
-The sampled trajectory on the top left figure shows that the initial parameters
-created unstable switching between the two systems.
+The sample trajectory in Figure~\ref{training_progress_control} shows that the
+initial parameters result in unstable switching between the two systems.
 %
-After only few parameter updates, the training finds a stable switching
+After only 200 parameter updates, the training finds a stable switching
 mechanism, but it does not yet converge to the desired equilibrium $x^*$.
 %
-The explorative state sampling technique visits states close to the desired
-equilibrium, allowing the training to learn the distinct boundaries of each
-partition at the origin. 
-\begin{figure}[tb]
+In order to create an asymptotically stable system, the corners of each state
+partition must intersect at the origin, which the training finds successfully
+after 2000 parameter updates (Figure~\ref{fig:final_switching}).
+%
+This is thanks to the explorative state sampling technique, which samples states
+close to the desired equilibrium, assisting the training in finding the distinct
+boundaries of each partition at the origin. 
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{switching_results.eps}
-    \caption{Final stable switching system. Left: Control input $F_i=\{0, 1\}$ in
-    the state space. Purple corresponds to $F_i=0$ or $\dot{x} = A_1x$. Yellow
-    corresponds to $F_i=1$ or $\dot{x} = A_2x$. The trajectory starts at $x_0=[-5,
-    -5]$ and converges to the origin shown by the red star. Right: State
-    partition from the output of the gating network. The training converged to 3
-    state partitions that can stabilize the system.}
-    \label{fig:final_switching}
+    \includegraphics[width=0.7\linewidth]{switching_training.eps}
+    \subfloat[\label{training_progress_control}Control input]{\hspace{0.5\linewidth}}
+    \subfloat[\label{training_progress_partition}State partition]{\hspace{0.5\linewidth}}
+    \caption{Training progress. The final solution is shown in
+    Figure~\ref{fig:final_switching}}
+    \label{fig:switching_training}
 \end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cartpole with Wall Contacts}
@@ -173,15 +113,6 @@ simulation and real-world experiments.
 %
 Lastly, we compare the performance of the MoE controller against
 a single swing-up controller. 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.87\linewidth]{switching_training.eps}
-    \caption{Training progress. Top row: the control and state partition at the
-    initial parameters. Second row: after 200 parameter updates. Third row:
-    after 1400 parameter updates. The final solution is shown in
-    Figure~\ref{fig:final_switching}}
-    \label{fig:switching_training}
-\end{figure} 
 
 \subsubsection{System Model}
 \label{sssec:cartpole_model}
@@ -203,15 +134,13 @@ wheels is characterized by the coefficient $b=1.2$ \nicefrac{N $\cdot$ sec}{m}.
 %
 The dynamics of the system is given by~\eqref{eq:hybrid_dynamics} where 
 %
-\begin{equation*}
-    M(q) = \bmat{m_c + m_p & -m_p+l_{cm} \cos(\theta_p) \\
-        -m_pl_{cm}\cos(\theta_p) & m_p l_{cm}^2+I_p}, 
-\end{equation*}
 \begin{equation}
     \begin{gathered}
-        C(q, \dot{q}) = \bmat{b  & m_pl_{cm}\sin(\theta_p) \\
-                -m_p\sin(\theta_p)/2 & 0}, \\
-        G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta_p)}^\top, \\
+    M(q) = \bmat{m_c + m_p & -m_p l_{cm} \cos(\theta_p) \\
+        -m_pl_{cm}\cos(\theta_p) & m_p l_{cm}^2+I_p}, \\
+    C(q, \dot{q}) = \bmat{b  & m_pl_{cm}\dot{\theta}_p\sin(\theta_p) \\
+        0 & 0}, \\
+    G(q) = \bmat{0 & -m_pg l_{cm} \sin(\theta_p)}^\top, \\
         B = [1 \; 0]^\top,
     \end{gathered}
 \end{equation}
@@ -254,50 +183,79 @@ t=0.001$.
 \subsubsection{Training}
 \label{sssec:cartpole_training}
 
-We aim to learn the parameters of the experts $\theta_i$ and the gating network
-$\psi$ that swing up the cartpole to the desired state $x^* = (q^*, \dot{q})^* =
-(0, 0)$ under contacts and impacts.
+\begin{table}[b]
+    \centering
+    \caption{Structure of the deep-net experts and the gating network.\label{tab:neural-net-structure}}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    Neural Network & Inputs &  \begin{tabular}{@{}c@{}}Number of neurons \\ in hidden layers\end{tabular} & Outputs\\
+    \hline
+    Expert $F_i(x;\theta_i)$ & $[x_c, \cos(\theta_p), \sin(\theta_p), \dot{x}_c, \dot{\theta}_p]$ & (10, 4) & $u \in \mathbb{R}$\\
+    Gating network $\mathbf{P}(x |\psi)$ & $[x_c, \cos(\theta_p), \sin(\theta_p), \dot{x}_c, \dot{\theta}_p]$ & (4, 3) & [$P_1, P_2, P_3$]\\ 
+    \hline
+  \end{tabular}
+\end{table}
+We aim to learn the parameters $(\psi, \theta)$ of the MoE controller in order to stabilize the 
+cartpole system to the desired state $x^* = (q^*, \dot{q})^* =
+((0, 0), (0, 0))$ under contacts, impacts and Coulomb friction.
 %
 Once the system reaches within a small neighborhood of $x^*$, we employ Linear
-Quadratic Regulator (LQR) to stabilize at the desired equilibrium.
+Quadratic Regulator (LQR) to maintain the system at the desired equilibrium.
 %
-The gating network is a fully-connected neural net with two hidden layers (state
-input $\rightarrow$ 4 neurons $\rightarrow$ 3 neurons $\rightarrow$  3 output).
+The structures of the deep-net experts and gating network are provided in
+Table~\ref{tab:neural-net-structure}.
+%
+% The gating network is a fully-connected
+% neural net with two hidden layers (state input $\rightarrow$ 4 neurons
+% $\rightarrow$ 3 neurons $\rightarrow$  3 output).
 % 
-We constrain the maximum number of state partitions to 3.
+We constrain the maximum number of state partitions to 3, where each partition
+has a local expert $F_i$.
 %
-There are a total of 3 experts $F_i$, each corresponding to a state
-partition.
 %
-The experts are fully-connected neural nets with two hidden layers (state input
-$\rightarrow$ 10 neurons $\rightarrow$ 4 neurons $\rightarrow$  1 output).
+% The experts are fully-connected neural nets with two hidden layers (state input
+% $\rightarrow$ 10 neurons $\rightarrow$ 4 neurons $\rightarrow$  1 output).
 %
 The output of the experts correspond to the force applied on the cart.
 %
 We use minimum trajectory loss (MTL) discussed in
-Section~\ref{ssec:performance_objective} with time horizon $T=1.5$s.
+Section~\ref{ssec:performance_objective} with time horizon $T=1.5$s, where the
+performance metric $\ell$ is given by~\eqref{eq:accumulatedLoss}.
 %
 In each parameter update, we sample $N_{\mathcal{D}}=4$ initial states through
 greedy and explorative techniques.
 %
 
-\subsubsection{Results}
 
-We demonstrate the performance of the MoE controller in simulation and hardware. 
-%
-The hardware is set up as shown in the Figure~\ref{fig:cartpole_hardware}.
-% 
-The cart uses a rack and pinion mechanism to translate on the track with
-zero-slip.
-%
+\subsubsection{Hardware}
+
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.8\linewidth]{cartpole_hardware.jpg}
+    \begin{tikzpicture}
+        \node [](image) at (0,0) {
+            \includegraphics[width=0.65\textwidth]{cartpole_hardware_2.jpg}
+        };
+        \draw[stealth-, ultra thick,red] (-4.2,2.2) -- ++(-2.0, 0.0) node[left,black]{\small Left wall};
+        \draw[stealth-, ultra thick,red] (4.2,2.0) -- ++(1.3, 0.0) node[right,black]{\small Right wall};
+        \draw[stealth-, ultra thick,red] (-0.1,-2.0) -- ++(-5.8, 0.0) node[left,black]{\small Pendulum};
+        \draw[stealth-, ultra thick,red] (2.0,-1.0) -- ++(4.0, 0.0) node[right,black]{\small Track}; 
+        \draw[stealth-, ultra thick,red] (-0.1,-0.3) -- ++(-6.0, 0.0) node[left,black]{\small Cart};
+    \end{tikzpicture}
     \caption{Experimental setup of cartpole with wall contacts}
     \label{fig:cartpole_hardware}
 \end{figure}
+%
+We demonstrate the performance of the MoE controller in simulation and hardware. 
+%
+The hardware (Figure~\ref{fig:cartpole_hardware}), designed and built by
+\textsc{Quanser}\cite{Quanser_2021}, uses a DC-motor to translate the cart on a
+track.
+% 
+The cart uses a rack-and-pinion mechanism to translate on the track with
+zero-slip.
+%
 One of the wheels of the cart is attached to an optical encoder, from which we
-can estimate the position and velocity of the cart.
+estimate the position and velocity of the cart.
 %
 There is also an optical encoder rigidly attached to the pendulum link,
 reporting its orientation. 
@@ -305,131 +263,130 @@ reporting its orientation.
 % Both encoders with resolution $4096$
 % \nicefrac{pulses}{revolution}.
 %
-We use MATLAB/Simulink to evaluate the neural nets and pass voltage commands to
-the DC-motor.
+We evaluate the experts and the gating network in MATLAB/Simulink and pass the
+corresponding voltage commands to the DC-motor via \textsc{Quarc},
+\textsc{Quanser's} real-time control software.
 %
-We convert the force commands output by the MoE controller into voltage
+The force commands output by the MoE controller are converted into voltage
 commands $V(t)$ as follows.
 \begin{align*}
-    V(t) = \frac{u(x(t); \psi, \theta) + A_m \dot{x}_c}{B_m},
+    V(t) = \frac{u(x(t)) + A_m \dot{x}_c(t)}{B_m},
 \end{align*} 
 \noindent where $A_m$ and $B_m$ consist of system parameters of the motor.
 
-\begin{figure}[tb]
+
+\subsubsection{Results}
+
+Figure~\ref{fig:cartpole_trajectory} shows a successful swing-up trajectory
+generated by the MoE controller in simulation and hardware.
+%
+The blue contours correspond to the level sets of the control input $u$ during
+impact ($x_c=0.36m, \dot{x}_c = 0\nicefrac{m}{s}$), and the solid red lines
+depict the boundaries of the state partitions.
+%
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{moe_traj_control.eps}
-    \caption{A sample trajectory starting from downward equilibrium at rest.
-    The contours correspond to the outputs of the MoE controller during impact
-    ($x_c=0.36m, \dot{x}_c = 0\nicefrac{m}{s}$). The solid line
-    splitting the state space horizontally in half shows the boundary between
-    the two state partitions. The state partition shows that the controller must
-    switch from one expert to another in order to catch the pendulum
-    post-impact.}
+    \includegraphics[width=0.5\linewidth]{moe_traj_red_boundaries.eps}
+    \caption{A sample trajectory starting from
+    downward equilibrium at rest. The blue contours represent the level sets of
+    the control input at the pre-impact and post-impact states.}
     \label{fig:cartpole_trajectory}
 \end{figure}
-
-Figure~\ref{fig:cartpole_trajectory} shows a trajectory generated by the MoE
-controllers in simulation and hardware.
 %
-The blue contours represent the level sets of the control input at the
-pre-impact and post-impact states.
-%
-The solid line splitting the state space horizontally in half shows the boundary
-between two state partitions.
-%
-Even though the gating network can provide up to three state partitions, the
-training converges to utilizing only two.
+\noindent Although the gating network can provide up to three state partitions,
+the training converges to utilizing only two.
 %
 Figure~\ref{fig:cartpole_trajectory} shows that the system successfully avoids
 contacts during the swing-up phase, which otherwise would have prevented the
 pendulum from pumping energy from the downward equilibrium.
 %
 By the time the pendulum approaches the upright equilibrium, it is moving at
-such high speed that LQR cannot stabilize it.
+such high speed ($\sim$-6\nicefrac{rad}{s}) that LQR cannot stabilize the
+pendulum to the upright.
 %
 However, we have observed from several trajectories that the system leverages
 the impact from the wall to lower the speed of the pendulum.
 %
-Then, the control law switches between experts as the velocity jumps due to impact.
-%
-The magnitude of the control is such that the MoE controller applies rapid
-braking during contact, allowing LQR to catch the pendulum post-impact.
+During impact, the control law switches experts, where the new expert applies
+rapid braking allowing the LQR to catch the pendulum post-impact.
 %
 The MoE controller achieves successful swing-up in simulation and real-world,
-proving the accuracy in the contact modelling and the robustness of the
+proving the accuracy in the contact model and the robustness of the
 controllers.
 
-\begin{figure}[tb]
-    \centering
-    \includegraphics[width=0.7\linewidth]{gapContourAndBins.eps}
-    \caption{The blue contours represent the level sets of the gap function. The red lines show the boundaries of the state partition. There are a total of two experts, one is active between the red boundaries and the other is responsible for regions outside the red lines.}
-    \label{fig:gapContour}
-\end{figure}
-Figure~\ref{fig:gapContour} shows the relationship between the selected expert
-and the occurrence of potential contacts.
-%
-The red lines represent the boundaries of the state partitions and the contour
-depicts the level sets of the shortest gap between the pendulum and the walls.
-%
-Notice that the states within the boundaries of the red lines have large gap
-values, hence contact events do not occur in this region.
-%
-This shows that the gating network has dedicated one expert for states with low
-risk of contact.
-%
-The regions outside the red boundaries correspond to the second expert, which is
-activated to prevent contact during swing-up and to catch the pendulum just
-after impact, as shown in the trajectory of
-Figure~\ref{fig:cartpole_trajectory}.
-%
-This demonstrates that the state partition depends on the occurrence of
-potential contacts.
-%
-Moreover, the gating network dedicates an expert to leverage the
-advantages or prevent the adverse effects of contacts and impacts.
+% \begin{figure}[tb]
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{gapContourAndBins.eps}
+%     \caption{The blue contours represent the level sets of the gap function. The red lines show the boundaries of the state partition. There are a total of two experts, one is active between the red boundaries and the other is responsible for regions outside the red lines.}
+%     \label{fig:gapContour}
+% \end{figure}
+% Figure~\ref{gap} shows the relationship between the selected expert and the
+% occurrence of potential contacts.
+% %
+% The blue contours depict the level sets of the shortest gap between the pendulum and
+% the walls.
+% %
+% The region enclosed by the red boundaries corresponds to the state partition $i=1$
+% where local expert $F_1(x;\theta_1)$ is executed.
+% %
+% Conversely, expert $F_2(x;\theta_2)$ is responsible for regions outside the red
+% boundaries.
+% %
+% Notice that the states in partition $i=1$ have large gap values, hence there are
+% no potential contacts in this region.
+% %
+% This shows that the gating network has dedicated one expert for states with low
+% risk of contact.
+% %
+% Expert $F_2(x;\theta_2)$ is responsible for states with high risk of contact and
+% from the trajectory in Figure~\ref{control}, this expert prevents contact during the
+% swing-up phase and catches the pendulum just after impact.
+% %
+% This demonstrates that the state partition depends on the occurrence of
+% potential contacts, proving that the MoE controller provides the desirable
+% characteristics of assigning specialized controllers to different modes of a
+% hybrid system.
 %
 
-\begin{figure}[tb]
-    \centering
-    \includegraphics[width=0.6\linewidth]{cont.eps}
-    \caption{A sample trajectory generated by the single controller. }
-    \label{fig:continuous_control}
-\end{figure}
 %
-Lastly, we compare the performance of the MoE controller against a single controller.
+\textbf{Comparison between MoE and single controller}: We compare the
+performance of the MoE controller against a single controller, which can be
+thought of as the MoE controller with $N_F=1$.
 %
-This controller is parameterized by a neural net (state input $\rightarrow$ 10
-neurons $\rightarrow$ 4 neurons $\rightarrow$  1 output) similar to one of the
-mixture experts.
+This controller is parameterized by a neural net, with a similar structure to
+the experts provided in Table~\ref{tab:neural-net-structure}.
 %
-We train the controller with the same minimum trajectory loss and training
+We train the controller with the same minimum trajectory loss (MTL) and training
 parameters as the MoE.
 %
 Once the controller swings the pendulum to the neighborhood of $x^*$, we use LQR
 to stabilize it to the upright.
-%
-%
+
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.7\linewidth]{contANDMOE.eps}
-    \caption{The performance of the MoE controller compared to the single
-    controller in Figure~\ref{fig:continuous_control}}.
+    \includegraphics[width=\linewidth]{continuous_vs_MOE.eps}
+    \subfloat[\label{continuous}Performance of a single controller]{\hspace{0.5\linewidth}} 
+    \subfloat[\label{moe}Performance of the MoE controller]{\hspace{0.5\linewidth}}
+    \caption{Comparison between MoE and a single controller}
     \label{fig:contandmoe}
 \end{figure}
 %
-\noindent As shown in Figure~\ref{fig:continuous_control}, the single controller
-successfully swings up the pendulum closer to the upright.
+As shown in Figure~\ref{continuous}, the single controller
+successfully swings up the pendulum close to the upright.
 %
-However, the controller is not able to catch the pendulum post-impact, because
-the velocity of the pendulum is still too high for LQR to stabilize it.
+However, due to the length of the pendulum and the tight distance between the
+walls, the pendulum inevitably impacts one of the barriers. 
 %
-On the other hand, Figure~\ref{fig:contandmoe} shows the performance of the MoE
+Unfortunately, the LQR is not able to catch the pendulum post-impact, due to the
+high velocity of the pendulum.
+%
+On the other hand, Figure~\ref{moe} shows the performance of the MoE
 controller in the same scenario.
 %
 The MoE solution leverages the switching controllers to apply rapid braking
-post-impact, which lowers the velocity of the pendulum. 
+post-impact, which significantly lowers the velocity of the pendulum. 
 %
 This assists the LQR in catching the pendulum at the appropriate speed.
 %
-This demonstrates the advantages of switching controllers in presence of
+This demonstrates the advantages of switching controllers in the presence of
 multi-modal contact-rich systems.
