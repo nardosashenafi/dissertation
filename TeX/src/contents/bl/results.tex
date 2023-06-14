@@ -595,86 +595,109 @@ posterior.
 
 \subsubsection{Simulated Experiments}
 
-We first show the performance of the deterministic \textsc{NeuralPbc} training
+
+We first show the performance of the deterministic \textsc{NeuralPbc} controller
 on a level ground.
 %
-As shown on the bottom plot of Figure~\ref{fig:deter_rw_trajectory}, the robot
-starts from rest and slowly reaches the desired hip speed.
+As shown in Figure~\ref{fig:deter_rw_trajectory}, the robot starts from rest and
+successfully reaches the desired hip speed.
 %
-The top plot shows that the controller learned to apply large torque
-when the wheel is at rest and then the torso maintains a constant angle, which
-is sufficient to create constant hip speed on level ground.  
+The state of the torso shown in Figure~\ref{fig:deter_rw_torso_orientation}
+demonstrates that the controller applies a large torque when the robot is at
+rest, allowing it to overcome the contact forces exerted from the ground.
 %
-During discrete transitions (shown with dashed-red lines), the angular velocity
-of the torso counteracts the forward motion of the wheel, but a large torque is
-applied quickly to maintain the torso angle.
+Once the rimless wheel gains speed, the controller attempts to maintain a constant
+torso angle, which is sufficient to achieve a steady hip speed on a level ground.  
 %
-The torque plot on Figure~\ref{fig:deter_control} shows that a large
-positive torque is applied if the wheel stumbles backwards.
+The effort to maintain a constant torso angle is counteracted by the contact
+forces from the ground, which result in a discrete transition in torso velocity
+(shown with dashed-red lines in Figure~\ref{fig:deter_rw_torso_orientation}).
 %
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{RW_deter_trajectory2.eps}
-    \caption{Top: Torso orientation and velocity for 10-second trajectory. The
-            solid black lines show the continuous phases and the dashed red
-            lines show discrete transitions. Bottom: Horizontal hip speed}
-    \label{fig:deter_rw_trajectory}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{RW_deterministic_control2.eps}
-    \caption{Torque command to torso as a function of torso angle and horizontal hip speed}
-    \label{fig:deter_control}
-\end{figure}
-We compare the performance of the deterministic and Bayesian controllers as
-follows.
+During these discrete transitions, the momentum of the torso
+counteracts the forward motion of the wheel.
 %
-Similar to the Bayesian training, we sample the terrain elevation from $p_s \sim
-\mathbb{U}(0, p_{max})$ where $p_{max} = [0, 0.5, 1, 1.5, 2]$ centimeters.
+However, the contact-aware controller applies a large torque to quickly maintain
+the desired torso angle.
 %
-As the value of $p_{max}$ increases, the difference in elevation between two consecutive 
-spokes increases.
+This characteristic is best shown in Figure~\ref{fig:deter_control}, which
+displays the torque applied as a function of the hip speed and torso angle. 
 %
-For instance, for $p_{max} = 0.5$, one spoke can be on a level ground and the adjacent spoke can be 
-up to $0.5$ cm higher.
+This figure also shows that a large positive torque is applied if the wheel
+stumbles backwards.
 %
-As $p_{max}$ increases to 2cm, the neighboring spokes can have up to 2cm
-elevation difference, which requires a large torque to overcome the steep rise
-in elevation.
-% 
-For each value of $p_{max}$, we generate 10 random initial states $x_0$ and
-integrate 10-second-long trajectories.
-%
-The cost $J_T$ of each trajectory is calculated as per~\eqref{eq:loss}.
-%
-The bars in Figure~\ref{fig:comparison} show the average $J_T$ over the
-10 trajectories for each $p_{max}$.
-%
-Notice that the Bayesian training consistently incurs less cost in all
-elevation differences compared to its deterministic counterpart.
-%
-The deterministic training accumulates more cost with each increment in the
-value of $p_{max}$, while the Bayesian training incurs a relatively consistent
-cost across all values of $p_{max}$. 
-%
-This demonstrates the improved robustness properties of Bayesian
-\textsc{NeuralPbc} under uneven terrain.
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.6\linewidth]{simulationComparison.eps}
-    \caption{Comparison of deterministic and Bayesian control for the rimless wheel.}
-    \label{fig:comparison}
+    \includegraphics[width=.47\linewidth]{rw_deter_level.eps}\hfill
+    \includegraphics[width=.47\linewidth]{torso_state.eps}
+    \subfloat[\label{fig:deter_rw_trajectory}Hip horizontal speed]{\hspace{0.5\textwidth}}
+    \subfloat[\label{fig:deter_rw_torso_orientation}Torso state]{\hspace{0.5\textwidth}}
+    \caption{Performance of the deterministic \textsc{NeuralPBC} controller on level ground in simulation}
+    \label{fig:deter_rw_level}
+\end{figure}
+%
+We compare the performances of the two controllers in simulation as follows.
+%
+Both controllers are tested in a simulated environment with randomized terrain
+elevations under each spoke.
+%
+Similar to the Bayesian training, we sample the terrain elevation from the
+uniform distribution $p_s \sim \mathcal{U}(0, p_{\text{max}})$ where
+$p_{\text{max}} = [0, 0.5, 1, 1.5, 2]$ centimeters.
+%
+For each value of $p_{\text{max}}$, we generate 10 random initial states $(q_0,
+\dot{q}_0)$ and integrate 10-second long trajectories.
+%
+The cost of each trajectory is calculated as per~\eqref{eq:loss}.
+%
+The bars in Figure~\ref{fig:simulationComparison} show the average running cost
+$J$ accumulated over the 10 trajectories, which is given
+by~\eqref{eq:expectation_running_cost} for each $p_{\text{max}}$.
+%and the error band represents the standard deviation over the accumulated losses.
+%
+As expected, without the knowledge of the uneven terrain, the deterministic controller
+accumulates more cost as $p_{\text{max}}$ increases.
+%
+Conversely, the Bayesian training accumulates less cost that its deterministic
+counterpart for all values of $p_{\text{max}}$.
+%
+
+\begin{figure}[tb]
+    \centering
+    \begin{minipage}{0.48\linewidth}
+        \includegraphics[width=\columnwidth]{rw_deter_control.eps}
+        \caption{Deterministic \textsc{NeuralPbc}: Torque command to torso as a function of torso angle and horizontal hip speed}
+        \label{fig:deter_control}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\linewidth}
+        \includegraphics[width=0.8\columnwidth]{simulationComparison.eps}    
+        \caption{Comparison of deterministic and Bayesian frameworks in uncertain terrain elevation}
+        \label{fig:simulationComparison}    
+    \end{minipage}
 \end{figure}
 
-\subsubsection{Real-World Experiments}
+\subsection{Real-World Experiments}
 
-We test the performance of both the deterministic and Bayesian controllers on
-the hardware shown in Figures~\ref{fig:hardware} and~\ref{fig:rw_picture}.
+% \begin{figure}[tb]
+%     \centering
+%     \begin{tikzpicture}
+%         \node [](image) at (0,0) {
+%             \includegraphics[width=0.4\linewidth]{rendering.eps}
+%         };
+%         \draw[stealth-, ultra thick,red] (-0.2,-0.8) -- ++(-3.0,0.0) node[left,black]{\small Motor};
+%         \draw[stealth-, ultra thick,red] (-0.75,-0.3) -- ++(-2.5,0.0) node[left,black]{\small Belt drive};
+%         \draw[stealth-, ultra thick,red] (-0.3,0.2) -- ++(-2.5,0.0) node[left,black]{\small Drive shaft};
+%         \draw[stealth-, ultra thick,red] (-0.7,3.5) -- ++(-2.0,0.0) node[left,black]{\small Rubber feet};
+%         \draw[stealth-, ultra thick,red] (-1.75,3.0) -- ++(-0.5,0.0) node[left,black]{\small Preloaded springs};
+%     \end{tikzpicture}
+%     \caption{Rimless Wheel Assembly}
+%     \label{fig:hardware}
+% \end{figure}
 %
-The robot consists of two set of $10$ spokes for stability.
+We test the performance of both controllers on the hardware shown in
+Figure~\ref{fig:hardware}.
+%
+The robot consists of two set of $N_s=10$ spokes for stability.
 %
 The torso holds two ODrive v3.6 brushless DC motors, which actuate the drive
 shaft through a belt-drive system.
@@ -694,9 +717,30 @@ the motors, a Raspberry Pi 3B and a Teensy microcontroller.
 We evaluate the neural networks on a laptop and exchange sensor readings and
 torque commands with the Raspberry Pi via ROS wireless communication protocols.
 
+\begin{wrapfigure}{r}{0.6\textwidth}
+    \vspace{-5mm}
+     \begin{center}
+        \begin{tikzpicture}
+            \node [](image) at (0,0) {
+                \includegraphics[width=0.7\linewidth]{rendering.eps}
+            };
+            \draw[stealth-, ultra thick,red] (-0.2,-0.8) -- ++(-3.0,0.0) node[left,black]{\small Motor};
+            \draw[stealth-, ultra thick,red] (-0.75,-0.3) -- ++(-2.5,0.0) node[left,black]{\small Belt drive};
+            \draw[stealth-, ultra thick,red] (-0.3,0.2) -- ++(-2.5,0.0) node[left,black]{\small Drive shaft};
+            \draw[stealth-, ultra thick,red] (-0.7,3.5) -- ++(-2.0,0.0) node[left,black]{\small Rubber feet};
+            \draw[stealth-, ultra thick,red] (-1.75,3.0) -- ++(-0.5,0.0) node[left,black]{\small Preloaded springs};
+        \end{tikzpicture}
+     \vspace{-5mm}
+     \end{center}
+    %  \vspace{-7mm}
+     \caption{Rimless Wheel Assembly}
+     \label{fig:hardware}
+     \vspace{-5mm}
+\end{wrapfigure}
+
 Figures~\ref{fig:deter_even} and~\ref{fig:bayes_even} show the horizontal hip
 speed achieved by the deterministic and Bayesian controllers, respectively, on
-the hardware.
+a level terrain.
 %
 The real-world experiments exhibit very similar behavior to the simulation
 results shown in Figure~\ref{fig:deter_rw_trajectory}.
@@ -710,36 +754,75 @@ to react to the energy loss due to impacts.
 Compared to the deterministic controller, the Bayesian controller exhibits spikes
 in hip speed.
 %
-This is due to the marginalizing scheme, which randomly samples parameters
-that result in a high torque in order to overcome large changes in elevation.
+This is due to the marginalizing scheme, which randomly samples parameters that
+result in a high torque, allowing the robot to overcome large changes in elevation.
 %
-This behavior is very beneficial in preventing the mechanism from stumbling due
-to impacts on uneven terrain. 
+This behavior is very beneficial in preventing the mechanism from
+\textit{stumbling} due to impacts on uneven terrain. 
+%
+%
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\columnwidth]{robot_uneven_terrain.png}
+%     \caption{Robot on uneven terrain}
+%     \label{fig:robot_on_uneven_terrain}
+% \end{figure}
 
+We depict the performances of the deterministic and Bayesian \textsc{NeuralPbc}
+controllers on uneven terrain in Figures~\ref{fig:deter_uneven}
+and~\ref{fig:bayes_uneven}, respectively.
+%
+The robot experiences impact forces from the troughs and peaks in the terrain,
+where the troughs naturally tumble the robot forward causing the hip to accelerate
+while the peaks instantaneously decelerate the robot.  
+%
+The distinction between the deterministic and Bayesian controllers lies in how
+they recover from these impact forces and how well they achieve the desired
+speed.
+%
+Compared to the deterministic controller, which stumbles from the impact
+forces of the ground, the Bayesian controller successfully overcomes the troughs
+and peaks while maintaining its average speed around the desired hip speed.
+%
+In \textit{all} the experimental runs, the Bayesian controller successfully
+traverses the track without stumbling. 
+%
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\columnwidth]{rendering.JPG}
-    \caption{Rimless Wheel Assembly}
-    \label{fig:hardware}
+    \includegraphics[width=.49\linewidth]{deter_even.eps}\hfill
+    \includegraphics[width=.49\linewidth]{bayes_even.eps}
+    \subfloat[\label{fig:deter_even}Deterministic \textsc{NeuralPBC}]{\hspace{0.5\textwidth}}
+    \subfloat[\label{fig:bayes_even}Bayesian \textsc{NeuralPBC}]{\hspace{0.5\textwidth}}
+    \caption{Performance of the deterministic and Bayesian \textsc{NeuralPBC} controllers on level ground}
+    \label{fig:deter_vs_bayes_hardware_even}
 \end{figure}
+%
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\columnwidth]{rimlesswheel_hardware.jpg}
-    \caption{Rimless Wheel Hardware}
-    \label{fig:rw_picture}
+    \begin{minipage}{0.47\linewidth}
+        \begin{tikzpicture}
+            \node [](image) at (0,0) {
+                \includegraphics[width=\linewidth]{deter_uneven.eps}
+            };
+            \draw[-stealth, very thick,blue] (1.5,-1.0) -- ++(1.0,0.8) node[above,black]{\footnotesize Robot stumbles};
+            \draw[-stealth, very thick,blue] (-2.2,1.9) -- ++(0.6,0.4) node[right,black]{\footnotesize Contact with trough};
+        \end{tikzpicture}
+    \end{minipage}\hfill
+    \begin{minipage}{0.47\linewidth}
+        \begin{tikzpicture}
+            \node [](image) at (0,0) {
+                \includegraphics[width=\linewidth]{bayes_uneven.eps}
+            };
+            \draw[-stealth, very thick,blue] (1.5,-1.5) -- ++(0.5,-0.1) node[right, black, text width=2cm]{\footnotesize Contact with peak};
+            \draw[-stealth, very thick,blue] (-1.2,1.9) -- ++(0.3,-0.1) node[right, black, text width=2cm]{\footnotesize Contact with trough};
+        \end{tikzpicture}
+    \end{minipage}
+    \subfloat[\label{fig:deter_uneven}Deterministic \textsc{NeuralPBC}]{\hspace{0.5\textwidth}}
+    \subfloat[\label{fig:bayes_uneven}Bayesian \textsc{NeuralPBC}]{\hspace{0.5\textwidth}}
+    \caption{Performance of the deterministic and Bayesian \textsc{NeuralPBC} controllers on uneven terrain}
+    \label{fig:deter_vs_bayes_hardware_UNeven}
 \end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\columnwidth]{deter_even.eps}
-    \caption{Trajectory generated by deterministic controller}
-    \label{fig:deter_even}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{bayes_even.eps}
-    \caption{Trajectory generated by Bayesian controller}
-    \label{fig:bayes_even}
-\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Bayesian Neural Interconnection and Damping Assignment PBC}

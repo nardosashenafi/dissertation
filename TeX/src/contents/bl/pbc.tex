@@ -277,7 +277,7 @@ problem.
                 \EndFor
             \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_{\theta}} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
             \EndFor
-            \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
+            \State $z \gets z + \alpha \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
             \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
             \State $i \;\:\gets i + 1$
             \EndWhile
@@ -587,7 +587,7 @@ auto-differentiation techniques.
             \State $\phi$ = Moreau($x_0$) \Comment Algorithm~\eqref{algo:moreau}
             \State $J \gets J + \ell(\phi; \theta)/N_{\mathcal{D}}$ \Comment{Batch loss}
         \EndFor
-        \State $\theta \gets \theta + \alpha_i \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
+        \State $\theta \gets \theta - \alpha \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
         \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
@@ -689,7 +689,7 @@ pre-selected posterior $Q(\theta;z)$.
             \EndFor
         \State $\mathcal{L} \gets \mathcal{L} + \frac{1}{N_{\theta}} \left(\log[P(J | \theta) P(\theta)] - \log[Q(\theta;z)]\right)$
         \EndFor
-        \State $z \gets z + \alpha_i \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
+        \State $z \gets z + \alpha \nicefrac{\partial \mathcal{L}}{\partial z}$\Comment{SGD step}
         \State $\mathcal{D}_N \gets \{x_0\}_{(N_{\mathcal{D}})}$\Comment{New initial state samples}
         \State $i \;\:\gets i + 1$
         \EndWhile
