@@ -514,7 +514,7 @@ dynamics~\eqref{eq:hybrid_dynamics}.
 In this procedure, we first use the kinematics of the system to evaluate the
 position vector $q$ after a half-time step as
 \begin{align*}
-  q(t+\nicefrac{\Delta t}{2}) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t) 
+  q(t+\nicefrac{\Delta t}{2}) = q(t) +  (\nicefrac{\Delta t}{2}) \dot{q}(t), 
 \end{align*}
 %
 This allows us to check the gap functions for possible penetration between
@@ -541,7 +541,7 @@ We substitute the contact forces $\lambda_N, \lambda_T$ provided by Lemke's
 algorithm into the equations of motion~\eqref{eq:hybrid_dynamics} to compute the
 post-impact velocities as follows:
 \begin{align*}
-  \dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t)
+  \dot{q}(t+\Delta t) = M^{-1}(W_T \lambda_T + W_N \lambda_N + h\Delta t) + \dot{q}(t),
 \end{align*}
 %
 This procedure is repeated for time horizon $T$.
@@ -573,7 +573,7 @@ Let $F(x; \theta)$ denote a collection of $N_F$ expert models $F(x;\theta) =
 are given by the set $\theta=\{\theta_1, \dots, \theta_{N_{F}} \}$.
 %
 The gating network is responsible for dividing the input space $\mathcal{X}
-\subset \mathbb{R}^m$ into \textit{state partitions}, and assigning local expert
+\subset \mathbb{R}^{2m}$ into \textit{state partitions}, and assigning local expert
 models capable of providing specialized predictions for each partition.
 %
 % The task of the gating network can be viewed as dividing the input space

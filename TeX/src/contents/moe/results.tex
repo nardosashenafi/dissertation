@@ -284,6 +284,9 @@ The blue contours correspond to the level sets of the control input $u$ during
 impact ($x_c=0.36m, \dot{x}_c = 0\nicefrac{m}{s}$), and the solid red lines
 depict the boundaries of the state partitions.
 %
+Although the gating network can provide up to three state partitions,
+the training converges to utilizing only two.
+%
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{moe_traj_red_boundaries.eps}
@@ -293,10 +296,7 @@ depict the boundaries of the state partitions.
     \label{fig:cartpole_trajectory}
 \end{figure}
 %
-\noindent Although the gating network can provide up to three state partitions,
-the training converges to utilizing only two.
-%
-Figure~\ref{fig:cartpole_trajectory} shows that the system successfully avoids
+\noindent Figure~\ref{fig:cartpole_trajectory} shows that the system successfully avoids
 contacts during the swing-up phase, which otherwise would have prevented the
 pendulum from pumping energy from the downward equilibrium.
 %
