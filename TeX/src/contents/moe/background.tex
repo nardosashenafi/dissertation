@@ -1,15 +1,22 @@
 
 \section{Background}
 
+In this chapter, we provide an automatic approach to finding multi-modal
+controllers for multi-modal dynamical systems.
+%
+This technique poses the mixture of experts framework from vanilla-supervised
+learning as a data-driven optimal control search problem with the goal of
+stabilizing the system across contact modes.
+%
+We use a high-fidelity contact model to generate the state-observation datasets
+on which this automated approach trains.
+%
 In this section, we provide a summary to contact modeling with the linear
 complementarity formulation presented in~\cite{glocker2005formulation}.
 %
 We also provide a brief introduction to the mixture of experts architecture and
 its uses in machine learning.
 %
-In Section~\ref{sec:moe_methods}, we utilize the high-fidelity models obtained
-from the linear complementarity formulation in order to design contact-aware
-mixture of expert controllers through data-driven techniques.
 
 \subsection{Contact Modeling with Linear Complementarity Problem}
 
@@ -505,15 +512,6 @@ data~\cite{harkonen2022mixtures}.
 The objective is to learn the parameters of each local experts and the gating
 network to best fit the dataset.
 %
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=\linewidth]{moe_background.eps}
-  \subfloat[\label{one_model}Multi-modal dataset fit with one model]{\hspace{0.5\linewidth}} 
-  \subfloat[\label{moes}Multi-modal dataset fit
-  with MoE]{\hspace{0.5\linewidth}} \caption{Comparison of multi-modal dataset
-  fit with one regression model and MoE }{\hspace{0.5\linewidth}}
-  \label{fig:oldfaithful}
-\end{figure}
 
 Let $F(x; \theta)$ denote a collection of $N_F$ expert models $F(x;\theta) =
 \{F_1(x; \theta_1), .. , F_{N_{F}}(x; \theta_{N_F})\}$, whose parameters
@@ -560,6 +558,15 @@ network\cite{chen2022towards}
 % Compared to the prediction in~\eqref{eq:weighted_sum}, the outputs from the
 % single best expert provide specialized predictions capable of exhibiting
 % discontinuous outputs at the boundaries of the state partitions.
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{moe_background.eps}
+  \subfloat[\label{one_model}Multi-modal dataset fit with one model]{\hspace{0.5\linewidth}} 
+  \subfloat[\label{moes}Multi-modal dataset fit
+  with MoE]{\hspace{0.5\linewidth}} \caption{Comparison of multi-modal dataset
+  fit with one regression model and MoE }{\hspace{0.5\linewidth}}
+  \label{fig:oldfaithful}
+\end{figure}
 
 \textbf{Model Structure}: The expert models and the gating network can take
 several forms. 

@@ -1,11 +1,23 @@
 \section{Background}
 
+In this chapter, we present a robust data-driven control design approach for
+contact-rich systems operating under system parameter and/or measurement
+uncertainties.
+%
+This technique leverages the stability properties inherent to passivity-based
+control and injects the robustness properties innate to Bayesian learning.
+%
+The resulting approach provides a healthy balance between the structure and
+thoroughness of classical control techniques and the flexibility and robustness
+of data-driven frameworks. 
+%
 In this section, we provide a brief summary to passivity-based control and the
-recent data-driven variant our group has introduced in~\cite{ashenafi2022robust,
+recent data-driven variant we introduced in~\cite{ashenafi2022robust,
 sirichotiyakul2022data, acc}.
 %
 We also motivate the advantages of the Bayesian learning framework in
 uncertainty modeling and robust control.
+
 \subsection{Passivity-Based Control (PBC)}
 \label{ssec:pbc}
 
@@ -127,7 +139,7 @@ optimization scheme:
       & & & \ell \left(\phi,u^{\theta} \right) , \\%
       \textrm{subject to}
       & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
-      & & u^{\theta} &= -\Omega^{\dagger} \nabla_q H_d^{\theta} - K_v^{\theta} \Omega^\top \nabla_p H_d^{\theta},%
+      & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H^{\theta}),%
       % & \quad x(0) &= x_0 \in \mathcal{X}, \\%
   \end{aligned}
   \label{eq:neural_pbc_finite_optim}
@@ -252,7 +264,7 @@ The activation function is chosen such that $\sigma(0) = 0$, ensuring that
 $\Phi(0) = 0$ and $\Phi(x) > 0, x \ne 0$.
 %
 Several choices of activation functions that satisfy these properties include
-\textsc{Elu}, \textsc{Tanh} and \textsc{Relu}.
+\textsc{Elu}, \textsc{Tanh} and \textsc{Relu}~\cite{sharma2017activation}.
 %
 
 
