@@ -258,12 +258,16 @@ of the contact forces.
 %
 From \eqref{eq:gamma} and~\eqref{eq:hybrid_dynamics}, we can express $\xi_N$
 as 
-\begin{align*}
-  \xi_N &= W_N^\top \dot{q}^+ + \epsilon_N W_N^\top \dot{q}^-, \\
-  &= W_N^\top M^{-1}[-h \Delta t + W_N \lambda_N] + (1 + \epsilon_N)W_N^\top \dot{q}^-, \\
-  &= \underbrace{W_N^\top M^{-1}W_N}_{A_N} \lambda_N \underbrace{-W_N^\top M^{-1}h \Delta t + (1 + \epsilon_N) W_N^\top \dot{q}^-}_{b_N}, \\
-  &= A_N \lambda_N + b_N,
-\end{align*}
+\begin{equation}
+  \begin{aligned}
+    \xi_N &= W_N^\top \dot{q}^+ + \epsilon_N W_N^\top \dot{q}^-, \\
+    &= W_N^\top M^{-1}[-h \Delta t + W_N \lambda_N] + (1 + \epsilon_N)W_N^\top \dot{q}^-, \\
+    &= \underbrace{W_N^\top M^{-1}W_N}_{A_N} \lambda_N \underbrace{-W_N^\top M^{-1}h \Delta t + (1 + \epsilon_N) W_N^\top \dot{q}^-}_{b_N}, \\
+    &= A_N \lambda_N + b_N,
+  \end{aligned}
+  \label{eq:Ab}
+\end{equation}
+
 \noindent where $\Delta t$ is the integration time-step for the discretization
 of~\eqref{eq:hybrid_dynamics}.
 %
@@ -281,28 +285,59 @@ optimization problem:
 \end{equation}
 \noindent If the linear complementarity problem (LCP) in~\eqref{eq:lcp} has a
 feasible solution, the objective function evaluates to zero.
+%
 
+\textbf{Example:} In this example, we use the linear complementarity problem
+in~\eqref{eq:lcp} to evaluate the normal contact force exerted on the bouncing
+ball shown in Figure~\ref{fig:bouncing_ball_sketch}, where there are $k=1$
+potential contacts. 
+%
+With the assumption that the ball is bouncing on a static and flat surface, we can compute 
+the gap between the ball and the surface as $g_N = y$.
+%
+The normal relative velocity is given by
+\begin{align*}
+  \dot{g}_N = \gamma_N = \underbrace{[0 \; 1]}_{W_N^\top} \bmat{\dot{x} \\ \dot{y}},
+\end{align*} 
+%
 \begin{figure}[tb]
   \centering
-  \begin{tikzpicture}
-      \node [](image) at (0,0) {
-          \includegraphics[width=0.9\textwidth]{tangential_to_complementary.eps}
-      };
-      \node[] at (-5.1, 1.8) {\small $\lambda_T$};
-      \node[] at (-4.0, -0.4) {\small $\xi_T$};
-      \node[] at (0.2, 2.0) {\small $\lambda_T$};
-      \node[] at (-1.9, -0.3) {\small $\xi_L$};
-      \node[] at (1.9, -0.3) {\small $\xi_R$};
-      \node[] at (3.8, 2.0) {\small $\lambda_L = \mu \lambda_N - \lambda_T$};
-      \node[] at (7.0, 2.0) {\small $\lambda_R = \mu \lambda_N + \lambda_T$};
-      \node[] at (3.8, -0.3) {\small $\xi_L$};
-      \node[] at (7.6, -0.3) {\small $\xi_R$};
-      % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
-  \end{tikzpicture}
-  \caption{Construction of complementarity condition for Coulomb friction}
-  \label{fig:tangential_to_complementarity}
+  \includegraphics[width=.47\linewidth]{bouncingball.eps}\hfill
+  \includegraphics[width=.45\linewidth]{bouncingball_resolved.eps}
+  \subfloat[\label{fig:bouncingball}Stages of a bouncing ball]{\hspace{0.5\textwidth}}
+  \subfloat[\label{fig:bouncingball_resolved}Illustration of the complementarity condition for the bouncing ball]{\hspace{0.5\textwidth}}
+  \caption{The bouncing ball}
+  \label{fig:bouncing_ball_sketch}
 \end{figure}
+
+From the Euler-Lagrange equations, we can find the dynamics of the system to be 
+\begin{align*}
+  M \dd q + h \dd t - W_N \dd \lambda_N  = 0,
+\end{align*}
+\noindent where $q = (x,y)$ consists the 2D configuration of the ball. The mass
+matrix and the gravity terms are given by  
+\begin{align*}
+  M = \bmat{m & 0 \\ 0 & m}, \; h = \bmat{0 \\ mg},
+\end{align*}
+\noindent where $m$ is the mass of the ball and $g$ is the acceleration due to
+gravity.
 %
+With these definitions, we construct $A_N$ and $b_N$ as per~\eqref{eq:Ab}, where
+\begin{align*} 
+  A_N = 1/m, \;
+  b_N = g \Delta t + (1+\epsilon_N)\dot{y}.
+\end{align*}
+Hence, the complementarity condition for the bouncing ball is
+\begin{align*}
+  \Bigl(\frac{\lambda_N}{m} + g \Delta t + (1+\epsilon_N)\dot{y}\Bigr)\lambda_N = 0.
+\end{align*} 
+%
+We can use the Karush-Kuhn-Tucker (KKT) conditions~\cite{hu2012linear} to ensure
+that the solution $\lambda_N$ to the LCP obeys the non-negativity constraints
+$A_N \lambda_N + b_N \geq 0, \lambda_N \geq 0$.
+
+
+
 With this understanding in mind, we extend the complementarity condition
 in~\eqref{eq:complementarity} to a system with normal and tangential contact
 forces.
@@ -367,6 +402,26 @@ The new quantities $\lambda_R$ and $\lambda_L$ are defined as~\cite{glocker2005f
 \end{equation}
 where $\xi_T = \xi_R - \xi_L$.
 %
+\begin{figure}[tb]
+  \centering
+  \begin{tikzpicture}
+      \node [](image) at (0,0) {
+          \includegraphics[width=0.9\textwidth]{tangential_to_complementary.eps}
+      };
+      \node[] at (-5.1, 1.8) {\small $\lambda_T$};
+      \node[] at (-4.0, -0.4) {\small $\xi_T$};
+      \node[] at (0.2, 2.0) {\small $\lambda_T$};
+      \node[] at (-1.9, -0.3) {\small $\xi_L$};
+      \node[] at (1.9, -0.3) {\small $\xi_R$};
+      \node[] at (3.8, 2.0) {\small $\lambda_L = \mu \lambda_N - \lambda_T$};
+      \node[] at (7.0, 2.0) {\small $\lambda_R = \mu \lambda_N + \lambda_T$};
+      \node[] at (3.8, -0.3) {\small $\xi_L$};
+      \node[] at (7.6, -0.3) {\small $\xi_R$};
+      % \draw[-stealth, dotted, very thick,black] (-0.7,-1.8) -- ++(1.2,5.0) node[above right,black,fill=white]{\small $\hat{n}$};
+  \end{tikzpicture}
+  \caption{Construction of complementarity condition for Coulomb friction}
+  \label{fig:tangential_to_complementarity}
+\end{figure}
 
 From the dynamics in~\eqref{eq:hybrid_dynamics}, $\xi_N, \xi_R$ and $\xi_L$ can
 be expressed as an affine function of the contact forces $\lambda_N, \lambda_R$

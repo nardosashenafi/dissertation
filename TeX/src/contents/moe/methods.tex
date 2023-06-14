@@ -444,7 +444,7 @@ adaptive learning rates $\alpha$.
           \While{$i < $ \texttt{maximum iteration}}
           \State $J \gets 0$\Comment{Batch loss}
           \For{$x_0 \in \mathcal {D}_N$}
-              \State $\mathbb{L}$ = \texttt{Performance objective}($x_0, \psi, \theta$) \Comment{Algorithm~\eqref{algo:accumulated_loss} or~\eqref{algo:mtl}}
+              \State $\mathbb{L}$ = \texttt{cost}($x_0, \psi, \theta$) \Comment{Algorithm~\eqref{algo:accumulated_loss} or~\eqref{algo:mtl}}
               \State $J \gets J + \mathbb{L}/N_{\mathcal{D}}$ 
           \EndFor
           \State $\theta \gets \theta - \alpha \nicefrac{\partial J}{\partial \theta}$\Comment{SGD step}
