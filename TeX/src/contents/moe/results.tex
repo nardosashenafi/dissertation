@@ -166,15 +166,13 @@ t=0.001$.
     \begin{tikzpicture}
     
         \node [](image) at (0,0) {
-            \includegraphics[width=0.5\textwidth]{cartpole.eps}
+            \includegraphics[width=0.5\textwidth]{cartpole_sketch2.eps}
         };
-        \draw[dotted, very thick,black] (0.1,-1.5) -- ++(0.0,3.5);
-        \draw[-stealth, very thick,black]  (0.1,0.0) arc (90:50:1.0); 
-        \node[] at (0.4,0.3) {\small $\theta_p$};
-        \draw[-stealth, very thick,black] (0.0,1.5) -- ++(-3.6, 0.0) node[above right,black]{\small $d=0.45$m};
-        \draw[-stealth, very thick,black] (0.1,-1.5) -- ++(2.0, 0.0) node[above,black]{\small $x_c$};
-
-        
+        \draw[dotted, very thick,black] (0.1,-1.8) -- ++(0.0,4.0);
+        \draw[-stealth, very thick,black]  (0.1,0.0) arc (90:140:1); 
+        \node[] at (-0.3,0.3) {\small $\theta_p$};
+        \draw[-stealth, very thick,black] (0.1,1.1) -- ++(-3.8, 0.0) node[above right,black]{\small $d=0.45$m};
+        \draw[-stealth, very thick,black] (0.1,-1.2) -- ++(1.7, 0.0) node[above,black]{\small $x_c$};
     \end{tikzpicture}
     \caption{Cartpole with wall contacts}
     \label{fig:cartpole_contact}
