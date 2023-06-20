@@ -10,35 +10,83 @@ For example, a humanoid bipedal robot consists of two potential contacts between
 the legs and the ground.
 %
 If we only observe the contact forces exerted on one of the legs, we can find a
-total of three modes~\cite{underactuated}.
+total of two modes~\cite{underactuated}.
 %
 In the first mode, called the \textit{swing mode}, the leg swings forward in the
 air while balancing off of the other; this phase is governed by a continuous
 dynamics with no contact forces on one of the legs. 
 %
-Then follows the \textit{heel strike mode}, where the leg impacts the ground,
-causing a discrete state transition.
+The second mode is the \textit{stance mode}, where the foot makes a persisting
+contact with the ground and leverages the friction to balance the rest of the
+mechanism.
 %
-Lastly, the leg goes into the \textit{stance mode}, where it leverages the
-contact force and friction from the ground to balance the rest of the mechanism.
+These modes are connected by the \textit{heel strike guard}, where the leg
+impacts the ground, causing a discrete state transition. 
 %
-Each one of these modes have a distinct dynamic behavior governed by unique
-equations of motion.
+Each one of these modes and their guard have a distinct dynamic behavior
+governed by unique equations of motion, which can be written in a compact manner
+as\cite{goebel2009hybrid}
+\begin{equation}
+    \begin{cases}
+        \dot{x} \in f(x, u), & x \in C,\\
+        x^+ \in g(x, u), & x \in D,
+    \end{cases}
+    \label{eq:cont_and_guards}
+\end{equation}
+\noindent where $x \in \mathbb{R}^m$ is the state vector, and $u \in
+\mathbb{R}^n$ is the input.
 %
+The set-valued mappings $f: \mathbb{R}^m \times \mathbb{R}^n \rightarrow
+\mathbb{R}^m$ and $g: \mathbb{R}^m \times \mathbb{R}^n \rightarrow \mathbb{R}^m$
+denote the flow and jump maps, respectively, where $C$ and $D$ are subsets of
+$\mathbb{R}^m$ consisting of the feasible states under the flow and jump
+rules, respectively. 
+%
+The notation $x^+$ indicates the state resulted by the jump rule $g$.
 
-Controlling such multi-modal systems comes with two main complications. First,
-it may be impossible to find a single policy that can achieve the desired
+\begin{wrapfigure}{r}{0.42\textwidth}
+    \vspace{-9mm}
+     \begin{center}
+     \includegraphics[width=0.43\textwidth]{primitives.eps}
+     \vspace{-5mm}
+     \end{center}
+     \vspace{-2mm}
+     \caption{Manipulation primitive sequence for manuvering a box past an obstacle}
+     \label{fig:primitives}
+     \vspace{-5mm}
+\end{wrapfigure}
+%
+Controlling such multi-modal systems presents two main complications. 
+%
+First, it may be impossible to find a single policy that can achieve the desired
 performance in all modes of the hybrid system.
 %
-In these scenarios, we can detect event triggers during mode changes
-and switch between several controllers.
+A typical approach is splitting tasks into \textit{manipulation
+primitives}\cite{nonprehensile_survey,rodyman,lynch2003control}, such as
+sliding, jumping, and toppling, where each primitive has a corresponding
+dynamics and is assigned its own controller. 
 %
-An example of such technique is fuzzy control~\cite{kahraman2020fuzzy,
-katic2003survey}, which is commonly used to generate if-then rules for the
-control of bipedal robots. 
+Consider the task of moving a box past an obstacle using a series of primitives
+such as sliding, toppling and reorienting as shown in
+Figure~\ref{fig:primitives}.
 %
-However, such techniques do not scale well to
-contact-rich systems with numerous modes. 
+Each primitive has a region of applicability in the state space, where the
+dynamics of that primitive describes the flow of the
+system\cite{lynch1999dynamic}.
+%
+Thus, manipulation planning involves identifying a successful primitive
+sequence, such as the order of primitives shown in Figure~\ref{fig:primitives},
+and stabilizing the system under each
+primitive\cite{erdmann1998exploration,yashima2003randomized}.  
+%
+This approach can be viewed as partitioning the state space and allocating a
+control law in each subdomain that results in a successful transition to the
+desired primitive until the goal state is reached\cite{woodruff2017planning}.
+%
+However, the task of ordering the primitives and identifying the distinct
+controllers in each state partition is done
+manually\cite{erdmann1998exploration,woodruff2017planning}, which does not scale
+well to contact-rich systems with numerous modes. 
 %
 An example of such system is multiagent
 manipulation~\cite{ashenafi2021nonholonomic}, which uses a group of robots to
@@ -50,28 +98,32 @@ new modes of the hybrid system.
 A cooperative manipulation with $k$ potential contacts can have up to $2^k$
 contact combinations. 
 %
-It is quite tedious, and in some cases impossible, to parameterize
-the effects of these contact combinations and find individual controllers for
-each mode. Moreover, it is difficult to parameterize the relationship between
-the states and the conditions that trigger the control switch.
+It is quite tedious and inefficient to manually identify and encode a successful
+primitive sequence for various initial states and to find individual controllers
+for each mode. 
 %
-To address this issue, we propose a data-driven framework that
-learns a mixture of expert controllers for contact-rich systems.
-%
-This technique infers the experts and a gating network, which determines the
-control switching scheme based on observed states.
-%
-Moreover, we learn optimal expert controllers by injecting a performance
-objective that characterizes the desired behavior of the resulting closed-loop
-system.
 
+To address this issue, we propose a data-driven approach for constructing
+dynamic motion plans and stabilizing control laws for complex locomotion and
+manipulation tasks that make and break contact.
+%
+Our framework leverages the \textit{mixture of experts} architecture from
+supervised learning to infer multi-modal controllers for contact-rich systems.
+% 
+This approach \textit{automatically} learns the boundaries of the state
+partitions and allocates the appropriate expert controller to each partition in
+order to drive the system to the desired mode, and overall to the goal state.
+%
+We demonstrate the efficacy of this technique on the swing-up task of the
+cartpole enclosed by wall barriers, both in simulation and real-world
+experiments.
 
 The second complication in the control of hybrid systems is that they operate in
 an environment that is not known completely or modeled accurately.
 %
 For instance, a legged robot needs to be robust enough to be able to perform
 satisfactorily on uneven terrain. Similarly, manipulators need to hold a firm
-grip on objects of all textures and shapes.
+grip on objects of all textures.
 %
 There are techniques that combine tools from optimization, probability theory,
 and machine learning to learn control strategies from inaccurate system models

@@ -29,7 +29,7 @@ in each state partition, with the goal of asymptotically stabilizing the origin.
 %
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.7\linewidth]{switching_linear.eps}
+    \includegraphics[width=0.6\linewidth]{switching_linear.eps}
     \subfloat[\label{marginally_stable}Two marginally stable closed-loop systems]{\hspace{0.5\linewidth}}
     \subfloat[\label{stable_switching}Asymptotically stable switching]{\hspace{0.5\linewidth}}
     \caption{Stable switching between two marginally stable systems }
@@ -144,7 +144,7 @@ We pose the search over the parameters of the experts and the gating network as 
         \underset{\psi, \theta}{\textrm{minimize}} 
         & & &\int_0^T \ell (x(t),u) \dd t , \\%
         \textrm{subject to}
-        & & M(q) &\dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0\\%
+        & & M(q) &\dd \dot{q} + h(q, \dot{q})\dd t - \dd R  = 0,\\%
         & & u = \{F_i&(x; \theta_i) \; | \; i  \sim \text{Categorical} (\mathbf{P}(x| \psi)) \}.
     \end{aligned}
     \label{eq:moe_opt}
@@ -183,7 +183,7 @@ We present two viable choices for the performance metric $\ell$.
     $\mathcal{R} \succeq 0$ represents a positive semi-definite matrix.
     %
     This construction encourages trajectories to reach the desired equilibrium
-    with minimum effort and shortest time.
+    with minimum effort and the shortest time.
     %
     We modify the cost function $\mathbb{L}$ presented
     in~\eqref{eq:log_normal_likelihood} to incorporate the quadratic loss
@@ -233,7 +233,7 @@ We present two viable choices for the performance metric $\ell$.
                 \For{$t = 0:\Delta t:T$}     
                 \For{$j=1:N_F$}\Comment{Evaluate performance of each expert}
                     \State $x_j(t+\Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_j(x(t), \theta_j))$\Comment{Algorithm~\eqref{algo:moreau}}
-                    \State $\mathbb{L} \leftarrow \mathbb{L} - \ell(x_j(t+\Delta t), F_j) \; P_j(x(t) | \psi)$
+                    \State $\mathbb{L} \leftarrow \mathbb{L} + \ell(x_j(t+\Delta t), F_j) \; P_j(x(t) | \psi)$
                 \EndFor
                 \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
                 \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$

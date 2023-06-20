@@ -99,7 +99,7 @@ $J$ is minimum.
     the weighting between the likelihood and prior distributions, achieving
     optimal \textit{bias-variance trade-off}. In this scenario, the posterior
     distribution is a multivariate probability distribution over the parameters
-    $\theta$ and $s$. 
+    $(\theta, s)$. 
 \end{rem}
 
 From here, we can use Hamiltonian Monte Carlo or variational inference
@@ -113,7 +113,7 @@ problem.
         \underset{P(\theta | J)}{\textrm{minimize}} 
         & & J(\phi, u^\theta) &= \mathbb{E}_{x_0 \in \mathcal{D}_N}[ \ell( \phi(x_0, u^\theta, T), u^\theta) ]  , \\
         \textrm{subject to}
-        & & \bmat{\dot{q} \\ \dot{p}} &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
+        & & \bmat{\dot{q} \\ \dot{p}} &= \bmat{0 & I_m \\ -I_m & 0}\bmat{\nabla_qH \\ \nabla_pH} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
         & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
         & & p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p), \\
         & & \theta &\sim P(\theta | J).
@@ -182,6 +182,13 @@ problem.
     \end{equation*} 
     We repeat this computation for every state in a trajectory.
     %
+
+    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
+    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
+    %
+    Unlike HMC, we have a closed form probability distribution for the
+    posterior. 
+    %
     \begin{algorithm}[H]
         \centering
         \setstretch{1.5}
@@ -224,12 +231,8 @@ problem.
         \State \textbf{Return} $\Theta$
         \end{algorithmic}
     \end{algorithm}
-
-    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
-    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
     %
-    Unlike HMC, we have a closed form probability distribution for the
-    posterior. We draw several samples from the current posterior and evaluate
+    We draw several samples from the current posterior and evaluate
     its performance through the joint distribution $P(\theta, J)$. Given the
     likelihood and the prior distributions, variational inference constructs the
     \textsc{Elbo} as
@@ -326,7 +329,7 @@ corresponding likelihood functions and the desired behavior they impose.
     %
     \begin{figure}
         \centering
-        \includegraphics[width=0.6\linewidth]{transverseCoordinates.eps}
+        \includegraphics[width=0.5\linewidth]{transverseCoordinates.eps}
         \caption{Transverse Coordinates}
         \label{fig:transverse}
     \end{figure}
@@ -430,9 +433,9 @@ The resulting Bayesian \textsc{NeuralPbc} problem is given by
 \begin{equation}
     \begin{aligned}
         \underset{P(\theta | J)}{\textrm{minimize}} 
-        & & & J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N}[\ell(\phi(x_0, u^\theta, T), u^\theta) ]  , \\
+        & & J(\phi, u^\theta) &= \mathbb{E}_{x_0 \in \mathcal{D}_N}[\ell(\phi(x_0, u^\theta, T), u^\theta) ]  , \\
         \textrm{subject to}
-        & & \dd x &= \left(\bmat{\phantom{-}\nabla_p H \\-\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}(x) \right) \dd t + \nabla_x u(x) \dd W_t, \\
+        & & \dd x = \Biggl(\bmat{\phantom{-}\nabla_p H \\-\nabla_q H} &+ \bmat{0 \\ \Omega(q)}u^{\theta}(x) \Biggr) \dd t + \nabla_x u(x) \dd W_t, \\
         & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H), \\
         & & p_s &\sim \mathcal{N}(\hat{p}_s, \sigma_p), \\
         & & \theta &\sim P(\theta | J).
@@ -484,36 +487,6 @@ well, i.e.,~\cite{van2007introduction}
 %
 \noindent where $x^-$ and $x^+$ are connected with the jump rule.
 %
-% Hence, the discrete transitions undergoing elastic or inelastic collisions are
-% jump-passive.
-% %
-% For instance, in the case of well-defined contact, the post-impact
-% Hamiltonian is given by
-% \begin{align*}
-%     H(x^+) = \epsilon^2 H(x^-),
-% \end{align*}
-% \noindent where $\epsilon$ is the coefficient of restitution, and it takes
-% values between 0 and 1.
-% %
-% This demonstrates that it is possible to find a single Hamiltonian $H_d$ that renders 
-% the closed-loop hybrid system flow- and jump-passive.
-% %
-% Thus, we translate the passivity-based control framework in
-% Section~\ref{ssec:pbc_smooth_dynamics} to hybrid systems.
-% %
-% We aim to find the desired Hamiltonian $H_d$, whose stable equilibrium is at
-% $x^*$.
-%
-% We explore hybrid systems such as walking robots, whose equilibrium state is
-% given by a periodic orbit as opposed to a point.
-% %
-% In such scenarios, we use the Poincar{\'e} maps defined as follows.
-% %
-% We take a point on the orbit and intersect a surface through that point such
-% that the surface is transversal to the orbit~\cite{underactuated}.
-% %
-% The equilibrium state $x^*$ is measured with respect to the origin projected
-% onto the surface. 
 
 In this section, we extend the techniques of deterministic and Bayesian
 \textsc{NeuralPbc} to hybrid dynamical systems.

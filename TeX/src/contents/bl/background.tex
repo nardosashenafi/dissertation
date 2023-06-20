@@ -33,7 +33,7 @@ where $p \in \mathbb{R}^m$ is the generalized momenta, and $V(q)$ represents the
 potential energy. Hamilton's equations of motion are given by
 \begin{align}
     \begin{split}  
-      f(x, u) &= \bmat{\nabla_pH \\ -\nabla_qH}\ + \bmat{0 \\ \Omega(q)}u, \\
+      f(x, u) &= \bmat{0 & I_m \\ -I_m & 0}\bmat{\nabla_qH \\ \nabla_pH} + \bmat{0 \\ \Omega(q)}u, \\
       &\hspace{-0.15cm} y = \Omega(q)^\top \dot{q},
     \end{split}
     \label{eq:hamiltonian_dynamics}
@@ -74,21 +74,22 @@ The objective of passivity-based control (PBC) is to design a control law $u$
 that imposes the desired storage function $H_d$ on the closed-loop system,
 rendering it passive and therefore stable~\cite{van2000l2}.
 %
-The dynamics of the closed-loop system with the desired storage function $H_d$ can be given as
+The dynamics of the closed-loop system with the desired storage function $H_d$
+and a new desired stable equilibrium at $x^*$ can be given as
 \begin{align}
   \begin{split}  
-    \bmat{\dot{q} \\ \dot{p}} &= \bmat{\nabla_pH_d \\ -\nabla_qH_d}, \\
+    \bmat{\dot{q} \\ \dot{p}} &= \bmat{0 & I_m \\ -I_m & 0}\bmat{\nabla_qH_d \\ \nabla_pH_d} + \bmat{0 \\ \Omega(q)} u_{di}, \\
   \end{split}
   \label{eq:desired_hamiltonian_dynamics}
 \end{align}
-\noindent and it has a new desired stable equilibrium at $x^*$.
+\noindent where $u_{di}$ is the damping control.
 %
 From~\eqref{eq:hamiltonian_dynamics}
 and~\eqref{eq:desired_hamiltonian_dynamics}, we can find the energy shaping
 control that results in a passive closed-loop system as
 %
 \begin{equation}
-  u_{es}(x) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right).
+  u_{es}(x) =  -\Omega^{\dagger} \left( \nabla_q H_d - \nabla_q H \right),
   \label{eq:esc}
 \end{equation}
 \noindent where $\Omega^\dagger = \left( \Omega^\top \Omega  \right)^{-1}
@@ -138,7 +139,7 @@ optimization scheme:
       \underset{\theta}{\textrm{minimize}} 
       & & & \ell \left(\phi,u^{\theta} \right) , \\%
       \textrm{subject to}
-      & & f(x, u) &= \bmat{\phantom{-}\nabla_p H \\ -\nabla_q H} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
+      & & f(x, u) &= \bmat{0 & I_m \\ -I_m & 0}\bmat{\nabla_qH \\ \nabla_pH} + \bmat{0 \\ \Omega(q)}u^{\theta}, \\%
       & & u^{\theta} &= -\Omega^{\dagger} (\nabla_q H_d^{\theta} - \nabla_q H^{\theta}),%
       % & \quad x(0) &= x_0 \in \mathcal{X}, \\%
   \end{aligned}
@@ -186,7 +187,7 @@ and~\eqref{eq:pch} equal to each other to find the energy-shaping and the dampin
 \begin{align}
   \begin{split}
   u_{es} &= \Omega^{\dagger} \left(\nabla_qH - M_dM^{-1} \nabla_qH_d + J_2M_d^{-1}p\right), \\
-  u_{di} &= -K_v \Omega^\top \nabla_p H_d,
+  u_{di} &= -K_v \Omega^\top \nabla_p H_d.
   \end{split}
   \label{eq:idapbc_ues}
 \end{align}
@@ -223,7 +224,7 @@ following optimization problem.
   \end{aligned}    
   \label{eq:idapbc_finite_optim}%
 \end{equation}
-where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
+\noindent where $V^\theta_d$ and the entries of the $M^\theta_d$ and $J^\theta_2$ matrices
 are parameterized by neural networks. 
 %
 To enforce the constraints shown in~\eqref{eq:idapbc_finite_optim}, we redefine

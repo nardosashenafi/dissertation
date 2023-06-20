@@ -22,30 +22,23 @@ We aim to learn the parameters $\psi$ of the gating network $\mathbf{P}(x|
 converges to the desired equilibrium $x^* = (0, 0)$.
 %
 The gating network is a fully-connected neural net with one hidden layer (2 input states 
-$\rightarrow$ 6 neurons $\rightarrow$ 4 outputs) and an \textsc{Elu} activation
+$\rightarrow$ 6 hidden neurons $\rightarrow$ 4 outputs) and an \textsc{Elu} activation
 function\cite{clevert2015fast}.
 %
-We constrain the maximum number of state partitions to $4$.
+We constrain the maximum number of state partitions to $N_F=4$.
 %
 Each state partition has a corresponding controller parameter $\theta_i \in
 \mathbb{R}$. 
 %
-\begin{figure}[tb]
-    \centering
-    \includegraphics[width=0.8\linewidth]{switching_results.eps}
-    \subfloat[\label{final_switching_control}Control input]{\hspace{0.5\linewidth}} 
-    \subfloat[\label{final_state_partition}State Partition]{\hspace{0.5\linewidth}}
-    \caption{Final stable switching system}
-    \label{fig:final_switching}
-\end{figure}
 
 The response of the learned switching system is shown in
 Figure~\ref{fig:final_switching}.
 %
-Figure~\ref{final_switching_control} shows the single best expert in each state
-partition, where purple corresponds to $F_i=0$ or $\dot{x} = A_1x$ and yellow
-corresponds to $F_i=1$ or $\dot{x} = A_2x$. The sample trajectory starts at $x_0=[-5,
--5]$ and successfully converges to the origin shown by the red star.
+Figure~\ref{final_switching_control} shows the single best expert $F_a$
+given by~\eqref{eq:best_expert_prediction} in each state partition, where purple
+corresponds to $F_a=0$ or $\dot{x} = A_1x$ and yellow corresponds to $F_a=1$ or
+$\dot{x} = A_2x$. The sample trajectory starts at $x_0=[-5, -5]$ and
+successfully converges to the origin shown by the red star.
 %
 The state partition index of the single best expert is shown in
 Figure~\ref{final_state_partition}, and it depicts that the training uses only 3
@@ -62,7 +55,18 @@ by\cite{liberzon2003switching}
 \end{equation*}
 \noindent where $x=[x_1, x_2]$.
 %
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{switching_results.eps}
+    \subfloat[\label{final_switching_control}]{\hspace{0.49\linewidth}} \subfloat[\label{final_state_partition}]{\hspace{0.35\linewidth}}
+    \caption{Final stable switching system: (a) The single best expert $F_a$ in
+    each state partition, where purple corresponds to $F_a=0$ or $\dot{x} =
+    A_1x$ and yellow corresponds to $F_a=1$ or $\dot{x} = A_2x$, (b) State
+    partition index of the single best expert}
+    \label{fig:final_switching}
+\end{figure}
 
+%
 The training progress is shown in Figure~\ref{fig:switching_training}.
 %
 The three rows in the figure depict the performance of the training after 0, 200
@@ -81,15 +85,7 @@ after 2000 parameter updates (Figure~\ref{fig:final_switching}).
 This is thanks to the explorative state sampling technique, which samples states
 close to the desired equilibrium, assisting the training in finding the distinct
 boundaries of each partition at the origin. 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\linewidth]{switching_training.eps}
-    \subfloat[\label{training_progress_control}Control input]{\hspace{0.5\linewidth}}
-    \subfloat[\label{training_progress_partition}State partition]{\hspace{0.5\linewidth}}
-    \caption{Training progress. The final solution is shown in
-    Figure~\ref{fig:final_switching}}
-    \label{fig:switching_training}
-\end{figure}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,6 +109,15 @@ simulation and real-world experiments.
 %
 Lastly, we compare the performance of the MoE controller against
 a single swing-up controller. 
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.65\linewidth]{switching_training.eps}
+    \subfloat[\label{training_progress_control}Single best expert]{\hspace{0.4\linewidth}}
+    \subfloat[\label{training_progress_partition}State partition index]{\hspace{0.3\linewidth}}
+    \caption{Training progress. The final solution is shown in
+    Figure~\ref{fig:final_switching}}
+    \label{fig:switching_training}
+\end{figure}
 
 \subsubsection{System Model}
 \label{sssec:cartpole_model}
@@ -285,12 +290,12 @@ depict the boundaries of the state partitions.
 Although the gating network can provide up to three state partitions,
 the training converges to utilizing only two.
 %
-\begin{figure}[H]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.5\linewidth]{moe_traj_red_boundaries.eps}
     \caption{A sample trajectory starting from
     downward equilibrium at rest. The blue contours represent the level sets of
-    the control input at the pre-impact and post-impact states.}
+    the control input at the pre-impact and post-impact states}
     \label{fig:cartpole_trajectory}
 \end{figure}
 %

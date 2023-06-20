@@ -376,7 +376,7 @@ Table~\ref{tab:modified_params}.
 %
 % The parameter error listed on the last column of Table~\ref{tab:modified_params}
 % is computed by $\|p - p_{\textrm{nom}}\| / \|p_{\textrm{nom}}\|$.
-\begin{table}[H]
+\begin{table}[b]
     \centering
     \caption{System parameters used in real-world experiments. The errors in the
     last column are $\|p_s - \hat{p}_s\| / \|\hat{p}_s\|$}.
@@ -630,7 +630,7 @@ stumbles backwards.
     \centering
     \includegraphics[width=.47\linewidth]{rw_deter_level.eps}\hfill
     \includegraphics[width=.47\linewidth]{torso_state.eps}
-    \subfloat[\label{fig:deter_rw_trajectory}Hip horizontal speed]{\hspace{0.5\textwidth}}
+    \subfloat[\label{fig:deter_rw_trajectory}Horizontal hip speed]{\hspace{0.5\textwidth}}
     \subfloat[\label{fig:deter_rw_torso_orientation}Torso state]{\hspace{0.5\textwidth}}
     \caption{Performance of the deterministic \textsc{NeuralPBC} controller on a level ground in simulation}
     \label{fig:deter_rw_level}
@@ -676,7 +676,7 @@ counterpart for all values of $p_{\text{max}}$.
     \end{minipage}
 \end{figure}
 
-\subsection{Real-World Experiments}
+\subsubsection{Real-World Experiments}
 
 %
 We test the performance of both controllers on the hardware shown in
