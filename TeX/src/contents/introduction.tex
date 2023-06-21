@@ -25,12 +25,13 @@ impacts the ground, causing a discrete state transition.
 %
 Each one of these modes and their guard have a distinct dynamic behavior
 governed by unique equations of motion, which can be written in a compact manner
-as\cite{goebel2009hybrid}
+as~\cite{goebel2009hybrid}
 \begin{equation}
-    \begin{cases}
-        \dot{x} \in f(x, u), & x \in C,\\
-        x^+ \in g(x, u), & x \in D,
-    \end{cases}
+    \left\{
+    \begin{array}{@{}c@{}}
+        \smash[t]{\dot{x} \in f(x, u), \; x \in C,} \\
+        \smash[b]{x^+ \in g(x, u), \; x \in D,}
+    \end{array}\right.
     \label{eq:cont_and_guards}
 \end{equation}
 \noindent where $x \in \mathbb{R}^m$ is the state vector, and $u \in
@@ -44,6 +45,18 @@ rules, respectively.
 %
 The notation $x^+$ indicates the state resulted by the jump rule $g$.
 
+
+%
+Controlling such multi-modal systems presents two main complications. 
+%
+First, it may be impossible to find a single policy that can achieve the desired
+performance in all modes of the hybrid system.
+%
+A typical approach is splitting tasks into \textit{manipulation
+primitives}~\cite{nonprehensile_survey,rodyman,lynch2003control}, such as
+sliding, jumping, and toppling, where each primitive has a corresponding
+dynamics and is assigned its own controller. 
+%
 \begin{wrapfigure}{r}{0.42\textwidth}
     \vspace{-9mm}
      \begin{center}
@@ -56,36 +69,26 @@ The notation $x^+$ indicates the state resulted by the jump rule $g$.
      \vspace{-5mm}
 \end{wrapfigure}
 %
-Controlling such multi-modal systems presents two main complications. 
-%
-First, it may be impossible to find a single policy that can achieve the desired
-performance in all modes of the hybrid system.
-%
-A typical approach is splitting tasks into \textit{manipulation
-primitives}\cite{nonprehensile_survey,rodyman,lynch2003control}, such as
-sliding, jumping, and toppling, where each primitive has a corresponding
-dynamics and is assigned its own controller. 
-%
 Consider the task of moving a box past an obstacle using a series of primitives
 such as sliding, toppling and reorienting as shown in
 Figure~\ref{fig:primitives}.
 %
 Each primitive has a region of applicability in the state space, where the
 dynamics of that primitive describes the flow of the
-system\cite{lynch1999dynamic}.
+system~\cite{lynch1999dynamic}.
 %
 Thus, manipulation planning involves identifying a successful primitive
 sequence, such as the order of primitives shown in Figure~\ref{fig:primitives},
 and stabilizing the system under each
-primitive\cite{erdmann1998exploration,yashima2003randomized}.  
+primitive~\cite{erdmann1998exploration,yashima2003randomized}.  
 %
 This approach can be viewed as partitioning the state space and allocating a
 control law in each subdomain that results in a successful transition to the
-desired primitive until the goal state is reached\cite{woodruff2017planning}.
+desired primitive until the goal state is reached~\cite{woodruff2017planning}.
 %
 However, the task of ordering the primitives and identifying the distinct
 controllers in each state partition is done
-manually\cite{erdmann1998exploration,woodruff2017planning}, which does not scale
+manually~\cite{erdmann1998exploration,woodruff2017planning}, which does not scale
 well to contact-rich systems with numerous modes. 
 %
 An example of such system is multiagent

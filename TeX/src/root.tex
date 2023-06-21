@@ -5,7 +5,7 @@
 
 % if you don't want two-sided printing, erase the twoside option
 % from the following line:
-\documentclass[12pt]{report}
+\documentclass[12pt,twoside]{report}
 
 % custom file for BSU style by KvW, 2006:
 \usepackage{BSUthesis}
@@ -20,10 +20,10 @@
 
 % For abbreviations
 \makeglossaries
-\loadglsentries{contents/abbreviations}
+% \loadglsentries{contents/abbreviations}
 % For symbols and nomenclature 
-\makenomenclature
-\input{contents/nomenclature}
+% \makenomenclature
+% \input{contents/nomenclature}
 
 \begin{document}
 
@@ -43,24 +43,28 @@
 \committeeMemberA{John Chiasson}{Ph.D.}
 \committeeMemberB{Kurtis Cantley}{Ph.D.}
 \committeeMemberC{Hao Chen}{Ph.D.}
-% \committeeMemberD{Arash Komaee}{Ph.D.}
+\committeeMemberD{Arash Komaee}{Ph.D.}
 %------------------------------------------------------------------------------
 \dean{Scott Lowe}{Dean of the Graduate College}
 %------------------------------------------------------------------------------
 % insert month and year of your thesis, only:
-\date{May 2023}
+\date{June 2023}
 \oralexamdate{1 May 2023}
 %------------------------------------------------------------------------------
 % optional external member: 
-% \extmember{Dr. Jane Doe}{Doctor of Experimental Philosophy}{University of Chicago}
+% \extmember{Arash Komaee}{Ph.D.}{Southern Illinois University}
 %------------------------------------------------------------------------------
 \maketitle
 %------------------------------------------------------------------------------
 \makecopyright
 %------------------------------------------------------------------------------
-% \submittalsheet
+\submittalsheet
 %------------------------------------------------------------------------------
 \setcounter{page}{4}
+%------------------------------------------------------------------------------
+\input contents/dedication
+%------------------------------------------------------------------------------
+\input contents/acknowledgments
 %------------------------------------------------------------------------------
 \input contents/abstract
 %------------------------------------------------------------------------------
@@ -91,6 +95,7 @@
 %------------------------------------------------------------------------------
 % start of main text (reset pagenumbers, etc.):
 %------------------------------------------------------------------------------
+\cleardoublepage
 \begintext
 
 
@@ -120,8 +125,6 @@
 
 %------------------------------------------------------------------------------
 % \cleardoublepage
-\addcontentsline{toc}{chapter}{Appendices}
-\appendix
 \input contents/appendix
 %------------------------------------------------------------------------------
 \end{document}

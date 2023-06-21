@@ -72,13 +72,14 @@ Section~\ref{ssec:pbc}.
 
 With the trajectories generated from the prior distribution samples, we compose
 a performance objective as follows.
-\begin{align*}
+\begin{align}
     J(\phi, u^\theta) = \mathbb{E}_{x_0 \in \mathcal{D}_N} [ \ell( \phi(x_0, u^\theta, T), u^\theta) ], 
-\end{align*}
+    \label{eq:expectation_running_cost}
+\end{align}
 \noindent where $\mathcal{D}_N$ is a collection of initial states sampled with
 explorative and greedy state sampling techniques
-(Section~\ref{ssec:state_sampling}), and $\ell$ is the running cost of the
-trajectories. We provide three options for the running cost in the upcoming
+(Section~\ref{ssec:state_sampling}), and $\ell(\phi, u)$ is the running cost of
+a trajectory. We provide three options for the running cost in the upcoming
 section titled \textit{Performance Objective}.
 %
 In order to update the posterior distribution based on the performance of the
@@ -123,7 +124,7 @@ problem.
 We expand on the use of HMC and variational inference to solve the optimization
 problem.
 %
-\begin{enumerate}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
     \item \textbf{Hamiltonian Monte Carlo (HMC)}: represents the posterior with
     a large collection of samples denoted by $\Theta$.
     %
@@ -167,27 +168,11 @@ problem.
     We keep collecting these samples until the average accumulated loss
     converges to the minimum achievable value. 
 
-    Once we obtain the collection samples, we use them to evaluate the
+    Once we obtain the collected samples, we use them to evaluate the
     controller as follows.
     %
     From the collection $\Theta$, we sample $N_{\theta}$ parameters in a uniform
     fashion.
-    %
-    We evaluate the neural net $H^\theta_d$ and the corresponding energy shaping
-    and damping control for each sample.
-    %
-    Then, we marginalize over the control law as 
-    \begin{equation*}
-        u(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
-    \end{equation*} 
-    We repeat this computation for every state in a trajectory.
-    %
-
-    \item \textbf{Variation Inference (VI)}: intends to learn the distribution
-    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
-    %
-    Unlike HMC, we have a closed form probability distribution for the
-    posterior. 
     %
     \begin{algorithm}[H]
         \centering
@@ -232,10 +217,27 @@ problem.
         \end{algorithmic}
     \end{algorithm}
     %
+    \noindent We evaluate the neural net $H^\theta_d$ and the corresponding
+    energy shaping control for each sample.
+    %
+    Then, we marginalize over the control law as 
+    \begin{equation*}
+        u(x) = \frac{1}{N_{\theta}} \sum_{\theta \sim P(\theta | J)} u(x; \theta).
+    \end{equation*} 
+    % We repeat this computation for every state in a trajectory.
+    %
+
+    \item \textbf{Variational Inference (VI)}: provides the distribution
+    parameters $z$ of the pre-selected (approximate) posterior $Q(\theta; z)$.
+    %
+    Unlike HMC, we have a closed form probability distribution for the
+    posterior. 
+    %
     We draw several samples from the current posterior and evaluate
-    its performance through the joint distribution $P(\theta, J)$. Given the
-    likelihood and the prior distributions, variational inference constructs the
-    \textsc{Elbo} as
+    its performance through the joint distribution $P(\theta, J)$. 
+    %
+    Given the likelihood and the prior distributions, variational inference
+    constructs the \textsc{Elbo} as
     \begin{align}
         \mathcal{L}(J,z) = \mathbb{E}_{\theta \sim Q} \left[\log(P(J | \theta)P(\theta)) - \log(Q(\theta;z)) \right].    
         \label{eq:neuralpbc_elbo}    
@@ -248,18 +250,20 @@ problem.
     The full variational inference training process is shown in
     Algorithm~\eqref{algo:vi}.
     
-    The gradient ${\partial \mathcal{L}}/{\partial z}$ holds a rather complex form for two reasons.
-    First, the \textsc{Elbo} is evaluated from trajectories integrated from the differential equations in~\eqref{eq:hamiltonian_dynamics}.
-    We use a combination of adjoint method and auto-differentiation techniques~\cite{chen2018neural} to compute the
+    The gradient ${\partial \mathcal{L}}/{\partial z}$ holds a rather complex
+    form for two reasons. First, the \textsc{Elbo} is evaluated from
+    trajectories integrated from the differential equations
+    in~\eqref{eq:hamiltonian_dynamics}. We use a combination of adjoint method
+    and auto-differentiation techniques~\cite{chen2018neural} to compute the
     gradient ${\partial \mathcal{L}}/{\partial z}$ through the trajectories.
     %
-    Secondly, computing ${\partial \mathcal{L}}/{\partial z}$ requires the derivative
-    of the sample $\theta$ with respect to the distribution parameters $z$, which is
-    intractable. We handle this complication by invoking the reparameterization
-    trick of the Automatic Differentiation Variational
-    Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic}.
-
-    \begin{algorithm}
+    Secondly, computing ${\partial \mathcal{L}}/{\partial z}$ requires the
+    derivative of the sample $\theta$ with respect to the distribution
+    parameters $z$, which is intractable. We handle this complication by
+    invoking the reparameterization trick of the Automatic Differentiation
+    Variational Inference(\textsc{ADVI})~\cite{kucukelbir2015automatic}.
+    %
+    \begin{algorithm}[tb]
         \setstretch{1.2}
         \caption{Bayesian \textsc{NeuralPbc} via variational inference}
         \label{algo:vi}
@@ -297,20 +301,32 @@ The cost function $J$ helps impose various desired behaviors in the learned
 controller. In this section, we present three performance objectives, their
 corresponding likelihood functions and the desired behavior they impose.
 
-\begin{enumerate}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
     \item \textbf{Trajectory tracking}: Let $x^\star$ denote the desired equilibrium of a
     dynamical system and $\phi(x_0, u^\theta, T)$ represent a
     prediction from the initial condition $x_0$ with the current control law
-    $u^\theta$. The objective of this task is to find a closed-loop controller
+    $u^\theta$. 
+    %
+    \begin{figure}[tb]
+        \centering
+        \includegraphics[width=0.5\linewidth]{transverseCoordinates.eps}
+        \caption{Transverse Coordinates}
+        \label{fig:transverse}
+    \end{figure}
+    %
+    The objective of this task is to find a closed-loop controller
     that can track an expert trajectory $\phi^\star$ obtained from a path
-    planner. To impose this behavior, the running cost is a function of the
+    planner. 
+    %
+    To impose this behavior, the running cost is a function of the
     distance from the current trajectory $\phi$ to $\phi^\star$, defined in
     terms of the transverse coordinates $\phi_\bot-\phi^\star_\bot$ along
     the preferred orbit (shown in Figure~\ref{fig:transverse}), using the ideas outlined
     in~\cite{shiriaev2009transverse,manchester2010transverse}. In this setting,
     the prediction converges to $\phi^\star$ if and only if
-    $\phi_\bot-\phi^\star_\bot \xrightarrow{t \to \infty}{} 0$. In order to
-    encourage this behavior, we define the cost function as
+    $\phi_\bot-\phi^\star_\bot \xrightarrow{t \to \infty}{} 0$. 
+    %
+    In order to encourage this behavior, we define the cost function as
     %
     \begin{equation}
         % J_{\textrm{MSE}} =  \frac{1}{N} \sum_{n=0}^N \Big( \norm{x(t_n) - \hat{x}(t_n)}{} + \norm{u(t_n) - \hat{u}(t_n)}{} \Big)
@@ -326,24 +342,8 @@ corresponding likelihood functions and the desired behavior they impose.
         P(J_{track} | \theta) = \prod_{x_\bot \in \phi_\bot, \; x^\star_\bot \in \phi^\star_\bot}\mathcal{N}(\norm{x_\bot - x^\star_\bot}{} \; | \; 0 , s),
         \label{eq:track_likelihood}
     \end{align}
+    
     %
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.5\linewidth]{transverseCoordinates.eps}
-        \caption{Transverse Coordinates}
-        \label{fig:transverse}
-    \end{figure}
-    % where $\Sigma$ parameterizes the variance of the likelihood. On top of the
-    % decision parameters $\theta$, we wish to learn the posterior over the
-    % variance $\Sigma$ of the likelihood. This allows us to adaptively tune the
-    % weights on the components of $x_\bot-x^\star_\bot$ on the overall cost, such
-    % that we achieve optimum trajectory tracking. This is most advantageous when
-    % the states of a system have high variance and the weights on
-    % $x_\bot-x^\star_\bot$ need to be selected in such a way that one state does
-    % not dominate the cost $J_{track}$.
-    % Hence, the posterior distribution $p(\theta | \mathcal{D})$ is a multivariate
-    % probability distribution over random variable $\xi$, where $\xi = [\theta,
-    % \Sigma]$.
     \item \textbf{Set distance loss}: Let $\mathcal{S}$ represent a small convex
     neighborhood containing $x^\star$. The objective is to find a policy that
     pulls trajectories to the goal set $\mathcal{S}$. The cost function suitable
@@ -631,13 +631,6 @@ The magnitude of the samples $p_s$ determine the elevation of the terrain under
 each spoke, which consequently randomize the gap $g_N$, pre-impact velocities
 $\dot{q}^{-}$ and contact forces between each spoke and the ground.
 
-We solve the optimization problem in~\eqref{eq:bayesian_hybrid_neuralpbc} with
-the procedure outlined in Algorithm~\eqref{algo:bayes_neuralpbc}. 
-%
-We follow the initial state sampling techniques and the performance objectives
-discussed in detail in Section~\ref{ssec:pbc_smooth_dynamics}. In particular, we
-use variational inference to learn the distribution parameters of the
-pre-selected posterior $Q(\theta;z)$.
 
 \begin{algorithm}
     \setstretch{1.2}
@@ -667,3 +660,12 @@ pre-selected posterior $Q(\theta;z)$.
         \State \textbf{return} $z$
     \end{algorithmic}
 \end{algorithm}
+%
+We solve the optimization problem in~\eqref{eq:bayesian_hybrid_neuralpbc} with
+the procedure outlined in Algorithm~\eqref{algo:bayes_neuralpbc}. 
+%
+We follow the initial state sampling techniques and the performance objectives
+discussed in detail in Sections~\ref{ssec:state_sampling}
+and~\ref{ssec:pbc_smooth_dynamics}, respectively. In particular, we use
+variational inference to learn the distribution parameters of the pre-selected
+posterior $Q(\theta;z)$.

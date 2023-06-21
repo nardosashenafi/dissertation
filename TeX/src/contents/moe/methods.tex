@@ -21,7 +21,7 @@ Figure~\ref{marginally_stable}.
 Although the individual systems are not asymptotically stable, it is possible to
 find a state-dependent switching rule that makes the resulting switched system
 asymptotically stable, as shown in
-Figure~\ref{stable_switching}\cite{liberzon2003switching}. 
+Figure~\ref{stable_switching}~\cite{liberzon2003switching}. 
 %
 We aim to learn a gating network $\mathbf{P}(x|\psi)$ to automatically divide
 the state space into partitions and identify which of the two systems to execute
@@ -66,7 +66,7 @@ execute in each partition.
 %
 In order to ensure that the parameter $\theta_i$ of the expert serves as the
 probability of the Bernoulli distribution, we use the \textsc{Sigmoid}
-function\cite{sharma2017activation} to limit $\theta_i$ between 0 and 1.
+function~\cite{sharma2017activation} to limit $\theta_i$ between 0 and 1.
 %
 The next state $x(t+\Delta t)$ in the trajectory is obtained from the following
 integration scheme:
@@ -167,7 +167,7 @@ optimization problem~\eqref{eq:moe_opt} via stochastic gradient descent.
 \label{ssec:performance_objective}
 %
 We present two viable choices for the performance metric $\ell$. 
-\begin{enumerate}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
     \item \textbf{Accumulated cost}: is the total quadratic loss between the
     desired state $x^*$ and the states generated under the current control law.
     We can also enforce control saturations for underactuated systems by incurring a
@@ -202,25 +202,6 @@ We present two viable choices for the performance metric $\ell$.
     achieved by expert $i$ is low and the responsibility $P_i(x(t) | \psi)$ of
     the expert is high.
     %
-
-    %
-    Algorithm~\eqref{algo:accumulated_loss} outlines how we construct the
-    cost function from a trajectory.
-    %
-    In this procedure we check the performance of each expert at every
-    integration step.
-    %
-    To do so, starting at initial state $x_0$, we integrate the dynamics
-    in~\eqref{eq:hybrid_dynamics} for one time step $\Delta t$ using all the
-    experts in $F(x_0;\theta)$.
-    %
-    We retrieve all the states $\{ x_i(\Delta t) , i \in \{1, \dots N_F \}\}$
-    obtained from the integration and evaluate the running cost $\ell(x_i(\Delta
-    t), F_i)$ incurred by each expert.
-    %
-    Each performance metric $\ell(x_i(\Delta t), F_i)$ is weighed by its
-    \textit{responsibility} $P_i(x_0 | \psi)$ and summed across experts to get
-    the cost function.
     \begin{algorithm}[tb]
         \setstretch{1.2}
         \caption{Accumulated Cost}
@@ -241,6 +222,25 @@ We present two viable choices for the performance metric $\ell$.
             \State \textbf{return} $\mathbb{L}$
         \end{algorithmic}
     \end{algorithm}
+
+    %
+    Algorithm~\eqref{algo:accumulated_loss} outlines how we construct the
+    cost function from a trajectory.
+    %
+    In this procedure we check the performance of each expert at every
+    integration step.
+    %
+    To do so, starting at initial state $x_0$, we integrate the dynamics
+    in~\eqref{eq:hybrid_dynamics} for one time step $\Delta t$ using all the
+    experts in $F(x_0;\theta)$.
+    %
+    We retrieve all the states $\{ x_i(\Delta t) , i \in \{1, \dots N_F \}\}$
+    obtained from the integration and evaluate the running cost $\ell(x_i(\Delta
+    t), F_i)$ incurred by each expert.
+    %
+    Each performance metric $\ell(x_i(\Delta t), F_i)$ is weighed by its
+    \textit{responsibility} $P_i(x_0 | \psi)$ and summed across experts to get
+    the cost function.
     %
     By checking the performance of each expert for every state, the computation
     of the cost function is prone to the curse of dimensionality.
@@ -288,6 +288,26 @@ We present two viable choices for the performance metric $\ell$.
     In such cases, a successful cost function encourages trajectories that
     \textit{eventually} lead to the goal state.
     %
+    \begin{algorithm}[b]
+        \setstretch{1.2}
+        \caption{Minimum Trajectory Loss}
+        \label{algo:mtl}
+        \small
+        \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
+        \begin{algorithmic}[1]
+            % \algrenewcommand\algorithmicindent{0em} % No indent
+            \State $\phi \leftarrow \{ x_0 \}$
+                \For{$t = 0:\Delta t:T$}     
+                    \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
+                    \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$\Comment{Algorithm~\eqref{algo:moreau}}
+                    \State $\phi \leftarrow \phi \cup x(t+\Delta t)$
+                \EndFor
+                \State $t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi\}$
+                \State $\mathbb{L} = - \ell(x(t_{min}), u) \sum_{t=0}^{t_{min}}P_i(x(t) | \psi)  $
+            \State \textbf{return} $\mathbb{L}$
+        \end{algorithmic}
+    \end{algorithm}
+    %
     This is achieved by MTL, which is composed of the lowest cost incurred
     across the entire trajectory and the responsibilities of the experts that
     led to the minimum cost.
@@ -308,25 +328,7 @@ We present two viable choices for the performance metric $\ell$.
     short time trajectories, but it equally rewards two trajectories
     as long as they both reach the goal state within the time horizon $T$. 
     %
-    \begin{algorithm}[tb]
-        \setstretch{1.2}
-        \caption{Minimum Trajectory Loss}
-        \label{algo:mtl}
-        \small
-        \hspace*{\algorithmicindent} \textbf{Input}: $x_0, \theta, \psi$
-        \begin{algorithmic}[1]
-            % \algrenewcommand\algorithmicindent{0em} % No indent
-            \State $\phi \leftarrow \{ x_0 \}$
-                \For{$t = 0:\Delta t:T$}     
-                    \State $i \sim \text{Categorical}\Bigl(\mathbf{P}(x(t)| \psi)\Bigr)$ \Comment{Sample a bin number}
-                    \State $x(t + \Delta t) \leftarrow \texttt{Moreau's one time step}(x(t), F_i(x(t), \theta_i))$\Comment{Algorithm~\eqref{algo:moreau}}
-                    \State $\phi \leftarrow \phi \cup x(t+\Delta t)$
-                \EndFor
-                \State $t_{min} = \underset{t}{\textrm{inf}} \; \{ \ell(x(t), u): x(t) \in \phi\}$
-                \State $\mathbb{L} = - \ell(x(t_{min}), u) \sum_{t=0}^{t_{min}}P_i(x(t) | \psi)  $
-            \State \textbf{return} $\mathbb{L}$
-        \end{algorithmic}
-    \end{algorithm}
+
 \end{enumerate}
 
 \subsection{State Sampling}
